@@ -18,6 +18,8 @@ The following practices will be taken into account for AOSC OS Core development:
 ## Packages
 AOSC OS Core will include the following packages:
 
+### Essential sector
+
 * linux+api, "Linux API Headers for glibc"
 * zlib, "A Massively Spiffy Yet Delicately Unobtrusive Compression Library"
 * glibc, "GNU C Library"
@@ -25,12 +27,17 @@ AOSC OS Core will include the following packages:
 * gmp, "GNU Multiprecision library"
 * mpfr, "Functions for multiple precision math“
 * mpc, "A library for the arithmetic of complex numbers"
-* gcc, "GNU Compiler Collection"
+* gcc, "GNU Compiler Collection", (languages: c, c++, fortran, lto)
 * binutils, "a set of programs to assemble and manipulate binary and object files"
 * gdbm, "GNU Database Manager library"
 * db, "Berkeley DB embedded database system"
 * perl, "a highly capable and feature rich programming language"
 * libffi, "portable foreign function interface library"
+
+(total of 13 packages)
+
+### Optional/Enhanced sector
+
 * bzip2, "a freely available, patent free, high-quality data compressor"
 * openssl, "the Open Source toolkit for Secure Sockets Layer and Transport Layer Security"
 * ca-certs, "Certificate Authority Certificates"
@@ -42,7 +49,7 @@ AOSC OS Core will include the following packages:
 * libedit, "command line editor library providing generic line editing, history and tokenization functions"
 * llvm, "Low Level Virtual Machine Infrastructure"
 
-(total of 23 packages)
+(total of 10 packages)
 
 ## Building (theoretical)
 A copy of BuildKit is recommended (instructions will be added when BuildKit is ready), BuildKit contains all packages for AOSC OS Core building (Autobuild3 and a script of AOCS OS Core automatic build).
