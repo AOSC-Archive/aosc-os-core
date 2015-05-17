@@ -33,8 +33,11 @@ AOSC OS Core will include the following packages:
 * db, "Berkeley DB embedded database system"
 * perl, "a highly capable and feature rich programming language"
 * libffi, "portable foreign function interface library"
+* readline, "GNU realine library"
+* ncurses, "System V Release 4.0 curses emulation library"
+* bash, "Bourne Again SHell"
 
-(total of 13 packages)
+(total of 16 packages)
 
 ### Optional/Enhanced sector
 
@@ -42,14 +45,11 @@ AOSC OS Core will include the following packages:
 * openssl, "the Open Source toolkit for Secure Sockets Layer and Transport Layer Security"
 * ca-certs, "Certificate Authority Certificates"
 * expat, "a stream oriented C library for parsing XML"
-* ncurses, "System V Release 4.0 curses emulation library"
-* readline, "GNU realine library"
 * sqlite, "SQLite software library"
-* bash, "Bourne Again SHell"
 * libedit, "command line editor library providing generic line editing, history and tokenization functions"
 * llvm, "Low Level Virtual Machine Infrastructure"
 
-(total of 10 packages)
+(total of 7 packages)
 
 ## Building (theoretical)
 A copy of BuildKit is recommended (instructions will be added when BuildKit is ready), BuildKit contains all packages for AOSC OS Core building (Autobuild3 and a script of AOCS OS Core automatic build).
