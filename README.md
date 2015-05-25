@@ -15,6 +15,14 @@ The following practices will be taken into account for AOSC OS Core development:
 * Only tool chain level packages like gcc, llvm, and glibc, etc. will be included;
 * **ALL** security updates will be provided when applicable.
 
+### An example of update cycle
+AOSC OS3, after being released as the last versioned build release (it will start rolling while AOSC OS Core is still versioned), it will release versions like follows:
+
+* Stable series: 3.1, 3.2, 3.3, ..., 3.10, 3.11, ...
+* Experimental (playground) series: 3.99.1, 3.99.2, ..., 3.99.10, 3.99.11, ...
+
+Stable and Experimental series will not affect each other, nor do they have a "testing - release" relationship. 3.99 series (Experimental) will become the future 4.0 series... And the cycle continues.
+
 ## Packages
 AOSC OS Core will include the following packages:
 
