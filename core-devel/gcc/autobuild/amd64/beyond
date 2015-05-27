@@ -1,0 +1,32 @@
+#
+# RPM compatibility support issue.
+#
+
+chmod 755 $PKGDIR/usr/lib{,64}/libgcc_s.so.1 || echo Never mind
+
+#
+# Links liblto plugin to /usr/lib/bfd-plugins, which is the binary format
+# plugins path for binutils, this enables linking support using GCC when LTO
+# flags are enabled.
+#
+# Remove if you need to prohibit users/developers from using LTO.
+#
+
+mkdir -p $PKGDIR/usr/lib/bfd-plugins
+ln -sv /usr/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/liblto_plugin.so \
+       $PKGDIR/usr/lib/bfd-plugins/liblto_plugin.so
+
+#
+# Some building scripts expects "cpp" to be in /lib.
+# 
+# FIXME: /usr/lib compliance to aosc-aaa?
+#
+
+ln -sv /usr/bin/cpp $PKGDIR/lib/cpp
+
+#
+# Misplaced file that confuses ldconfig(8), provided by GLibc.
+#
+
+mkdir -pv $PKGDIR/usr/share/gdb/auto-load/usr/lib
+mv -v $PKGDIR/usr/lib/*gdb.py $PKGDIR/usr/share/gdb/auto-load/usr/lib
