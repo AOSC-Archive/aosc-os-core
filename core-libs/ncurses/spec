@@ -1,0 +1,3 @@
+PKGVER=5.9
+PKGREL=9
+http://ftp.gnu.org/gnu/ncurses/ncurses-$PKGVER.tar.gz

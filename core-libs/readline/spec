@@ -1,0 +1,9 @@
+#
+# .008 refers to patch level.
+#
+
+PKGVER=6.3.008
+VER=6.3
+PKGREL=3
+
+SRCTBL="http://ftp.gnu.org/gnu/readline/readline-$VER.tar.gz"
