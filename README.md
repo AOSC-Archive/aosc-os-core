@@ -21,6 +21,8 @@ AOSC OS3, after being released as the last versioned build release (it will star
 * Stable series: 3.1, 3.2, 3.3, ..., 3.10, 3.11, ...
 * Experimental (playground) series: 3.99.1, 3.99.2, ..., 3.99.10, 3.99.11, ...
 
+![update_model](https://github.com/AOSC-Dev/aosc-os-core/raw/master/assets/images/AOSC%20OS%20Core%20Rationale%2C%20update%20model.png)
+
 Stable and Experimental series will not affect each other, nor do they have a "testing - release" relationship. 3.99 series (Experimental) will become the future 4.0 series... And the cycle continues.
 
 ## Packages
