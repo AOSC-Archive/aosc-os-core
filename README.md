@@ -37,6 +37,7 @@ AOSC OS Core will include the following packages:
 * gmp, "GNU Multiprecision library"
 * mpfr, "Functions for multiple precision math“
 * mpc, "A library for the arithmetic of complex numbers"
+* gcc-runtime, "GNU Compiler Collection (runtime libraries only)"
 * gcc, "GNU Compiler Collection", (languages: c, c++, fortran, lto)
 * binutils, "a set of programs to assemble and manipulate binary and object files"
 * gdbm, "GNU Database Manager library"
@@ -48,7 +49,7 @@ AOSC OS Core will include the following packages:
 * bash, "Bourne Again SHell"
 * libtool, "GNU generic library support script"
 
-(total of 16 packages)
+(total of 18 packages)
 
 ### Optional/Enhanced sector
 
