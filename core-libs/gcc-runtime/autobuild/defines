@@ -1,6 +1,6 @@
 PKGNAME=gcc-runtime
 PKGSEC=devel
-PKGDEP="binutilc"
+PKGDEP="binutils"
 PKGDES="GNU Compiler Collection (runtime libraries only)"
 
 ABRPMAUTOPROVONLY=yes
