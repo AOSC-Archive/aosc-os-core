@@ -46,6 +46,7 @@ AOSC OS Core will include the following packages:
 * readline, "GNU realine library"
 * ncurses, "System V Release 4.0 curses emulation library"
 * bash, "Bourne Again SHell"
+* libtool, "GNU generic library support script"
 
 (total of 16 packages)
 
