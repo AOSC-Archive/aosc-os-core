@@ -1,4 +1,4 @@
-PKGVER=3.1.2
-PKGREL=4
+VER=3.1.2
+REL=4
 SRCTBL="ftp://ftp.gnu.org/gnu/mpfr/mpfr-$VER.tar.xz"
 
