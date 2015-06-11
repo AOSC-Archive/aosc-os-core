@@ -1,0 +1,9 @@
+PKGNAME=gcc-runtime
+PKGSEC=devel
+PKGDEP="binutilc"
+PKGDES="GNU Compiler Collection (runtime libraries only)"
+
+ABRPMAUTOPROVONLY=yes
+NOSTATIC=no
+NOLTO=yes
+ABSTRIP=no

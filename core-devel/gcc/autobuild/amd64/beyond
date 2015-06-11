@@ -30,3 +30,11 @@ ln -sv /usr/bin/cpp $PKGDIR/lib/cpp
 
 mkdir -pv $PKGDIR/usr/share/gdb/auto-load/usr/lib
 mv -v $PKGDIR/usr/lib/*gdb.py $PKGDIR/usr/share/gdb/auto-load/usr/lib
+
+#
+# Remove files in gcc-runtime.
+#
+
+for i in `cat /usr/share/gcc-runtime/file-list`; do
+    rm -f $PKGDIR/$i
+done
