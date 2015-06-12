@@ -57,13 +57,12 @@ AOSC OS Core will include the following packages:
 * bzip2, "a freely available, patent free, high-quality data compressor"
 * libffi, "portable foreign function interface library"
 * openssl, "the Open Source toolkit for Secure Sockets Layer and Transport Layer Security"
-* ca-certs, "Certificate Authority Certificates"
 * expat, "a stream oriented C library for parsing XML"
 * sqlite, "SQLite software library"
 * libedit, "command line editor library providing generic line editing, history and tokenization functions"
 * llvm, "Low Level Virtual Machine Infrastructure"
 
-(total of 7 packages)
+(total of 6 packages)
 
 ## Building (theoretical)
 A copy of BuildKit is recommended (instructions will be added when BuildKit is ready), BuildKit contains all packages for AOSC OS Core building (Autobuild3 and a script of AOCS OS Core automatic build).
