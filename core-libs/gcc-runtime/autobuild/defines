@@ -4,6 +4,5 @@ PKGDEP="glibc"
 PKGDES="GNU Compiler Collection (runtime libraries only)"
 
 ABRPMAUTOPROVONLY=yes
-NOSTATIC=no
 NOLTO=yes
 ABSTRIP=no
