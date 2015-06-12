@@ -47,9 +47,10 @@ AOSC OS Core will include the following packages:
 * ncurses, "System V Release 4.0 curses emulation library"
 * bash, "Bourne Again SHell"
 * libtool, "GNU generic library support script"
+* make, "GNU Make, designed for code processing"
 * aosc-aaa, "bed rock level system definitions"
 
-(total of 19 packages)
+(total of 20 packages)
 
 ### Optional/Enhanced sector
 
