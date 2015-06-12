@@ -35,6 +35,22 @@ mv -v $PKGDIR/usr/lib/*gdb.py $PKGDIR/usr/share/gdb/auto-load/usr/lib
 # Remove files in gcc-runtime.
 #
 
-for i in `cat /usr/share/gcc-runtime/file-list`; do
-    rm -f $PKGDIR/$i
-done
+rm /usr/lib64/libcilkrts.so.5.0.0
+rm /usr/lib64/libvtv.so.0.0.0
+rm /usr/lib64/libitm.so.1.0.0
+rm /usr/lib64/libatomic.so.1.1.0
+rm /usr/lib64/libgcc_s.so.1
+rm /usr/lib64/libubsan.so.0.0.0
+rm /usr/lib64/libasan.so.1.0.0
+rm /usr/lib64/libgfortran.so.3.0.0
+rm /usr/lib64/liblsan.so.0.0.0
+rm /usr/lib64/libquadmath.so.0.0.0
+rm /usr/lib64/libtsan.so.0.0.0
+rm /usr/lib64/libgomp.so.1.0.0
+rm /usr/lib64/libstdc++.so.6.0.20
+rm /usr/share/gcc-runtime/file-list
+rm /usr/share/locale/de/LC_MESSAGES/libstdc++.mo
+rm /usr/share/locale/fr/LC_MESSAGES/libstdc++.mo
+rm /usr/share/info/libgomp.info
+rm /usr/share/info/libquadmath.info
+rm /usr/share/info/libitm.info
