@@ -35,22 +35,46 @@ mv -v $PKGDIR/usr/lib/*gdb.py $PKGDIR/usr/share/gdb/auto-load/usr/lib
 # Remove files in gcc-runtime.
 #
 
-rm $PKGDIR/usr/lib64/libcilkrts.so.5.0.0
-rm $PKGDIR/usr/lib64/libvtv.so.0.0.0
-rm $PKGDIR/usr/lib64/libitm.so.1.0.0
-rm $PKGDIR/usr/lib64/libatomic.so.1.1.0
-rm $PKGDIR/usr/lib64/libgcc_s.so.1
-rm $PKGDIR/usr/lib64/libubsan.so.0.0.0
-rm $PKGDIR/usr/lib64/libasan.so.1.0.0
-rm $PKGDIR/usr/lib64/libgfortran.so.3.0.0
-rm $PKGDIR/usr/lib64/liblsan.so.0.0.0
-rm $PKGDIR/usr/lib64/libquadmath.so.0.0.0
-rm $PKGDIR/usr/lib64/libtsan.so.0.0.0
-rm $PKGDIR/usr/lib64/libgomp.so.1.0.0
-rm $PKGDIR/usr/lib64/libstdc++.so.6.0.20
-rm $PKGDIR/usr/share/gcc-runtime/file-list
-rm $PKGDIR/usr/share/locale/de/LC_MESSAGES/libstdc++.mo
-rm $PKGDIR/usr/share/locale/fr/LC_MESSAGES/libstdc++.mo
-rm $PKGDIR/usr/share/info/libgomp.info
-rm $PKGDIR/usr/share/info/libquadmath.info
-rm $PKGDIR/usr/share/info/libitm.info
+rm -fv $PKGDIR/usr/lib64/liblsan.so
+rm -fv $PKGDIR/usr/lib64/libcilkrts.so.5.0.0
+rm -fv $PKGDIR/usr/lib64/libtsan.so.0
+rm -fv $PKGDIR/usr/lib64/libvtv.so
+rm -fv $PKGDIR/usr/lib64/libvtv.so.0.0.0
+rm -fv $PKGDIR/usr/lib64/libitm.so.1.0.0
+rm -fv $PKGDIR/usr/lib64/libcilkrts.so.5
+rm -fv $PKGDIR/usr/lib64/libquadmath.so.0
+rm -fv $PKGDIR/usr/lib64/libubsan.so
+rm -fv $PKGDIR/usr/lib64/libatomic.so.1.1.0
+rm -fv $PKGDIR/usr/lib64/libcilkrts.so
+rm -fv $PKGDIR/usr/lib64/libgcc_s.so
+rm -fv $PKGDIR/usr/lib64/libgcc_s.so.1
+rm -fv $PKGDIR/usr/lib64/libasan.so.1
+rm -fv $PKGDIR/usr/lib64/libtsan.so
+rm -fv $PKGDIR/usr/lib64/libubsan.so.0.0.0
+rm -fv $PKGDIR/usr/lib64/libasan.so.1.0.0
+rm -fv $PKGDIR/usr/lib64/libatomic.so
+rm -fv $PKGDIR/usr/lib64/libitm.so.1
+rm -fv $PKGDIR/usr/lib64/libquadmath.so
+rm -fv $PKGDIR/usr/lib64/libgomp.so.1
+rm -fv $PKGDIR/usr/lib64/libgfortran.so.3.0.0
+rm -fv $PKGDIR/usr/lib64/liblsan.so.0.0.0
+rm -fv $PKGDIR/usr/lib64/libstdc++.so
+rm -fv $PKGDIR/usr/lib64/libquadmath.so.0.0.0
+rm -fv $PKGDIR/usr/lib64/libubsan.so.0
+rm -fv $PKGDIR/usr/lib64/libgomp.so
+rm -fv $PKGDIR/usr/lib64/libtsan.so.0.0.0
+rm -fv $PKGDIR/usr/lib64/libitm.so
+rm -fv $PKGDIR/usr/lib64/libvtv.so.0
+rm -fv $PKGDIR/usr/lib64/libgfortran.so
+rm -fv $PKGDIR/usr/lib64/libgomp.so.1.0.0
+rm -fv $PKGDIR/usr/lib64/libasan.so
+rm -fv $PKGDIR/usr/lib64/libatomic.so.1
+rm -fv $PKGDIR/usr/lib64/liblsan.so.0
+rm -fv $PKGDIR/usr/lib64/libstdc++.so.6.0.20
+rm -fv $PKGDIR/usr/lib64/libgfortran.so.3
+rm -fv $PKGDIR/usr/lib64/libstdc++.so.6
+rm -fv $PKGDIR/usr/share/locale/de/LC_MESSAGES/libstdc++.mo
+rm -fv $PKGDIR/usr/share/locale/fr/LC_MESSAGES/libstdc++.mo
+rm -fv $PKGDIR/usr/share/info/libgomp.info
+rm -fv $PKGDIR/usr/share/info/libquadmath.info
+rm -fv $PKGDIR/usr/share/info/libitm.info
