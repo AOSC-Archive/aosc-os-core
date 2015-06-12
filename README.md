@@ -63,7 +63,7 @@ AOSC OS Core will include the following packages:
 * python-2, "Python, version 2.7.x"
 * llvm, "Low Level Virtual Machine Infrastructure"
 
-(total of 6 packages)
+(total of 8 packages)
 
 ## Building (theoretical)
 A copy of BuildKit is recommended (instructions will be added when BuildKit is ready), BuildKit contains all packages for AOSC OS Core building (Autobuild3 and a script of AOCS OS Core automatic build).
