@@ -9,7 +9,7 @@ sed -i "s/python2.3/python2/g" Lib/distutils/tests/test_build_scripts.py \
  
 rm -r Modules/expat
 rm -r Modules/zlib
-rm -r Modules/_ctypes/{darwin,libffi}*
+rm -r Modules/_ctypes/darwin*
 
 find . -name '*.py' | \
     xargs sed -i "s|#[ ]*![ ]*/usr/bin/env python$|#!/usr/bin/env python2|"
