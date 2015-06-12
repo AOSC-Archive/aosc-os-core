@@ -60,6 +60,7 @@ AOSC OS Core will include the following packages:
 * expat, "a stream oriented C library for parsing XML"
 * sqlite, "SQLite software library"
 * libedit, "command line editor library providing generic line editing, history and tokenization functions"
+* python-2, "Python, version 2.7.x"
 * llvm, "Low Level Virtual Machine Infrastructure"
 
 (total of 6 packages)
