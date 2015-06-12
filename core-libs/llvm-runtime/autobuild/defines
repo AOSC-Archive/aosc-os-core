@@ -1,7 +1,7 @@
 PKGNAME=llvm
 PKGSEC=devel
 PKGDEP="libffi python-2 libedit"
-PKGDES="Low Level Virtual Machine Infrastructure"
+PKGDES="Low Level Virtual Machine Infrastructure (runtime libraries)"
 
 #
 # RPM hacks
