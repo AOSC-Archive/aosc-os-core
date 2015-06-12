@@ -13,7 +13,6 @@ ABRPMAUTOPROVONLY=yes
 # LTO breaks binary, NOSTATIC breaks development capabilities.
 #
 
-NOSTATIC=no
 NOLTO=yes
 
 #
