@@ -43,7 +43,6 @@ AOSC OS Core will include the following packages:
 * gdbm, "GNU Database Manager library"
 * db, "Berkeley DB embedded database system"
 * perl, "a highly capable and feature rich programming language"
-* libffi, "portable foreign function interface library"
 * readline, "GNU realine library"
 * ncurses, "System V Release 4.0 curses emulation library"
 * bash, "Bourne Again SHell"
@@ -54,6 +53,7 @@ AOSC OS Core will include the following packages:
 ### Optional/Enhanced sector
 
 * bzip2, "a freely available, patent free, high-quality data compressor"
+* libffi, "portable foreign function interface library"
 * openssl, "the Open Source toolkit for Secure Sockets Layer and Transport Layer Security"
 * ca-certs, "Certificate Authority Certificates"
 * expat, "a stream oriented C library for parsing XML"
