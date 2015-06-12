@@ -8,15 +8,15 @@ wget -i autobuild/list
 # Extract, and link the sources.
 #
 
-for i in clang-tools-extra-$VER.src.tar.xz compiler-rt-$VER.src.tar.xz \
-         lldb-$VER.src.tar.xz cfe-$VER.src.tar.xz; do
+for i in clang-tools-extra-$PKGVER.src.tar.xz compiler-rt-$PKGVER.src.tar.xz \
+         lldb-$PKGVER.src.tar.xz cfe-$PKGVER.src.tar.xz; do
     tar xf $i
 done
 
-mv cfe-$VER.src tools/clang
-mv clang-tools-extra-$VER.src tools/clang/tools/extra
-mv compiler-rt-$VER.src projects/compiler-rt
-mv lldb-$VER.src tools/lldb
+mv cfe-$PKGVER.src tools/clang
+mv clang-tools-extra-$PKGVER.src tools/clang/tools/extra
+mv compiler-rt-$PKGVER.src projects/compiler-rt
+mv lldb-$PKGVER.src tools/lldb
 
 #
 # Fix permissions of the source directory.
