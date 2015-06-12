@@ -3,6 +3,6 @@
 #
 
 VER=6.3.008
-PKGREL=3
+REL=3
 
 SRCTBL="http://ftp.gnu.org/gnu/readline/readline-${VER::-4}.tar.gz"
