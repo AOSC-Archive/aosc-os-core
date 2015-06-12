@@ -29,7 +29,7 @@ ln -sv /usr/bin/cpp $PKGDIR/lib/cpp
 #
 
 mkdir -pv $PKGDIR/usr/share/gdb/auto-load/usr/lib
-mv -v $PKGDIR/usr/lib/*gdb.py $PKGDIR/usr/share/gdb/auto-load/usr/lib
+mv -v $PKGDIR/usr/lib64/*gdb.py $PKGDIR/usr/share/gdb/auto-load/usr/lib
 
 #
 # Remove files in gcc-runtime.
