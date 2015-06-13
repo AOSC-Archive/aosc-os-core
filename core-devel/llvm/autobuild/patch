@@ -9,7 +9,7 @@ wget -i autobuild/list
 #
 
 for i in clang-tools-extra-$VER.src.tar.xz compiler-rt-$VER.src.tar.xz \
-         lldb-$VER.src.tar.xz cfe-$VER.src.tar.xz; do
+         cfe-$VER.src.tar.xz; do
     tar xf $i
 done
 

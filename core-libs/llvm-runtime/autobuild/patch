@@ -9,7 +9,7 @@ wget -i autobuild/list
 #
 
 for i in clang-tools-extra-$PKGVER.src.tar.xz compiler-rt-$PKGVER.src.tar.xz \
-         lldb-$PKGVER.src.tar.xz cfe-$PKGVER.src.tar.xz; do
+         cfe-$PKGVER.src.tar.xz; do
     tar xf $i
 done
 

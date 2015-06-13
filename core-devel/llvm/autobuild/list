@@ -1,4 +1,3 @@
 http://llvm.org/releases/$VER/cfe-$VER.src.tar.xz
 http://llvm.org/releases/$VER/clang-tools-extra-$VER.src.tar.xz
 http://llvm.org/releases/$VER/compiler-rt-$VER.src.tar.xz
-http://llvm.org/releases/$VER/lldb-$VER.src.tar.xz
