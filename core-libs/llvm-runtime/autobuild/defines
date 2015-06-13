@@ -1,6 +1,6 @@
-PKGNAME=llvm
+PKGNAME=llvm-runtime
 PKGSEC=devel
-PKGDEP="libffi python-2 libedit"
+PKGDEP="gcc-runtime libedit libffi ncurses zlib"
 PKGDES="Low Level Virtual Machine Infrastructure (runtime libraries)"
 
 #
@@ -14,10 +14,3 @@ ABRPMAUTOPROVONLY=yes
 #
 
 NOLTO=yes
-
-#
-# Extra provides, acts like package name aliases.
-#
-
-PKGPROV="lldb clang"
-

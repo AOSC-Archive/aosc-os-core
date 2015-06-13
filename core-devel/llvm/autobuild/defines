@@ -1,6 +1,6 @@
 PKGNAME=llvm
 PKGSEC=devel
-PKGDEP="libffi python-2 libedit"
+PKGDEP="llvm-runtime perl python-2"
 PKGDES="Low Level Virtual Machine Infrastructure"
 
 #
@@ -20,5 +20,5 @@ NOLTO=yes
 # Extra provides, acts like package name aliases.
 #
 
-PKGPROV="lldb clang"
+PKGPROV="clang"
 
