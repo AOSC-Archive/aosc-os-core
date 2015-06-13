@@ -1,9 +1,0 @@
-#
-# Records library list for gcc build.
-#
-
-cd $SRCDIR
-find abdist -type f > $SRCDIR/file-list
-
-mkdir -p $PKGDIR/usr/share/gcc-runtime/
-cp $SRCDIR/file-list $PKGDIR/usr/share/gcc-runtime/file-list

@@ -12,7 +12,7 @@ export CFLAGS="$CFLAGS -fPIC"
 # 2. Enables multibyte characters support;
 #
 
-./configure --prefix=/usr --with-curses --enable-multibyte
+./configure --prefix=/usr --with-curses --enable-multibyte --enable-shared
 
 #
 # Force linking with libncursesw (or libncurses if you wish).
