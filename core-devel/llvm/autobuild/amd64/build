@@ -50,7 +50,7 @@ make install DESTDIR=$PKGDIR -j1
 
 for file in $PKGDIR/usr/lib/lib{clang,LLVM,LTO}*.a
 do
-  test -f $file chmod -v 644 $file
+  chmod -v 644 $file
 done
 
 #
