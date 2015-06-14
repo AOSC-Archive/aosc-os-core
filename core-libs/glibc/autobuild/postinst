@@ -10,10 +10,3 @@ if [ -x /usr/bin/locale-gen ]; then
 else
 	true
 fi
-
-#
-# Linker cache generation/pre-configuration to ensure system runtime.
-#
-
-echo "Generating LD cache..."
-ldconfig
