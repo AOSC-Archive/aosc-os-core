@@ -1,6 +1,8 @@
 abbs-build core-devel/linux+api &&
 abbs-build core-misc/tzdata &&
 abbs-build core-libs/glibc &&
+abbs-build core-libs/ncurses &&
+abbs-build core-libs/readline &&
 abbs-build core-libs/zlib &&
 abbs-build core-libs/gmp &&
 abbs-build core-libs/mpfr &&
@@ -9,8 +11,6 @@ abbs-build core-libs/gcc-runtime &&
 abbs-build core-devel/gcc &&
 abbs-build core-devel/binutils &&
 abbs-build core-devel/libtool &&
-abbs-build core-libs/readline &&
-abbs-build core-libs/ncurses &&
 abbs-build core-libs/gdbm &&
 abbs-build core-database/db &&
 abbs-build core-shells/bash && 
