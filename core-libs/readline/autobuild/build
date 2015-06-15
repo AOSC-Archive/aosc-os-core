@@ -29,3 +29,9 @@ make install DESTDIR=`pwd`/abdist SHLIB_LIBS=-lncursesw
 rm -f $PKGDIR/usr/lib/libreadline.so{,.6}
 cp $PKGDIR/usr/lib/libreadline.so.6.3 $PKGDIR/usr/lib/libreadline.so.6
 cp $PKGDIR/usr/lib/libreadline.so.6.3 $PKGDIR/usr/lib/libreadline.so
+
+#
+# Remove .old libraries
+#
+
+rm -f $PKGDIR/usr/lib/*.old
