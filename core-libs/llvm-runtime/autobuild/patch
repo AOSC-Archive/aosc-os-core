@@ -16,7 +16,6 @@ done
 mv cfe-$PKGVER.src tools/clang
 mv clang-tools-extra-$PKGVER.src tools/clang/tools/extra
 mv compiler-rt-$PKGVER.src projects/compiler-rt
-mv lldb-$PKGVER.src tools/lldb
 
 #
 # Fix permissions of the source directory.
