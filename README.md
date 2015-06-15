@@ -25,6 +25,12 @@ AOSC OS3, after being released as the last versioned build release (it will star
 
 Stable and Experimental series will not affect each other, nor do they have a "testing - release" relationship. 3.99 series (Experimental) will become the future 4.0 series... And the cycle continues.
 
+#### Guidelines for "structural version"
+
+Simply put, no "$((n-1)).9*.*" like version should be used in package "aosc-aaa", instead, for example, AOSC OS Core 4.0's Beta 2 release should be presented as "4.0~beta2", instead of "3.99.2" in the Core versioning rules.
+
+*(Proposed by ![Arthur2e5](https://github.com/Arthur2e5))*
+
 ## Packages
 AOSC OS Core will include the following packages:
 
