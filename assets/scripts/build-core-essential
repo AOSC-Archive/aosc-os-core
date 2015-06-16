@@ -13,6 +13,7 @@ abbs-build core-devel/binutils &&
 abbs-build core-devel/libtool &&
 abbs-build core-libs/gdbm &&
 abbs-build core-database/db &&
+abbs-build core-perl/perl &&
 abbs-build core-shells/bash && 
 abbs-build core-devel/make &&
 abbs-build core-misc/aosc-aaa
