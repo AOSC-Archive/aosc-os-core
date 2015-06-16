@@ -4,15 +4,6 @@ abbs-build core-libs/openssl &&
 abbs-build core-libs/expat &&
 abbs-build core-libs/libedit &&
 abbs-build core-database/sqlite &&
-
-#
-# cross-armel has some work in progress.
-#
-
-if [ "$ARCH" = "armel" ]; then
-	echo "python-2, llvm-runtime, and llvm not yet ported to architecture: armel."
-else
-	abbs-build core-python/python-2 &&
-	abbs-build core-libs/llvm-runtime &&
-	abbs-build core-devel/llvm
-fi
+abbs-build core-python/python-2 &&
+abbs-build core-libs/llvm-runtime &&
+abbs-build core-devel/llvm
