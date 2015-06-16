@@ -73,6 +73,7 @@ rm -fv $PKGDIR/usr/lib/liblsan.so.0
 rm -fv $PKGDIR/usr/lib/libstdc++.so.6.0.20
 rm -fv $PKGDIR/usr/lib/libgfortran.so.3
 rm -fv $PKGDIR/usr/lib/libstdc++.so.6
+rm -fv  $PKGDIR/usr/share/locale/*/LC_MESSAGES/libstdc++.mo
 rm -fv $PKGDIR/usr/share/locale/de/LC_MESSAGES/libstdc++.mo
 rm -fv $PKGDIR/usr/share/locale/fr/LC_MESSAGES/libstdc++.mo
 rm -fv $PKGDIR/usr/share/info/libgomp.info

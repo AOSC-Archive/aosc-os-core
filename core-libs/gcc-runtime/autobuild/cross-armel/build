@@ -97,7 +97,7 @@ for lib in libatomic \
 done
 
 make -C armv7a-hardfloat-linux-gnueabi/libsanitizer/tsan DESTDIR=$PKGDIR install-toolexeclibLTLIBRARIES
-make -C armv7a-hardfloat-linux-gnueabi/libobjc DESTDIR=$PKGDIR install-libs
+# make -C armv7a-hardfloat-linux-gnueabi/libobjc DESTDIR=$PKGDIR install-libs
 make -C armv7a-hardfloat-linux-gnueabi/libstdc++-v3/po DESTDIR=$PKGDIR install
 make -C armv7a-hardfloat-linux-gnueabi/libmpx DESTDIR=$PKGDIR install
 

@@ -74,7 +74,7 @@ make
 # to save some space.
 #
 
-make -C x86_64-unknown-linux-gnu/libstdc++-v3/doc doc-man-doxygen  &&
+# make -C x86_64-unknown-linux-gnu/libstdc++-v3/doc doc-man-doxygen  &&
 
 make install DESTDIR=$PKGDIR
 
