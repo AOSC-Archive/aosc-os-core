@@ -1,5 +1,4 @@
 ARMEL:
-	python-2, llvm-runtime, llvm on armel (cross-armel).
 	Automatic build test.
 
 ALL:
