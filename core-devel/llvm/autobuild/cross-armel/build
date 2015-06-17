@@ -36,7 +36,7 @@ CC=$HOST-gcc CXX=$HOST-g++ \
 # Enables RTTI runtime support.
 #
 
-make REQUIRES_RTTI=1
+make REQUIRES_RTTI=1 $ABMK
 
 #
 # Parallelism during installation causes failure.

@@ -15,6 +15,8 @@
 # 7. Uses system binutils;
 # 8. Enables Python support for LLVM functionalities (Python 3 is not going to work);
 # 9. Enables optimizations;
+# 10.Prevent 'make' process from stripping the binaries, as it will use the build strip which
+#            do not work on host binaries. Autobuild uses eu-strip, which is arch-independent.
 #    TODO: Check if necessary as we have a string of optimization flags.
 #
 
@@ -30,13 +32,13 @@ CC=$HOST-gcc CXX=$HOST-g++ \
     --disable-assertions \
     --with-binutils-include=/var/ab/cross-root/armel/usr/include \
     --with-python=/usr/bin/python2 \
-    --enable-optimized --with-float-abi=hard --with-fpu=neon
+    --enable-optimized --with-float-abi=hard --with-fpu=neon --enable-keep-symbols
 
 #
 # Enables RTTI runtime support.
 #
 
-make REQUIRES_RTTI=1
+make REQUIRES_RTTI=1 $ABMK
 
 #
 # Parallelism during installation causes failure.
