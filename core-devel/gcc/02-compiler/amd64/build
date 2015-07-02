@@ -2,18 +2,17 @@
 # Shadow build is necessary for a successful GCC build (at least for 4.9.2).
 #
 
-mkdir -p build
+#mkdir -p build
 cd build
 
 #
 # The following configuration:
 #
-# 1. Enables support for C, C++, "LTO";
+# 1. Enables support for C, C++, Fortran, "LTO";
 #    a. Mind here, Object C/C++ support is not enabled, we will provide that
 #       in the "llvm" package as they provide a higher quality support for them;
 #    b. Fortran is needed for many mathematical packages, as well as some audio/
 #       video codecs, remove support for fortran if you know what you are doing;
-#	FIXME: Fortran support fails to build!!!
 #    c. "LTO" is not really a language, but it enables GCC to use LTO flags, and
 #       thus provide respective optimizations later;
 # 2. Enables shared libraries for linking (this is probably a good choice to
@@ -44,37 +43,31 @@ cd build
 #                                not change this option, which WILL result in binary
 #                                incompatibility with AOSC OS);
 #
-# ARM specific configuration:
-#
-# ARMv7-a architecture, hard float point ABI, and tuned for Neon FPUs.
-#
 
-../configure --host=armv7a-hardfloat-linux-gnueabi --target=armv7a-hardfloat-linux-gnueabi \
-      --prefix=/usr \
-      --libdir=/usr/lib --libexecdir=/usr/lib \
-      --mandir=/usr/share/man --infodir=/usr/share/info \
-      --enable-languages=c,c++,lto \
-      --enable-shared --enable-threads=posix \
-      --with-system-zlib --enable-__cxa_atexit \
-      --disable-libunwind-exceptions --enable-clocale=gnu \
-      --disable-libstdcxx-pch --disable-libssp \
-      --enable-gnu-unique-object --enable-linker-build-id \
-      --enable-lto --enable-plugin --enable-install-libiberty \
-      --with-linker-hash-style=gnu \
-      --disable-multilib --disable-werror \
-      --enable-checking=release \
-      --with-default-libstdcxx-abi=c++98 \
-      --disable-altivec --disable-fixed-point --with-float=hard \
-      --with-arch=armv7-a --with-float=hard --with-fpu=vfpv3-d16 &&
-
-make
+#../configure --prefix=/usr \
+#      --libdir=/usr/lib --libexecdir=/usr/lib \
+#      --mandir=/usr/share/man --infodir=/usr/share/info \
+#      --enable-languages=c,c++,fortran,lto \
+#      --enable-shared --enable-threads=posix \
+#      --with-system-zlib --enable-__cxa_atexit \
+#      --disable-libunwind-exceptions --enable-clocale=gnu \
+#      --disable-libstdcxx-pch --disable-libssp \
+#      --enable-gnu-unique-object --enable-linker-build-id \
+#      --enable-cloog-backend=isl --disable-cloog-version-check \
+#      --enable-lto --enable-plugin --enable-install-libiberty \
+#      --with-linker-hash-style=gnu \
+#      --disable-multilib --disable-werror \
+#      --enable-checking=release \
+#      --with-default-libstdcxx-abi=c++98 &&
+#
+#make
 
 #
 # Build documentations, comment the following line if you really need
 # to save some space.
 #
 
-# make -C x86_64-unknown-linux-gnu/libstdc++-v3/doc doc-man-doxygen  &&
+make -C x86_64-unknown-linux-gnu/libstdc++-v3/doc doc-man-doxygen  &&
 
 make install DESTDIR=$PKGDIR
 
