@@ -1,3 +1,4 @@
-VER=2.98.2.1
+VER=3.0.0
+
 SRCTBL="https://github.com/AOSC-Dev/aosc-aaa/archive/$VER.tar.gz"
 SUBDIR=aosc-aaa-$VER

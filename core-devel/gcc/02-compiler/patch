@@ -14,7 +14,7 @@ sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" $SRCDIR/{libiberty,gcc}/configure
 # * DEV-PHASE are used as branding identification, you may alter the line.
 #
 
-echo 4.9.2 > $SRCDIR/gcc/BASE-VER
+echo 4.9.3 > $SRCDIR/gcc/BASE-VER
 echo 'AOSC OS, Core' > $SRCDIR/gcc/DEV-PHASE
 
 patch -Np0 -i autobuild/patches/file-name.patch

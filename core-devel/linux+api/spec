@@ -3,4 +3,5 @@
 #
 
 VER=4.0.5
+REL=1
 SRCTBL="https://www.kernel.org/pub/linux/kernel/v4.x/linux-$VER.tar.xz"
