@@ -7,7 +7,6 @@ abbs-build core-libs/zlib &&
 abbs-build core-libs/gmp &&
 abbs-build core-libs/mpfr &&
 abbs-build core-libs/mpc &&
-abbs-build core-libs/gcc-runtime &&
 abbs-build core-devel/gcc &&
 abbs-build core-devel/binutils &&
 abbs-build core-devel/libtool &&
