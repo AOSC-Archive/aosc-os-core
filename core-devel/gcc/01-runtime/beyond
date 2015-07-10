@@ -1,0 +1,5 @@
+#
+# Dumb RPM is confused with all those libraries.
+#
+
+chmod +x $PKGDIR/usr/lib/lib*.so*
