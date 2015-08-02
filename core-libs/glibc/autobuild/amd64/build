@@ -131,11 +131,3 @@ strip --strip-unneeded $PKGDIR/usr/lib/{libanl,libBrokenLocale,libcidn,libcrypt}
                        $PKGDIR/usr/lib/{libdl,libm,libnsl,libresolv,librt,libutil}-*.so \
                        $PKGDIR/usr/lib/{libmemusage,libpcprofile,libSegFault}.so \
                        $PKGDIR/usr/lib/{audit,gconv}/*.so
-
-#
-# Historic flaw of AOSC OS3, comment out next 3 lines for derivative build.
-#
-
-cd abdist
-ln -sv /usr/lib lib64
-cd ..
