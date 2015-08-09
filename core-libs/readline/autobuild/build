@@ -22,15 +22,6 @@ make SHLIB_LIBS=-lncursesw
 make install DESTDIR=`pwd`/abdist SHLIB_LIBS=-lncursesw
 
 #
-# Temporary hack for -lncursesw linkage problem. Blame libtool.
-# FIXME: ldconfig will complain that libreadline.so.6 is not a symlink.
-#
-
-rm -f $PKGDIR/usr/lib/libreadline.so{,.6}
-cp $PKGDIR/usr/lib/libreadline.so.6.3 $PKGDIR/usr/lib/libreadline.so.6
-cp $PKGDIR/usr/lib/libreadline.so.6.3 $PKGDIR/usr/lib/libreadline.so
-
-#
 # Remove .old libraries
 #
 
