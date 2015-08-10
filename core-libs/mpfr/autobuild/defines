@@ -2,8 +2,9 @@ PKGNAME=mpfr
 PKGSEC=libs
 PKGDEP="gmp glibc"
 PKGDES="functions for multiple precision math"
-AUTOTOOLS_AFTER="--enable-thread-safe --enable-shared --docdir=/usr/share/doc/mpfr-3.1.2"
 
+AUTOTOOLS_AFTER="--enable-thread-safe --enable-shared --docdir=/usr/share/doc/mpfr-3.1.2 \
+                 --host=${ARCH_TARGET} --build=${ARCH_TARGET} --target=${ARCH_TARGET}"
 #
 # Configuration:
 #
