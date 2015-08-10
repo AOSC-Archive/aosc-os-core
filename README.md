@@ -21,20 +21,15 @@ AOSC OS3, after being released as the last versioned build release (it will star
 * Stable series: 3.1, 3.2, 3.3, ..., 3.10, 3.11, ...
 * Experimental (playground) series: 3.99.1, 3.99.2, ..., 3.99.10, 3.99.11, ...
 
+#### Minor changes (security, and partial updates)
+For updates like this, we will use a sub-version to mark an update, like `x.y.z-n` where `n` is a positive integer.
+
 ![update_model](https://github.com/AOSC-Dev/aosc-os-core/raw/master/assets/images/AOSC%20OS%20Core%20Rationale%2C%20update%20model.png)
 
 Stable and Experimental series will not affect each other, nor do they have a "testing - release" relationship. 3.99 series (Experimental) will become the future 4.0 series... And the cycle continues.
 
-#### Guidelines for "structural version"
-
-Simply put, no "$((n-1)).9*.*" like version should be used in package "aosc-aaa", instead, for example, AOSC OS Core 4.0's Beta 2 release should be presented as "4.0~beta2", instead of "3.99.2" in the Core versioning rules.
-
-*(Proposed by ![Arthur2e5](https://github.com/Arthur2e5))*
-
 ## Packages
 AOSC OS Core will include the following packages:
-
-### Essential sector
 
 * linux+api, "Linux API Headers for glibc"
 * zlib, "A Massively Spiffy Yet Delicately Unobtrusive Compression Library"
