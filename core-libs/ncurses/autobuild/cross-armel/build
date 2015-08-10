@@ -4,7 +4,7 @@ pushd wide-build
 ../configure --host=armv7a-hardfloat-linux-gnueabi --prefix=/usr --mandir=/usr/share/man \
              --with-shared --with-normal --without-debug --without-ada \
              --enable-widec --enable-pc-files --with-cxx-binding --with-cxx-shared \
-             --without-gpm
+             --without-gpm --enable-ext-color
 make
 make install DESTDIR=$PKGDIR
 popd

@@ -26,7 +26,7 @@ pushd wide-build
 ../configure --prefix=/usr --mandir=/usr/share/man \
              --with-shared --with-normal --without-debug --without-ada \
              --enable-widec --enable-pc-files --with-cxx-binding --with-cxx-shared \
-             --without-gpm
+             --without-gpm --enable-ext-colors
 make
 make install DESTDIR=$PKGDIR
 popd
