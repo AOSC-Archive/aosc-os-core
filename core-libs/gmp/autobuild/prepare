@@ -1,0 +1,6 @@
+#
+# Apply custom flags to GMP build.
+#
+
+export CC="gcc ${CPPFLAGS} ${CFLAGS} ${LDFLAGS}"
+export CXX="g++ ${CPPFLAGS} ${CFLAGS} ${LDFLAGS}"
