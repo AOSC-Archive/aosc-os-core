@@ -36,8 +36,10 @@ AOSC OS Core will include the following packages:
 * glibc, "GNU C Library"
 * tzdata, "Time Zone Data"
 * gmp, "GNU Multiprecision library"
-* mpfr, "Functions for multiple precision math“
+* mpfr, "Functions for multiple precision math"
 * mpc, "A library for the arithmetic of complex numbers"
+* isl, "Library for manipulating sets and relations of integer points bounded by linear constraints"
+* cloog, "Library that generates loops for scanning Polyhedras"
 * gcc-runtime, "GNU Compiler Collection (runtime libraries only)"
 * gcc, "GNU Compiler Collection", (languages: c, c++, fortran, lto)
 * binutils, "a set of programs to assemble and manipulate binary and object files"
@@ -51,7 +53,7 @@ AOSC OS Core will include the following packages:
 * make, "GNU Make, designed for code processing"
 * aosc-aaa, "bed rock level system definitions"
 
-(total of 20 packages)
+(total of 22 packages)
 
 ## Building (theoretical)
 A copy of BuildKit is recommended (instructions will be added when BuildKit is ready), BuildKit contains all packages for AOSC OS Core building (Autobuild3 and a script of AOCS OS Core automatic build).
