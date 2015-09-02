@@ -1,10 +1,4 @@
 #
-# Enables -fPIC for later linking support.
-#
-
-export CFLAGS="$CFLAGS -fPIC"
-
-#
 # The following configuration:
 #
 # 1. Enables linking with Curses (NCurses in this case), disable if you are cool with
@@ -19,7 +13,7 @@ export CFLAGS="$CFLAGS -fPIC"
 #
 
 make SHLIB_LIBS=-lncursesw
-make install DESTDIR=`pwd`/abdist SHLIB_LIBS=-lncursesw
+make install DESTDIR=$PKGDIR SHLIB_LIBS=-lncursesw
 
 #
 # Remove .old libraries
