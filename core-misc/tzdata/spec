@@ -1,4 +1,3 @@
-VER=2015e
-REL=1
+VER=2015f
 SRCTBL="http://www.iana.org/time-zones/repository/releases/tzdata$VER.tar.gz"
 SRCNOSUBDIR=yes
