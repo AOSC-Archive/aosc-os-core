@@ -26,18 +26,16 @@ cd binutils-build
              --with-bugurl=https://github.com/AOSC-Dev/AOSC-OS \
              --enable-threads --enable-shared --with-pic \
              --enable-ld=default --enable-plugins \
-             --disable-werror --enable-lto --disable-gdb &&
+             --disable-werror --enable-lto --disable-gdb
 
 #
 # Pre-build configuration check.
 #
 
-make configure-host &&
-make tooldir=/usr &&
+make configure-host
+make tooldir=/usr
 
-make prefix=$PKGDIR/usr tooldir=$PKGDIR/usr install &&
-
-cd $SRCDIR
+make prefix=$PKGDIR/usr tooldir=$PKGDIR/usr install
 
 #
 # Avoid conflicts.
