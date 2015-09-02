@@ -6,12 +6,12 @@
 #
 
 ./Configure --sysroot=/var/ab/cross-root/armel --target=armv7a-hardfloat-linux-gnueabi \
-    -des -Dusethreads -Duseshrplib \
-    -Dprefix=/usr -Dvendorprefix=/usr \
-    -Dman1dir=/usr/share/man/man1 \
-    -Dman3dir=/usr/share/man/man3 \
-    -Dcccdlflags='${CFLAGS}' \
-    -Dlddlflags="-shared ${LDFLAGS}" 
+            -des -Dusethreads -Duseshrplib \
+            -Dprefix=/usr -Dvendorprefix=/usr \
+            -Dman1dir=/usr/share/man/man1 \
+            -Dman3dir=/usr/share/man/man3 \
+            -Dcccdlflags='${CFLAGS}' \
+            -Dlddlflags="-shared ${LDFLAGS}" 
 
 make
 make install DESTDIR=$PKGDIR
