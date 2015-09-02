@@ -54,7 +54,7 @@ cd build
              --disable-libunwind-exceptions --enable-clocale=gnu \
              --disable-libstdcxx-pch --disable-libssp \
              --enable-gnu-unique-object --enable-linker-build-id \
-             --without-isl --without-cloog \
+             --enable-cloog-backend=isl --disable-cloog-version-check \
              --enable-lto --enable-plugin --enable-install-libiberty \
              --with-linker-hash-style=gnu \
              --disable-multilib --disable-werror \

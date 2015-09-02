@@ -27,16 +27,19 @@ cd build
 # 9. Enables GNU unique object;
 # 10. Enables linker build ID;
 # 11. Enables LTO support (as mentioned in note 1, section c);
-# 12. Enables plugin support;
-# 13. Enables libiberty installation (you may disable "--enable-install-libiberty"
+# 12. Enables isl as the default cloog backend, and disables version check
+#     for cloog (which is included in GCC itself, Cloog enables support for
+#                graphite based optimizations);
+# 13. Enables plugin support;
+# 14. Enables libiberty installation (you may disable "--enable-install-libiberty"
 #                                     if you really feel the urge...);
-# 14. Enables GNU style linker hash;
-# 15. Disables multilib support (you may remove "--disable-multilib" to enable
+# 15. Enables GNU style linker hash;
+# 16. Disables multilib support (you may remove "--disable-multilib" to enable
 #                                the support for it, however you will need a copy of
 #                                GCC with multilib support to build);
 #     a. AOSC OS uses subsystems to provide binary support for foreign architectures.
-# 16. Enable release level checking;
-# 17. Defaults CXX ABI to C++98 (this is generally a compatibility measure, you may
+# 17. Enable release level checking;
+# 18. Defaults CXX ABI to C++98 (this is generally a compatibility measure, you may
 #                                not change this option, which WILL result in binary
 #                                incompatibility with AOSC OS);
 #
