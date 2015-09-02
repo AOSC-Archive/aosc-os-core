@@ -35,7 +35,7 @@ popd
 # Avoid /lib, use /usr/lib.
 #
 
-cp -r $PKGDIR/lib abdist/usr/
+cp -r $PKGDIR/lib $PKGDIR/usr/
 rm -rf $PKGDIR/lib
 
 #
