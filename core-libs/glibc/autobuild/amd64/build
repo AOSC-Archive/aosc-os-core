@@ -18,8 +18,9 @@ echo "rootsbindir=/usr/bin" >> configparms
 # Hardening should not be enabled at build time.
 #
 
-export CFLAGS=${CFLAGS/-fstack-protector-strong/}
+export CFLAGS=${CFLAGS/-fstack-protector-strong -fPIE/}
 export CPPFLAGS=${CPPFLAGS/-D_FORTIFY_SOURCE=2/}
+export LDFLAGS=${LDFLAGS/-fPIE -pie/}
 
 #
 # The following configuration:
@@ -68,8 +69,9 @@ make
 #
 
 sed -i "/build-programs=/s#no#yes#" configparms
-echo "CC += -fstack-protector-strong -D_FORTIFY_SOURCE=2" >> configparms
-echo "CXX += -fstack-protector-strong -D_FORTIFY_SOURCE=2" >> configparms
+echo "CC += -fPIE -fstack-protector-strong -D_FORTIFY_SOURCE=2" >> configparms
+echo "CXX += fPIE -fstack-protector-strong -D_FORTIFY_SOURCE=2" >> configparms
+export LDFLAGS="${LDFLAGS} -fPIE -pie"
 
 make
 

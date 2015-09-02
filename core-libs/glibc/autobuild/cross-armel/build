@@ -29,8 +29,9 @@ EOF
 # Hardening should not be enabled at build time.
 #
 
-export CFLAGS=${CFLAGS/-fstack-protector-strong/}
+export CFLAGS=${CFLAGS/-fstack-protector-strong -fPIE/}
 export CPPFLAGS=${CPPFLAGS/-D_FORTIFY_SOURCE=2/}
+export LDFLAGS=${LDFLAGS/-fPIE -pie/}
 
 #
 # Calibrate for cross tool chain.
@@ -63,7 +64,7 @@ export PATH=`dirname $HOSTTOOLPREFIX`:$PATH
 ../configure --prefix=/usr \
              --libdir=/usr/lib --libexecdir=/usr/lib \
              --with-headers=/usr/include \
-             --with-bugurl=https://github.com/AOSC-Dev/AOSC-OS \
+             --with-bugurl=https://github.com/AOSC-Dev/aosc-os-core \
              --enable-add-ons \
              --enable-obsolete-rpc \
              --enable-kernel=2.6.32 \
@@ -89,8 +90,9 @@ make
 #
 
 sed -i "/build-programs=/s#no#yes#" configparms
-echo "CC += -fstack-protector-strong -D_FORTIFY_SOURCE=2" >> configparms
-echo "CXX += -fstack-protector-strong -D_FORTIFY_SOURCE=2" >> configparms
+echo "CC += -fPIE -fstack-protector-strong -D_FORTIFY_SOURCE=2" >> configparms
+echo "CXX += -fPIE -fstack-protector-strong -D_FORTIFY_SOURCE=2" >> configparms
+export LDFLAGS="${LDFLAGS} -fPIE -pie"
 
 make
 
