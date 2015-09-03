@@ -6,3 +6,5 @@ PKGDES="GNU Compiler Collection (runtime libraries only)"
 ABRPMAUTOPROVONLY=yes
 NOLTO=yes
 ABSTRIP=no
+
+AB_FLAGS_PIE=0

@@ -54,7 +54,9 @@ cd build
              --disable-libunwind-exceptions --enable-clocale=gnu \
              --disable-libstdcxx-pch --disable-libssp \
              --enable-gnu-unique-object --enable-linker-build-id \
-             --enable-cloog-backend=isl --disable-cloog-version-check \
+             --with-isl=/usr --with-cloog=/usr \
+             --enable-cloog-backend=isl \
+             --disable-cloog-version-check \
              --enable-lto --enable-plugin --enable-install-libiberty \
              --with-linker-hash-style=gnu \
              --disable-multilib --disable-werror \
@@ -96,3 +98,9 @@ for lib in libgomp \
            libquadmath; do
     make -C x86_64-unknown-linux-gnu/$lib DESTDIR=$PKGDIR install-info
 done
+
+#
+# Calibration: move /usr/lib64/* /usr/lib/
+#
+
+mv $PKGDIR/usr/lib64/* $PKGDIR/usr/lib/

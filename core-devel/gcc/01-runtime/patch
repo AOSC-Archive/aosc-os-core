@@ -16,4 +16,3 @@ sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" $SRCDIR/{libiberty,gcc}/configure
 
 echo $PKGVER > $SRCDIR/gcc/BASE-VER
 echo 'AOSC OS, Core' > $SRCDIR/gcc/DEV-PHASE
-
