@@ -3,7 +3,7 @@
 #
 
 ZONEINFO=$PKGDIR/usr/share/zoneinfo
-mkdir -pv $ZONEINFO/{posix,right}
+mkdir -p $ZONEINFO/{posix,right}
 
 #
 # Install timezones.
@@ -17,6 +17,6 @@ for tz in etcetera southamerica northamerica europe africa antarctica  \
     zic -L leapseconds -d $ZONEINFO/right -y "sh yearistype.sh" ${tz}
 done
 
-cp -v zone.tab iso3166.tab $ZONEINFO
+cp zone.tab iso3166.tab $ZONEINFO
 zic -d $ZONEINFO -p America/New_York
 
