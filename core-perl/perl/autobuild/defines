@@ -49,3 +49,5 @@ tmp 'perl(timelocal.pl)'
 tmp 'perl(utf8_heavy.pl)'
 tmp 'perl(validate.pl)'
 unset tmp
+
+AB_FLAGS_PIE=0
