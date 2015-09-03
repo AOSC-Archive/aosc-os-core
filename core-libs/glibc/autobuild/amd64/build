@@ -18,9 +18,8 @@ echo "rootsbindir=/usr/bin" >> configparms
 # Hardening should not be enabled at build time.
 #
 
-export CFLAGS=${CFLAGS/-fstack-protector-strong -fPIE/}
+export CFLAGS=${CFLAGS/-fstack-protector-strong/}
 export CPPFLAGS=${CPPFLAGS/-D_FORTIFY_SOURCE=2/}
-export LDFLAGS=${LDFLAGS/-fPIE -pie/}
 
 #
 # The following configuration:
@@ -69,9 +68,8 @@ make
 #
 
 sed -i "/build-programs=/s#no#yes#" configparms
-echo "CC += -fPIE -fstack-protector-strong -D_FORTIFY_SOURCE=2" >> configparms
-echo "CXX += fPIE -fstack-protector-strong -D_FORTIFY_SOURCE=2" >> configparms
-export LDFLAGS="${LDFLAGS} -fPIE -pie"
+echo "CC += -fstack-protector-strong -D_FORTIFY_SOURCE=2" >> configparms
+echo "CXX += -fstack-protector-strong -D_FORTIFY_SOURCE=2" >> configparms
 
 make
 
@@ -99,15 +97,15 @@ rm -f $PKGDIR/etc/ld.so.{cache,conf}
 #
 
 install -dm755 $PKGDIR/usr/lib/{locale,systemd/system,tmpfiles.d}
-install -m644 $PKGDIR/nscd/nscd.conf $PKGDIR/etc/nscd.conf
-install -m644 $PKGDIR/nscd/nscd.service $PKGDIR/usr/lib/systemd/system
-install -m644 $PKGDIR/nscd/nscd.tmpfiles $PKGDIR/usr/lib/tmpfiles.d/nscd.conf
+install -m644 $SRCDIR/nscd/nscd.conf $PKGDIR/etc/nscd.conf
+install -m644 $SRCDIR/nscd/nscd.service $PKGDIR/usr/lib/systemd/system
+install -m644 $SRCDIR/nscd/nscd.tmpfiles $PKGDIR/usr/lib/tmpfiles.d/nscd.conf
 
 #
 # Install "getaddrinfo" configuration file.
 #
 
-install -m644 posix/gai.conf $PKGDIR/etc/gai.conf
+install -m644 $SRCDIR/posix/gai.conf $PKGDIR/etc/gai.conf
 
 #
 # Unneeded static libraries (because we disabled static library purging for this package.
