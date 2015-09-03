@@ -78,9 +78,3 @@ rm -fv $PKGDIR/usr/share/locale/fr/LC_MESSAGES/libstdc++.mo
 rm -fv $PKGDIR/usr/share/info/libgomp.info
 rm -fv $PKGDIR/usr/share/info/libquadmath.info
 rm -fv $PKGDIR/usr/share/info/libitm.info
-
-#
-# Link cc.
-#
-
-ln -sv gcc $PKGDIR/usr/bin/cc
