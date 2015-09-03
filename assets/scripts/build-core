@@ -8,6 +8,8 @@ for i in \
 	core-libs/gmp \
 	core-libs/mpfr \
 	core-libs/mpc \
+	core-libs/isl \
+	core-libs/cloog \
 	core-devel/gcc \
 	core-devel/binutils \
 	core-devel/libtool \
@@ -18,7 +20,7 @@ for i in \
 	core-devel/make \
 	core-misc/aosc-aaa
 do
-	echo "->	Starting build of $i\n" &&
+	echo "->	Starting build of $i" &&
 	abbs-build $i &&
-	echo "->	Finished build of $i\n"
+	echo "->	Finished build of $i"
 done
