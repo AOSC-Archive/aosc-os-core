@@ -2,3 +2,5 @@ PKGNAME=readline
 PKGSEC=libs
 PKGDEP="glibc ncurses"
 PKGDES="GNU realine library"
+
+AB_FLAGS_PIE=0
