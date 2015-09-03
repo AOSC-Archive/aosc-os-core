@@ -2,3 +2,5 @@ PKGNAME=ncurses
 PKGDEP=glibc
 PKGDES="System V Release 4.0 curses emulation library"
 PKGSEC=libs
+
+AB_FLAGS_PIE=0
