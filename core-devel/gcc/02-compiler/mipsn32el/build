@@ -67,7 +67,7 @@ cd build
 # to save some space.
 #
 
-make -C mips64-unknown-linux-gnu/libstdc++-v3/doc doc-man-doxygen  &&
+# make -C mips64-unknown-linux-gnu/libstdc++-v3/doc doc-man-doxygen  &&
 
 make install DESTDIR=$PKGDIR
 
