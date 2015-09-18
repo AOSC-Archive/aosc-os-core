@@ -49,7 +49,7 @@ export PATH=`dirname $HOSTTOOLPREFIX`:$PATH
 #                                                            know what you are doing);
 # 5. Declares that Kernel verion 2.6.32 is the minimum accepted (you may raise the version
 #                                                                number as you like);
-# 6. Enables "bind now" support for network;
+# 6. Enables "bind now" support;
 # 7. Disables profiling support (you may enable, using --enable-profile to your need, however
 #                                this is not realistic in a "Core" environment);
 # 8. Enables stackguard randomization for extra security;
