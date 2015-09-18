@@ -2,4 +2,4 @@
 # Dumb RPM is confused with all those libraries.
 #
 
-chmod +x $PKGDIR/usr/lib/lib*.so*
+chmod +x $PKGDIR/usr/lib{,32,64}/lib*.so*
