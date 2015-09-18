@@ -8,3 +8,4 @@ NOLTO=yes
 ABSTRIP=no
 
 AB_FLAGS_PIE=0
+RECONF=no
