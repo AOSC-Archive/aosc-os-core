@@ -42,6 +42,9 @@ cd build
 # 18. Defaults CXX ABI to C++98 (this is generally a compatibility measure, you may
 #                                not change this option, which WILL result in binary
 #                                incompatibility with AOSC OS);
+#     #18 is now accepted by GCC 5.2.0 as gcc4-compatible
+# 19. Enables support for GNU indirect function (you may disable this by removing
+#                                                "--enable-gnu-indirect-function");
 #
 
 ../configure --prefix=/usr \
@@ -50,7 +53,7 @@ cd build
              --with-bugurl=https://github.com/AOSC-Dev/aosc-os-core \
              --enable-languages=c,c++,fortran,lto \
              --enable-shared --enable-threads=posix \
-             --with-system-zlib --enable-__cxa_atexit \
+             --with-system-zlib --enable-gnu-indirect-function --enable-__cxa_atexit \
              --disable-libunwind-exceptions --enable-clocale=gnu \
              --disable-libstdcxx-pch --disable-libssp \
              --enable-gnu-unique-object --enable-linker-build-id \
@@ -60,7 +63,7 @@ cd build
              --enable-lto --enable-plugin --enable-install-libiberty \
              --disable-multilib --disable-werror \
              --enable-checking=release \
-             --with-default-libstdcxx-abi=c++98
+             --with-default-libstdcxx-abi=gcc4-compatible
 
 make
 
