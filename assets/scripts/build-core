@@ -1,3 +1,30 @@
+corewarn(){ echo -e "[\e[33mCOREWARN\e[0m]: \e[1m$*\e[0m" >&2; }
+coreerr(){ echo -e "[\e[31mCOREERROR\e[0m]: \e[1m$*\e[0m" >&2; }
+coreinfo(){ echo -e "[\e[96mCOREINFO\e[0m]: \e[1m$*\e[0m" >&2; }
+coresucc(){ echo -e "[\e[32mCORESUCC\e[0m]: \e[1m$*\e[0m" >&2; }
+
+core_build_start() {
+	coreinfo "Started build of $1 at $(date +'%F %R %Z')"
+}
+
+core_build_finish() {
+        coresucc "Finished build of $1 at $(date +'%F %R %Z')"
+}
+
+core_build_error() {
+	coreerr "Error occurred while building $1, at $(date +'%F %R %Z')"
+	exit 1
+}
+
+core_pre_dep_miss() {
+	coreerr "You would need \`autobuild' and \`abbs-build' executables for Core\
+  \n             to be built. It is recommended to use BuildKit for building.\
+  \n             \033[33m* \033[0mGet it from https://aosc.io"
+	exit 1
+}
+
+! type abbs-build &>/dev/null || ! type autobuild &>/dev/null && core_pre_dep_miss
+
 for i in \
 	core-devel/linux+api \
 	core-misc/tzdata \
@@ -20,7 +47,7 @@ for i in \
 	core-devel/make \
 	core-misc/aosc-aaa
 do
-	echo "->	Starting build of $i" &&
-	abbs-build $i &&
-	echo "->	Finished build of $i"
+	core_build_start $i
+	abbs-build $i || core_build_error $i
+	core_build_finish $i
 done
