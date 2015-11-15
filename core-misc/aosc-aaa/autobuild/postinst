@@ -6,9 +6,35 @@
 #
 # Extra Section
 #
-# Copyleft, AOSC Development Hub and the Core developers behalf.
+# Copyleft, AOSC Developers.
 #
 # Purpose of this section:
 # 1. Adjustment for current system.
 # 2. News and issues to be read and advised by the users.
 #
+
+# FIXME: may cause trouble for graphical PM frontends.
+# 3.1.0, comment all of below on next release.
+
+printf "\
+
+Welcome to AOSC OS (with the brand new Core 3.1.0)!
+
+Here, let me introduce you to many of the changes that is introduced in this
+new release:
+
+	1. GCC compiler and runtime libraries are now updated to 5.2.0,
+	   please don't panic! GCC 5.2.0 is built with a default cxxabi
+	   of c++98, meaning that you wouldn't have to rebuild any of
+	   C++ programs that rely on GCC runtime (and of course, if you
+	   do have any proprietary/closed-source C++ program, they will
+	   still work after this update).
+	2. Well, and now you will start to see this message at every
+	   AOSC OS Core version update.
+
+Thanks for using AOSC OS, and best regards,
+Developers of AOSC OS
+
+(Use 'Q' to exit out of this prompt)
+
+" | less

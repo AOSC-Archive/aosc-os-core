@@ -1,5 +1,2 @@
-VER=3.0.4
-REL=1
-
-SRCTBL="https://github.com/AOSC-Dev/aosc-aaa/archive/${VER}-${REL}.tar.gz"
-SUBDIR=aosc-aaa-${VER}-${REL}
+VER=3.1.0
+SRCTBL="https://github.com/AOSC-Dev/aosc-aaa/archive/v$VER.tar.gz"
