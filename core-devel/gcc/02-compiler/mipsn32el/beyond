@@ -51,7 +51,7 @@ rm -fv $PKGDIR/usr/lib{,32}/libgomp.so*
 rm -fv $PKGDIR/usr/lib{,32}/libgfortran.so*
 rm -fv $PKGDIR/usr/lib{,32}/liblsan.so*
 rm -fv $PKGDIR/usr/lib{,32}/libstdc++.so*
-rm -rf $PKGDIR/usr/lib{,32}/libgomp-plugin-host_nonshm.so
+rm -fv $PKGDIR/usr/lib{,32}/libgomp-plugin-host_nonshm.so*
 rm -fv $PKGDIR/usr/share/locale/de/LC_MESSAGES/libstdc++.mo
 rm -fv $PKGDIR/usr/share/locale/fr/LC_MESSAGES/libstdc++.mo
 rm -fv $PKGDIR/usr/share/info/libgomp.info
