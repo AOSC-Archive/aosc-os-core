@@ -15,11 +15,14 @@
 
 printf "\
 
-Welcome to AOSC OS (with the brand new Core 3.1.1)!
+Welcome to AOSC OS (with the brand new Core 3.1.2)!
 
-AOSC OS Core 3.1.1 is a maintenance update, in which:
+Core 3.1.2 is a maintenance release over Core 3.1.0 to be provided to AOSC OS
+users. Core 3.1.2 contains essential fixes that includes:
 
-	/etc/sysctl.d configurations are removed for further review.
+	1. Proper removal of non-runtime GCC libraries, with potential of
+	   causing problem with build time;
+	2. Removal of /etc/sysctl.d configuration files for further review.
 
 Thanks for using AOSC OS, and best regards,
 Developers of AOSC OS
@@ -46,7 +49,7 @@ Developers of AOSC OS
 #	   still work after this update).
 #	2. Well, and now you will start to see this message at every
 #	   AOSC OS Core version update.
-
+#
 #Thanks for using AOSC OS, and best regards,
 #Developers of AOSC OS
 #
