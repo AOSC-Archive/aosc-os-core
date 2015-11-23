@@ -9,3 +9,5 @@ ABSTRIP=no
 
 AB_FLAGS_PIE=0
 RECONF=no
+
+PKGBREAK="gcc<=5.2.0-1"

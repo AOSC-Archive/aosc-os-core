@@ -101,9 +101,3 @@ for lib in libgomp \
            libquadmath; do
     make -C x86_64-unknown-linux-gnu/$lib DESTDIR=$PKGDIR install-info
 done
-
-#
-# Calibration: move /usr/lib64/* /usr/lib/
-#
-
-mv $PKGDIR/usr/lib64/* $PKGDIR/usr/lib/

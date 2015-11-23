@@ -8,3 +8,4 @@ NOSTATIC=no
 NOLTO=yes
 
 AB_FLAGS_PIE=0
+PKGBREAK="gcc-runtime<=5.2.0-2"
