@@ -1,6 +1,6 @@
 PKGNAME=gcc
 PKGSEC=devel
-PKGDEP="binutils mpc gcc-runtime cloog isl"
+PKGDEP="binutils mpc gcc-runtime isl"
 PKGDES="GNU Compiler Collection"
 
 ABRPMAUTOPROVONLY=yes
