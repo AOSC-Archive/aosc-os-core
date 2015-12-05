@@ -15,21 +15,45 @@
 
 printf "\
 
-Welcome to AOSC OS (with the brand new Core 3.1.2)!
+Welcome to AOSC OS (with the brand new Core 3.2.0)!
 
-Core 3.1.2 is a maintenance release over Core 3.1.0 to be provided to AOSC OS
-users. Core 3.1.2 contains essential fixes that includes:
+Core 3.2.0 is a major update to the AOSC OS Core. It contains a major toolchain
+update, and re-introduces security sysctl.d definitions.
 
-	1. Proper removal of non-runtime GCC libraries, with potential of
-	   causing problem with build time;
-	2. Removal of /etc/sysctl.d configuration files for further review.
+* GCC is updated to 5.3.0.
+* Binutils and Libtool are rebuilt due to GCC update.
+* /etc/sysctl.d configurations are reviewed and re-introduced, providing better
+  protection for the Kernel, the virtual memory subsystem; and performance and
+  security improvement for the Kernel network stack.
 
 Thanks for using AOSC OS, and best regards,
 Developers of AOSC OS
 
+For any issue encountered in the future, please report them as an Issue at
+
+https://github.com/AOSC-Dev/aosc-os-core/issues/
+
 (Use 'Q' to exit out of this prompt)
 
 " | less
+
+#printf "\
+#
+#Welcome to AOSC OS (with the brand new Core 3.1.2)!
+#
+#Core 3.1.2 is a maintenance release over Core 3.1.0 to be provided to AOSC OS
+#users. Core 3.1.2 contains essential fixes that includes:
+#
+#	1. Proper removal of non-runtime GCC libraries, with potential of
+#	   causing problem with build time;
+#	2. Removal of /etc/sysctl.d configuration files for further review.
+#
+#Thanks for using AOSC OS, and best regards,
+#Developers of AOSC OS
+#
+#(Use 'Q' to exit out of this prompt)
+#
+#" | less
 
 # FIXME: may cause trouble for graphical PM frontends.
 # 3.1.0, comment all of below on next release.
