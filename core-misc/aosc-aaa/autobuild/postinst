@@ -15,16 +15,10 @@
 
 printf "\
 
-Welcome to AOSC OS (with the brand new Core 3.2.0)!
+Welcome to AOSC OS (with the brand new Core 3.2.1)!
 
-Core 3.2.0 is a major update to the AOSC OS Core. It contains a major toolchain
-update, and re-introduces security sysctl.d definitions.
-
-* GCC is updated to 5.3.0.
-* Binutils and Libtool are rebuilt due to GCC update.
-* /etc/sysctl.d configurations are reviewed and re-introduced, providing better
-  protection for the Kernel, the virtual memory subsystem; and performance and
-  security improvement for the Kernel network stack.
+Core 3.2.1 is a maintenance release to the current 3.2 branch of AOSC OS Core.
+It mainly contains fixes for RPM-based system releases.
 
 Thanks for using AOSC OS, and best regards,
 Developers of AOSC OS
@@ -36,6 +30,30 @@ https://github.com/AOSC-Dev/aosc-os-core/issues/
 (Use 'Q' to exit out of this prompt)
 
 " | less
+
+#printf "\
+#
+#Welcome to AOSC OS (with the brand new Core 3.2.0)!
+#
+#Core 3.2.0 is a major update to the AOSC OS Core. It contains a major toolchain
+#update, and re-introduces security sysctl.d definitions.
+#
+#* GCC is updated to 5.3.0.
+#* Binutils and Libtool are rebuilt due to GCC update.
+#* /etc/sysctl.d configurations are reviewed and re-introduced, providing better
+#  protection for the Kernel, the virtual memory subsystem; and performance and
+#  security improvement for the Kernel network stack.
+#
+#Thanks for using AOSC OS, and best regards,
+#Developers of AOSC OS
+#
+#For any issue encountered in the future, please report them as an Issue at
+#
+#https://github.com/AOSC-Dev/aosc-os-core/issues/
+#
+#(Use 'Q' to exit out of this prompt)
+#
+#" | less
 
 #printf "\
 #
