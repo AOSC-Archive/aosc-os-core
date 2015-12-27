@@ -1,6 +1,6 @@
 PKGNAME=glibc
 PKGSEC=libs
-PKGDEP="tzdata"
+PKGDEP="tzdata linux+api"
 PKGDES="GNU C Library"
 
 RPMEXTRAPROVIDE="rtld(GNU_HASH)"
