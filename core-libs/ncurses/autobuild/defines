@@ -4,4 +4,4 @@ PKGDES="System V Release 4.0 curses emulation library"
 PKGSEC=libs
 
 AB_FLAGS_PIE=0
-RPMEXTRAPROVIDE="Provides: libform.so.5()(54bit) libformw.so.5()(54bit) libmenu.so.5()(54bit) libmenuw.so.5()(54bit) libncurses++w.so.5()(54bit) libncurses.so.5()(54bit) libncursesw.so.5()(54bit) libpanel.so.5()(54bit) libpanelw.so.5()(54bit)"
+RPMEXTRAPROVIDE="Provides: libform.so.5()(64bit) libformw.so.5()(64bit) libmenu.so.5()(64bit) libmenuw.so.5()(64bit) libncurses++w.so.5()(64bit) libncurses.so.5()(64bit) libncursesw.so.5()(64bit) libpanel.so.5()(64bit) libpanelw.so.5()(64bit)"
