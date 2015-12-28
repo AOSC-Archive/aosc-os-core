@@ -4,9 +4,7 @@
 
 patch -Np1 -i $PATCHDIR/binutils-e9c1bdad.patch
 
-sed -i 's/testsuite//g' $SRCDIR/gold/Makefile.am
-
-autoreconf -fi
+sed -i 's/testsuite//g' $SRCDIR/gold/Makefile.in
 
 #
 # $CPPFLAGS adjustment for libiberty.
