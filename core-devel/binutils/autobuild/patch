@@ -4,10 +4,12 @@
 
 patch -Np1 -i $PATCHDIR/binutils-e9c1bdad.patch
 
+sed -i 's/testsuite//g' $SRCDIR/gold/Makefile.am
+
+autoreconf -fi
+
 #
 # $CPPFLAGS adjustment for libiberty.
 #
 
 sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" $SRCDIR/libiberty/configure
-
-sed -i 's/testsuite//g' $SRCDIR/gold/Makefile.am
