@@ -69,13 +69,19 @@ cd build
              --build=armv7a-hardfloat-linux-gnueabi \
              --with-arch=armv7-a --with-float=hard --with-fpu=neon
 
+#
+# Disable fixincludes
+#
+
+sed -i 's/fixincludes gcc/gcc/g' Makefile
+sed -i '/fixincludes//d' Makefile
+
 make
 
 #
 # Build documentations, comment the following line if you really need
 # to save some space.
 #
-
 
 make -C armv7a-hardfloat-linux-gnueabi/libgcc install-shared DESTDIR=$PKGDIR
 rm `find $PKGDIR -name 'libgcc_eh.a'`
