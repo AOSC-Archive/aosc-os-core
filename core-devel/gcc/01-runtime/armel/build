@@ -63,7 +63,7 @@ cd build
              --with-linker-hash-style=gnu \
              --disable-multilib --disable-werror \
              --enable-checking=release \
-             --with-default-libstdcxx-abi=c++98 \
+             --with-default-libstdcxx-abi=gcc4-compatible \
              --disable-altivec --disable-fixed-point \
              --host=armv7a-hardfloat-linux-gnueabi \
              --build=armv7a-hardfloat-linux-gnueabi \
