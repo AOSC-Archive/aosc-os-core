@@ -22,7 +22,7 @@ cd binutils-build
              --with-lib-path=/usr/lib \
              --with-bugurl=https://github.com/AOSC-Dev/aosc-os-core \
              --enable-threads --enable-shared --with-pic \
-             --enable-ld=default --enable-gold --enable-plugins \
+             --enable-ld --enable-gold=default --enable-plugins \
              --disable-werror --enable-lto --disable-gdb
 
 #
