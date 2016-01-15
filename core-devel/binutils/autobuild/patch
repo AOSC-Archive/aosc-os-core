@@ -2,25 +2,25 @@
 # Qt linked with gold crash on startup, Red Hat BZ #1193044
 #
 
-patch -Np1 -i $PATCHDIR/binutils-2.25.1-dynamic_list.patch
+patch -Np1 -i autobuild/patches/binutils-2.25.1-dynamic_list.patch
 
 #
 # Fix incorrectly generated ELF binaries and DSOs
 #
 
-patch -Np1 -i $PATCHDIR/binutils-rh1247126.patch
+patch -Np1 -i autobuild/patches/binutils-rh1247126.patch
 
 #
 # Fix infinite recursion when a plugin tries to claim an unrecognized binary
 #
 
-patch -Np1 -i $PATCHDIR/binutils-2.25.1-plugin-format-checking.patch
+patch -Np1 -i autobuild/patches/binutils-2.25.1-plugin-format-checking.patch
 
 #
 # https://sourceware.org/bugzilla/show_bug.cgi?id=16992
 #
 
-patch -Np1 -i $PATCHDIR/binutils-e9c1bdad.patch
+patch -Np1 -i autobuild/patches/binutils-e9c1bdad.patch
 
 sed -i 's/testsuite//g' $SRCDIR/gold/Makefile.in
 
