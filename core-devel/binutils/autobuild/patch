@@ -10,18 +10,6 @@ patch -Np1 -i autobuild/patches/binutils-2.25.1-dynamic_list.patch
 
 patch -Np1 -i autobuild/patches/binutils-rh1247126.patch
 
-#
-# Fix infinite recursion when a plugin tries to claim an unrecognized binary
-#
-
-patch -Np1 -i autobuild/patches/binutils-2.25.1-plugin-format-checking.patch
-
-#
-# https://sourceware.org/bugzilla/show_bug.cgi?id=16992
-#
-
-patch -Np1 -i autobuild/patches/binutils-e9c1bdad.patch
-
 sed -i 's/testsuite//g' $SRCDIR/gold/Makefile.in
 
 #
