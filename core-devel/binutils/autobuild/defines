@@ -5,3 +5,4 @@ PKGDES="a set of programs to assemble and manipulate binary and object files"
 
 NOSTATIC=no
 NOLTO=yes
+AB_FLAGS_PIE=0
