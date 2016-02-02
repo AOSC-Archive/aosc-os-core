@@ -36,6 +36,4 @@ ln -sv bin $PKGDIR/usr/sbin
 # Linux From Scratch Chapter 6, Section 2.
 #
 mkdir -pv $PKGDIR/{dev,proc,sys,run}
-mknod -m 600 $PKGDIR/dev/console c 5 1
-mknod -m 666 $PKGDIR/dev/null c 1 3
 install -dv -m 1777 $PKGDIR/dev/shm
