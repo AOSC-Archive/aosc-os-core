@@ -1,6 +1,13 @@
 sed -i 's@\./fixinc\.sh@-c true@' $SRCDIR/gcc/Makefile.in
 
 #
+# PR69140: fixes an issue that prevents Wine from being bulit, when using optimization
+#          levels higher or equal to -O1 (-mincoming-stack-boundary=3).
+#
+
+patch -Np1 -i autobuild/patches/pr69140.patch
+
+#
 # $CPPFLAGS adjustments.
 #
 
