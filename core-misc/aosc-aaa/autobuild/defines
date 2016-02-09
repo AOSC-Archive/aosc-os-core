@@ -1,4 +1,4 @@
 PKGNAME=aosc-aaa
 PKGSEC=misc
 PKGDEP=""
-PKGDES="bed rock level system definitions"
+PKGDES="Bed rock level system definitions"
