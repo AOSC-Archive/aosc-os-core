@@ -10,9 +10,3 @@ if [ -x /usr/bin/locale-gen ]; then
 else
 	true
 fi
-
-#
-# Historic flaw of AOSC OS3, comment out next 3 lines for derivative build.
-#
-
-ln -sv /usr/lib lib64
