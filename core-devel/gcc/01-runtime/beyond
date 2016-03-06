@@ -1,5 +1,35 @@
-#
-# Dumb RPM is confused with all those libraries.
-#
+# Runtime libraries installation.
 
+cd build
+
+make -C "${ARCH_TARGET}"/libgcc install-shared DESTDIR="$PKGDIR"
+rm `find "$PKGDIR" -name 'libgcc_eh.a'`
+
+# Common runtimes.
+RTLIBS="libatomic libgfortran libgomp libitm libquadmath \
+        libsanitizer/{a,l,ub}san libstdc++-v3/src libvtv"
+
+# Intel Cilk Runtime is only for x86.
+[ "$ARCH" = "amd64" ] && RTLIBS+=" libcilkrts"
+
+for lib in "${RTLIBS}"; do
+    make -C "${ARCH_TARGET}"/$lib DESTDIR="$PKGDIR" install-toolexeclibLTLIBRARIES
+done
+
+make -C "${ARCH_TARGET}"/libsanitizer/tsan DESTDIR="$PKGDIR" install-toolexeclibLTLIBRARIES
+make -C "${ARCH_TARGET}"/libobjc DESTDIR="$PKGDIR" install-libs
+make -C "${ARCH_TARGET}"/libstdc++-v3/po DESTDIR="$PKGDIR" install
+make -C "${ARCH_TARGET}"/libmpx DESTDIR="$PKGDIR" install
+
+rm "$PKGDIR"/usr/lib/libmpx.spec
+
+for lib in libgomp \
+           libitm \
+           libquadmath; do
+    make -C "${ARCH_TARGET}"/$lib DESTDIR="$PKGDIR" install-info
+done
+
+cd "$SRCDIR"
+
+# Dumb RPM is confused with all those libraries.
 chmod +x $PKGDIR/usr/lib{,32,64}/lib*.so*

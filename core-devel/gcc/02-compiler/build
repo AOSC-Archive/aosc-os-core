@@ -1,16 +1,9 @@
-#
 # Shadow build is necessary for a successful GCC build (at least for 4.9.2).
-#
-
 cd build
 
-#
 # Build documentations, comment the following line if you really need
 # to save some space.
-#
-
-make -C x86_64-unknown-linux-gnu/libstdc++-v3/doc doc-man-doxygen
-
-make install DESTDIR=$PKGDIR
+make -C ${ARCH_TARGET}/libstdc++-v3/doc doc-man-doxygen
+make install DESTDIR="$PKGDIR"
 
 

@@ -1,9 +1,0 @@
-#
-# Shadow build is necessary for a successful GCC build (at least for 4.9.2).
-#
-
-cd build
-
-make install DESTDIR=$PKGDIR
-
-
