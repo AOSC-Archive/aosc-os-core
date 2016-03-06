@@ -3,6 +3,45 @@ PKGSEC=libs
 PKGDEP="tzdata linux+api"
 PKGDES="GNU C Library"
 
+# The following configuration:
+#
+# 1. Declares that libraries should be installed into /usr/lib instead of /lib64;
+# 2. Declares bug tracking URL (should not be changed unless you are building a derivative);
+# 3. Enables add-on support;
+# 4. Disables obsolete RPC (Remote Procedural Call) support  
+#    (--disable-obsolete-rpc to disable such support, if you know what you are doing);
+# 5. Declares that Kernel verion 2.6.32 is the minimum accepted
+#    (you may raise the version number as you like);
+# 6. Enables "bind now" (dynamic loader) support;
+# 7. Disables profiling support 
+#    (you may enable, using --enable-profile to your need, however this is not realistic in
+#    a "Core" environment);
+# 8. Enables stackguard randomization for extra security;
+# 9. Enables lock elision (essential for GUILE, and many others that is lock-sensitive);
+# 10. Enables multiple architecture support 
+#     (mainly used to distinguish among different builds, multiarch is not supported);
+# 11. Disables "warning as error";
+
+AUTOTOOLS_AFTER="--libexecdir=/usr/lib \
+                 --with-headers=/usr/include \
+                 --with-bugurl=https://github.com/AOSC-Dev/aosc-os-core \
+                 --enable-add-ons \
+                 --enable-obsolete-rpc \
+                 --enable-kernel=2.6.32 \
+                 --enable-bind-now --disable-profile \
+                 --enable-stackguard-randomization \
+                 --enable-lock-elision \
+                 --enable-multi-arch \
+                 --disable-werror"
+
+# MIPS specific.
+[ "$ARCH" = "mipsel" ] || [ "$ARCH" = "mipsn32el" ] && \
+    AUTOTOOLS_AFTER+=" --disable-multi-arch"
+
+# ARM specific.
+[ "$ARCH" = "armel" ] || [ "$ARCH" = "arm64" ] && \
+    AUTOTOOLS_AFTER+=" --with-__thread"
+
 RPMEXTRAPROVIDE="rtld(GNU_HASH)"
 NOSTATIC=no
 ABSTRIP=no
