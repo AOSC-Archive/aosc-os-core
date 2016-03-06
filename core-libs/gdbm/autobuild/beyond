@@ -1,8 +1,5 @@
-#
 # Fix build failures in some packages.
-#
-
-install -dm755 $PKGDIR/usr/include/gdbm
-ln -sf ../gdbm.h $PKGDIR/usr/include/gdbm/gdbm.h
-ln -sf ../ndbm.h $PKGDIR/usr/include/gdbm/ndbm.h
-ln -sf ../dbm.h  $PKGDIR/usr/include/gdbm/dbm.h
+install -dm755 "$PKGDIR"/usr/include/gdbm
+ln -sf ../gdbm.h "$PKGDIR"/usr/include/gdbm/gdbm.h
+ln -sf ../ndbm.h "$PKGDIR"/usr/include/gdbm/ndbm.h
+ln -sf ../dbm.h  "$PKGDIR"/usr/include/gdbm/dbm.h
