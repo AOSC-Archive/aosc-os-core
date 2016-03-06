@@ -28,8 +28,15 @@ mkdir -pv $PKGDIR/var/{opt,cache,local}
 # Avoid confusion.
 #
 ln -sv usr/lib $PKGDIR/lib
-ln -sv usr/lib $PKGDIR/lib64
-ln -sv lib $PKGDIR/usr/lib64
+case $ARCH in
+	(arm*)	;;
+	(*n32)
+		ln -sv usr/lib $PKGDIR/lib32
+		ln -sv lib $PKGDIR/usr/lib32;;	
+	(*)
+		ln -sv usr/lib $PKGDIR/lib64
+		ln -sv lib $PKGDIR/usr/lib64;;
+esac
 ln -sv usr/bin $PKGDIR/bin
 ln -sv usr/bin $PKGDIR/sbin
 ln -sv bin $PKGDIR/usr/sbin
