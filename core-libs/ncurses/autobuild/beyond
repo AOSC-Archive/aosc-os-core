@@ -1,15 +1,12 @@
-#
 # Contigency: add symlinks for system to even survive the bump
-#
-
-ln -sv libform.so.6.0		$PKGDIR/usr/lib/libform.so.5
-ln -sv libpanel.so.6.0		$PKGDIR/usr/lib/libpanel.so.5
-ln -sv libpanelw.so.6.0		$PKGDIR/usr/lib/libpanelw.so.5
-ln -sv libncursesw.so.6.0	$PKGDIR/usr/lib/libncursesw.so.5
-ln -sv libncurses++w.so.6.0	$PKGDIR/usr/lib/libncurses++w.so.5
-ln -sv libmenu.so.6.0		$PKGDIR/usr/lib/libmenu.so.5
-ln -sv libmenuw.so.6.0		$PKGDIR/usr/lib/libmenuw.so.5
-ln -sv libformw.so.6.0		$PKGDIR/usr/lib/libformw.so.5
-ln -sv libncurses.so.6.0	$PKGDIR/usr/lib/libncurses.so.5
-ln -sv libtinfo.so.6.0		$PKGDIR/usr/lib/libtinfo.so.5
+ln -sv libform.so.6.0		"$PKGDIR"/usr/lib/libform.so.5
+ln -sv libpanel.so.6.0		"$PKGDIR"/usr/lib/libpanel.so.5
+ln -sv libpanelw.so.6.0		"$PKGDIR"/usr/lib/libpanelw.so.5
+ln -sv libncursesw.so.6.0	"$PKGDIR"/usr/lib/libncursesw.so.5
+ln -sv libncurses++w.so.6.0	"$PKGDIR"/usr/lib/libncurses++w.so.5
+ln -sv libmenu.so.6.0		"$PKGDIR"/usr/lib/libmenu.so.5
+ln -sv libmenuw.so.6.0		"$PKGDIR"/usr/lib/libmenuw.so.5
+ln -sv libformw.so.6.0		"$PKGDIR"/usr/lib/libformw.so.5
+ln -sv libncurses.so.6.0	"$PKGDIR"/usr/lib/libncurses.so.5
+ln -sv libtinfo.so.6.0		"$PKGDIR"/usr/lib/libtinfo.so.5
 
