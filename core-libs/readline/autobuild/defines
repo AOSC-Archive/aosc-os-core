@@ -3,4 +3,16 @@ PKGSEC=libs
 PKGDEP="glibc ncurses"
 PKGDES="GNU realine library"
 
+ABSHADOW=no
 AB_FLAGS_PIE=0
+
+# The following configuration:
+#
+# 1. Enables linking with Curses (NCurses in this case), disable if you are cool with
+#    no UNIX shell;
+# 2. Enables multibyte characters support;
+AUTOTOOLS_DEF="--with-curses --enable-multibyte --enable-shared"
+MAKE_AFTER="SHLIB_LIBS=-lncursesw"
+
+# Cross parameters.
+[ "$ARCH" = "cross-*" ] && AUTOTOOLS_AFTER+=" --host=${ARCH_TARGET}"

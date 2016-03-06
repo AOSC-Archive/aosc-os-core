@@ -1,0 +1,2 @@
+# Remove .old libraries
+rm -f "$PKGDIR"/usr/lib/*.old
