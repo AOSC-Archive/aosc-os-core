@@ -3,8 +3,4 @@ PKGDES="GNU Make, designed for code processing"
 PKGDEP="glibc"
 PKGSEC=devel
 
-#
-# Simply meant to minimalize dependencies.
-#
-
 AUTOTOOLS_AFTER="--without-guile"
