@@ -8,7 +8,6 @@ core-libs/gmp
 core-libs/mpfr
 core-libs/mpc
 core-libs/isl
-core-libs/cloog
 core-devel/gcc
 core-devel/binutils
 core-devel/libtool
