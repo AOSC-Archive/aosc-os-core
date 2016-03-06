@@ -1,2 +1,2 @@
-install -dm755 $PKGDIR/usr/share/gdb/auto-load/usr/lib/
-mv $PKGDIR/usr/lib/libisl.so.*-gdb.py $PKGDIR/usr/share/gdb/auto-load/usr/lib/
+install -dm755 "$PKGDIR"/usr/share/gdb/auto-load/usr/lib/
+mv "$PKGDIR"/usr/lib/libisl.so.*-gdb.py "$PKGDIR"/usr/share/gdb/auto-load/usr/lib/
