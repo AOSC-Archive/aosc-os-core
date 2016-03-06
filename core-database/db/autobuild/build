@@ -6,7 +6,7 @@ pushd build_unix
 # 1. Enables compatibility for old version Berkeley DBs (probably before Oracle);
 # 2. Enables DB manager libraries and utilities;
 # 3. Enables CXX programs (disable --enable-cxx if you do think it is necessary);
-# 4. Enables both shared libraries (if you need static libraries, add --enable-static);
+# 4. Enables shared libraries (if you need static libraries, add --enable-static);
 # 5. Disables Tcl bindings (it is not necessary so far, at least in AOSC OS);
 #
 
@@ -22,7 +22,7 @@ pushd build_unix
 #
 
 make LIBSO_LIBS=-lpthread
-make DESTDIR=$PKGDIR install
+make DESTDIR="$PKGDIR" install
 
 #
 # Remove local documentations.
