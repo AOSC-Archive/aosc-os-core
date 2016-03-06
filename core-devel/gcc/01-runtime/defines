@@ -3,7 +3,6 @@ PKGSEC=devel
 PKGDEP="glibc"
 PKGDES="GNU Compiler Collection (runtime libraries only)"
 
-#
 # The following configuration:
 #
 # 1. Enables support for C, C++, Fortran, "LTO", ObjC, and ObjC++;
@@ -63,8 +62,8 @@ AUTOTOOLS_AFTER="--libexecdir=/usr/lib \
 [ "$ARCH" != "mipsn32el" ] && AUTOTOOLS_AFTER+=" --with-linker-hash-style=gnu"
 
 # ARM and AARCH64 specific.
-[ "$ARCH" = "armel" ] || [ "$ARCH" = "arm64" ] && \
-AUTOTOOLS_AFTER+=" --disable-altivec --disable-fixed-point"
+[ "$ARCH" = "arm*" ] && \
+    AUTOTOOLS_AFTER+=" --disable-altivec --disable-fixed-point"
 [ "$ARCH" = "armel" ] && AUTOTOOLS_AFTER+=" --with-arch=armv7-a --with-float=hard --with-fpu=neon"
 [ "$ARCH" = "arm64" ] && AUTOTOOLS_AFTER+=" --with-arch=armv8-a"
 
