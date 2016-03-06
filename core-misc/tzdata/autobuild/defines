@@ -1,4 +1,4 @@
 PKGNAME=tzdata
 PKGSEC=misc
 PKGDEP=""
-PKGDES="timezone data from IANA"
+PKGDES="Timezone data from IANA"
