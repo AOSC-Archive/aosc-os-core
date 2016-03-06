@@ -1,3 +1,2 @@
-wget https://github.com/arsv/perl-cross/releases/download/0.9.6/perl-5.20.2-cross-0.9.6.tar.gz -O - | tar xvfz - -C ..
-
+wget https://github.com/arsv/perl-cross/releases/download/1.0.2/perl-5.22.1-cross-1.0.2.tar.gz -O - | tar xvfz - -C ..
 # Perl Cross Applied

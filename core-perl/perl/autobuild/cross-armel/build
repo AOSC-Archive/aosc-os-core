@@ -1,10 +1,7 @@
-#
 # Nothing special here...
 #
 # However, by default, vendordir is not set as in concern in many of
 # version-related issues of Perl.
-#
-
 ./Configure --sysroot=/var/ab/cross-root/armel --target=armv7a-hardfloat-linux-gnueabi \
             -des -Dusethreads -Duseshrplib \
             -Dprefix=/usr -Dvendorprefix=/usr \
@@ -14,12 +11,12 @@
             -Dlddlflags="-shared ${LDFLAGS}" 
 
 make
-make install DESTDIR=$PKGDIR
+make install DESTDIR="$PKGDIR"
 
 #
 # A hacky link.
 #
 
-pushd $PKGDIR
-ln -sv /usr/lib/perl5/5.20.2/armv7a-linux/CORE/libperl.so usr/lib/
+pushd "$PKGDIR"
+ln -sv /usr/lib/perl5/$PKGVER/armv7a-linux/CORE/libperl.so usr/lib/
 popd
