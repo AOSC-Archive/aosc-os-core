@@ -11,7 +11,7 @@ AB_FLAGS_PIE=0
 # 1. Enables linking with Curses (NCurses in this case), disable if you are cool with
 #    no UNIX shell;
 # 2. Enables multibyte characters support;
-AUTOTOOLS_DEF="--with-curses --enable-multibyte --enable-shared"
+AUTOTOOLS_AFTER="--with-curses --enable-multibyte --enable-shared"
 MAKE_AFTER="SHLIB_LIBS=-lncursesw"
 
 # Cross parameters.

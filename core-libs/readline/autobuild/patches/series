@@ -1,8 +1,6 @@
-bash43-021.diff
 rl-attribute.diff
 rl-header.diff
 rl-no-cross-check.diff
-rl-no-rpath.diff
 rlfe-history.diff
 rlfe-kfreebsd.diff
 rlfe-tinfo.diff
