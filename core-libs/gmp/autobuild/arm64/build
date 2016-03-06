@@ -1,0 +1,12 @@
+#
+# The following configuration:
+#
+# 1. Enable build particularly for aarch64 targets;
+# 2. Enables C++ based programs;
+#
+
+./configure --host=aarch64-unknown-linux-gnu --prefix=/usr \
+            --enable-cxx
+
+make
+make install DESTDIR=$PKGDIR
