@@ -1,0 +1,2 @@
+# Avoid conflicts.
+rm "$PKGDIR"/usr/share/man/man1/{dlltool,nlmconv,windres,windmc}*

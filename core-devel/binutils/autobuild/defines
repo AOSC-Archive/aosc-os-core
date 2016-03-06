@@ -6,3 +6,16 @@ PKGDES="a set of programs to assemble and manipulate binary and object files"
 NOSTATIC=no
 NOLTO=yes
 AB_FLAGS_PIE=0
+
+AUTOTOOLS_AFTER="--with-lib-path=/usr/lib \
+                 --with-bugurl=https://github.com/AOSC-Dev/aosc-os-core \
+                 --enable-threads --enable-shared --with-pic \
+                 --enable-ld --enable-plugins \
+                 --disable-werror --enable-lto --disable-gdb"
+
+# Mips64 is not quite ready with gold linker just yet, but we can ship them.
+[ "$ARCH" = "mipsn32el" ]  && AUTOTOOLS_AFTER+=" --enable-gold" || \
+                              AUTOTOOLS_AFTER+=" --enable-gold=default"
+
+alias BUILD_READY='make configure-host'
+MAKE_AFTER="prefix=$PKGDIR/usr tooldir=$PKGDIR/usr"

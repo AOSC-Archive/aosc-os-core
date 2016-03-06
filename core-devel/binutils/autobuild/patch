@@ -1,19 +1,10 @@
-#
 # Qt linked with gold crash on startup, Red Hat BZ #1193044
-#
-
 patch -Np1 -i autobuild/patches/binutils-2.25.1-dynamic_list.patch
 
-#
 # Fix incorrectly generated ELF binaries and DSOs
-#
-
 patch -Np1 -i autobuild/patches/binutils-rh1247126.patch
 
 sed -i 's/testsuite//g' $SRCDIR/gold/Makefile.in
 
-#
 # $CPPFLAGS adjustment for libiberty.
-#
-
 sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" $SRCDIR/libiberty/configure
