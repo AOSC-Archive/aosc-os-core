@@ -2,3 +2,6 @@ PKGNAME=gmp
 PKGSEC=libs
 PKGDEP=glibc
 PKGDES="GNU Multiprecision library"
+
+# Build C++ libraries as well.
+AUTOTOOLS_AFTER="--enable-cxx"
