@@ -32,7 +32,7 @@ case $ARCH in
 	(arm*)	;;
 	(*n32*)
 		ln -sv usr/lib "$PKGDIR"/lib32
-		ln -sv lib "$PKGDIR"/usr/lib32;;	
+		ln -sv lib "$PKGDIR"/usr/lib32;;
 	(*)
 		ln -sv usr/lib "$PKGDIR"/lib64
 		ln -sv lib "$PKGDIR"/usr/lib64;;
