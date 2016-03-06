@@ -1,17 +1,12 @@
 #!/bin/sh
-#
 # Base Section
-#
 
-#
 # Extra Section
-#
 # Copyleft, AOSC Developers.
-#
+
 # Purpose of this section:
 # 1. Adjustment for current system.
 # 2. News and issues to be read and advised by the users.
-#
 
 mknod -m 600 /dev/console c 5 1 || true
 mknod -m 666 /dev/null c 1 3 || true
