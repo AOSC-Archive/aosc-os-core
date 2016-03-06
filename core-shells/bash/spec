@@ -1,4 +1,4 @@
 VER=4.3.42
-REL=1
+REL=2
 DISTVER=4.3
 SRCTBL="ftp://ftp.gnu.org/gnu/bash/bash-${DISTVER}.tar.gz"
