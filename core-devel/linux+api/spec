@@ -1,6 +1,2 @@
-#
-# This is not likely to be updated, think twice when thinking of a bump.
-#
-
-VER=4.4.1
+VER=4.4.4
 SRCTBL="http://www.kernel.org/pub/linux/kernel/v4.x/linux-$VER.tar.xz"
