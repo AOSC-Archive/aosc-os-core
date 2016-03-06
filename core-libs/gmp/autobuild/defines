@@ -3,5 +3,6 @@ PKGSEC=libs
 PKGDEP=glibc
 PKGDES="GNU Multiprecision library"
 
-# Build C++ libraries as well.
-AUTOTOOLS_AFTER="--enable-cxx"
+# Build C++ and static libraries as well.
+AUTOTOOLS_AFTER="--enable-cxx --enable-static"
+NOSTATIC=no
