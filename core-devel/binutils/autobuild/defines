@@ -7,7 +7,8 @@ NOSTATIC=no
 NOLTO=yes
 AB_FLAGS_PIE=0
 
-AUTOTOOLS_AFTER="--with-lib-path=/usr/lib \
+AUTOTOOLS_AFTER="--prefix=/usr \
+                 --with-lib-path=/usr/lib \
                  --with-bugurl=https://github.com/AOSC-Dev/aosc-os-core \
                  --enable-threads --enable-shared --with-pic \
                  --enable-ld --enable-plugins \
