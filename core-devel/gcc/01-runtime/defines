@@ -43,7 +43,9 @@ PKGDES="GNU Compiler Collection (runtime libraries only)"
 # 19. Enables support for GNU indirect function 
 #     (you may disable this by removing "--enable-gnu-indirect-function");
 
-AUTOTOOLS_AFTER="--libexecdir=/usr/lib \
+AUTOTOOLS_AFTER="--prefix=/usr \
+                 --libdir=/usr/lib --libexecdir=/usr/lib \
+                 --mandir=/usr/share/man --infodir=/usr/share/info \
                  --with-bugurl=https://github.com/AOSC-Dev/aosc-os-core \
                  --enable-languages=c,c++,fortran,lto,objc,obj-c++ \
                  --enable-shared --enable-threads=posix \
@@ -55,8 +57,10 @@ AUTOTOOLS_AFTER="--libexecdir=/usr/lib \
                  --enable-lto --enable-plugin --enable-install-libiberty \
                  --disable-multilib --disable-werror \
                  --enable-checking=release \
-                 --with-default-libstdcxx-abi=gcc4-compatible
-                 --host=${ARCH_TARGET} --target=${ARCH_TARGET}"
+                 --with-default-libstdcxx-abi=gcc4-compatible"
+
+# Cross.
+[ "$ARCH" = "*cross*" ] && AUTOTOOLS_AFTER+=" --host=${ARCH_TARGET[$ARCH]} --target=${ARCH_TARGET[$ARCH]}"
 
 # Mips64 is not yet happy with GNU hashing style.
 [ "$ARCH" != "mipsn32el" ] && AUTOTOOLS_AFTER+=" --with-linker-hash-style=gnu"
