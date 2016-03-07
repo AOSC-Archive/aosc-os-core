@@ -3,8 +3,6 @@
 # However, by default, vendordir is not set as in concern in many of
 # version-related issues of Perl.
 
-# FIXME: we are using a hack here, we wanted to bump
-
 ./Configure -des -Dusethreads -Duseshrplib \
             -Dprefix=/usr -Dvendorprefix=/usr \
             -Dman1dir=/usr/share/man/man1 \
@@ -16,5 +14,3 @@
 
 make
 make install DESTDIR="$PKGDIR"
-
-# FIXME: Build time test pending, will append to beyond.

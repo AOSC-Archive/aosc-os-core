@@ -6,7 +6,7 @@ PKGDES="A highly capable and feature rich programming language"
 # RPM related standard hacks, not necessary when RPM build is disabled.
 RPMEPOCH=4
 ABRPMAUTOPROVONLY=yes
-RPMEXTRAPROVIDE="perl(abbrev.pl) /sbin/perl /usr/sbin/perl /bin/perl
+RPMEXTRAPROVIDE="perl(abbrev.pl) /sbin/perl /usr/sbin/perl /bin/perl \
 perl(assert.pl) perl(bigfloat.pl) perl(bigint.pl) perl(bigrat.pl) perl(bytes_heavy.pl) \
 perl(cacheout.pl) perl(complete.pl) perl(ctime.pl) perl(dotsh.pl) perl(dumpvar.pl) \
 perl(exceptions.pl) perl(fastcwd.pl) perl(find.pl) perl(finddepth.pl) perl(flush.pl) \
