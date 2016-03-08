@@ -1,3 +1,4 @@
 VER=5.22.1
+REL=1
 # Hard coding 5.0, bite me.
 SRCTBL="http://www.cpan.org/src/5.0/perl-$VER.tar.bz2"
