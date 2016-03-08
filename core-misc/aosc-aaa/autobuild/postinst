@@ -20,8 +20,8 @@ Core 3.5.1 is a security update for AOSC OS Core.
 	- Fixed Perl vulnerability (CVE-2016-2381):
 
 	Previously if there was a duplicate definition for a name in environ[]
-        setting that name in %ENV could result in an unsafe value being passed
-        to a child process
+	setting that name in %ENV could result in an unsafe value being passed
+	to a child process.
 
 ------------------------------------------------------------------------------
 
