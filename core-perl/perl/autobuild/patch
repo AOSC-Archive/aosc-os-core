@@ -8,4 +8,6 @@ sed -i -e "s|BUILD_ZLIB\s*= True|BUILD_ZLIB = False|"           \
        -e "s|LIB\s*= ./zlib-src|LIB        = /usr/lib|"         \
        cpan/Compress-Raw-Zlib/config.in
 
-
+for i in autobuild/patches/*; do
+    patch -Np1 -i $i
+done
