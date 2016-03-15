@@ -68,7 +68,9 @@ AUTOTOOLS_AFTER="--prefix=/usr \
 # ARM and AARCH64 specific.
 [ "$ARCH" = "arm*" ] && \
     AUTOTOOLS_AFTER+=" --disable-altivec --disable-fixed-point"
-[ "$ARCH" = "armel" ] && AUTOTOOLS_AFTER+=" --with-arch=armv7-a --with-float=hard --with-fpu=neon"
+# ARMEL had a weird triplet.
+[ "$ARCH" = "armel" ] && AUTOTOOLS_AFTER+=" --with-arch=armv7-a --with-float=hard --with-fpu=neon \
+                                            --host=${ARCH_TARGET[$ARCH]} --build=${ARCH_TARGET[$ARCH]}"
 [ "$ARCH" = "arm64" ] && AUTOTOOLS_AFTER+=" --with-arch=armv8-a"
 
 ABRPMAUTOPROVONLY=yes
