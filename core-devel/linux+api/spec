@@ -1,2 +1,2 @@
-VER=4.4.4
-SRCTBL="http://www.kernel.org/pub/linux/kernel/v4.x/linux-$VER.tar.xz"
+VER=4.5.0
+SRCTBL="http://www.kernel.org/pub/linux/kernel/v${VER%%.*}.x/linux-${VER%.*}.tar.xz"
