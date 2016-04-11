@@ -14,9 +14,9 @@ AUTOTOOLS_AFTER="--prefix=/usr \
                  --enable-ld --enable-plugins \
                  --disable-werror --enable-lto --disable-gdb"
 
-# Mips64 is not quite ready with gold linker just yet, but we can ship them.
-[ "$ARCH" = "mipsn32el" ]  && AUTOTOOLS_AFTER+=" --enable-gold" || \
-                              AUTOTOOLS_AFTER+=" --enable-gold=default"
+# MIPS is not quite ready with gold linker just yet, but we can ship them.
+[ "$ARCH" = "mips*" ]  && AUTOTOOLS_AFTER+=" --disble-gold" || \
+                          AUTOTOOLS_AFTER+=" --enable-gold=default"
 
 alias BUILD_READY='make configure-host'
 MAKE_AFTER="prefix=$PKGDIR/usr tooldir=$PKGDIR/usr BUILDROOT= DESTDIR="
