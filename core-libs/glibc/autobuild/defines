@@ -35,11 +35,11 @@ AUTOTOOLS_AFTER="--libexecdir=/usr/lib \
                  --disable-werror"
 
 # MIPS specific.
-[ "$ARCH" = "mips*" ] && \
+[[ "${CROSS:-$ARCH}" = mips* ]] && \
     AUTOTOOLS_AFTER+=" --disable-multi-arch"
 
 # ARM specific.
-[ "$ARCH" = "arm*" ] && \
+[[ "${CROSS:-$ARCH}" = arm* ]] && \
     AUTOTOOLS_AFTER+=" --with-__thread"
 
 RPMEXTRAPROVIDE="rtld(GNU_HASH)"
