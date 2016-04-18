@@ -1,1 +1,1 @@
-rm abdist/bin/sh
+rm "$PKGDIR"/bin/sh

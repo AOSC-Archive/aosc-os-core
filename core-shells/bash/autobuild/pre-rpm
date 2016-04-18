@@ -1,1 +1,1 @@
-ln -sfv bash abdist/bin/sh
+ln -sfv bash "$PKGDIR"/bin/sh
