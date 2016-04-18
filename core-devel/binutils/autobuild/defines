@@ -14,9 +14,13 @@ AUTOTOOLS_AFTER="--prefix=/usr \
                  --enable-ld --enable-plugins \
                  --disable-werror --enable-lto --disable-gdb"
 
-# MIPS is not quite ready with gold linker just yet, but we can ship them.
-[ "$ARCH" = "mips*" ]  && AUTOTOOLS_AFTER+=" --disble-gold" || \
-                          AUTOTOOLS_AFTER+=" --enable-gold=default"
+# MIPS (mipsel, mipsn32el) is not quite ready for gold linker.
+# BFD will be the default and only linker for those architectures.
+if [[ "${CROSS:-$ARCH}" = mips* ]; then
+	AUTOTOOLS_AFTER+=" --disable-gold"
+else
+	AUTOTOOLS_AFTER+=" --enable-gold=default"
+fi
 
 alias BUILD_READY='make configure-host'
 MAKE_AFTER="prefix=$PKGDIR/usr tooldir=$PKGDIR/usr BUILDROOT= DESTDIR="

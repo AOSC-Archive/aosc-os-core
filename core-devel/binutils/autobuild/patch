@@ -1,5 +1,5 @@
 # Disable gold testsuite.
-sed -i 's/testsuite//g' $SRCDIR/gold/Makefile.in
+sed -i 's/testsuite//g' "$SRCDIR"/gold/Makefile.in
 
 # $CPPFLAGS adjustment for libiberty.
-sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" $SRCDIR/libiberty/configure
+sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" "$SRCDIR"/libiberty/configure
