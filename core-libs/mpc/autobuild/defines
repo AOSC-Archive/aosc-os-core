@@ -1,6 +1,6 @@
 PKGNAME=mpc
 PKGDEP="gmp mpfr"
 PKGSEC=libs
-PKGDES="a library for the arithmetic of complex numbers"
+PKGDES="Library for the arithmetic of complex numbers"
 
-AUTOTOOLS_AFTER="--host=${ARCH_TARGET} --build=${ARCH_TARGET} --target=${ARCH_TARGET}"
+AUTOTOOLS_AFTER="--host=${ARCH_TARGET[$ARCH]} --build=${ARCH_TARGET[$ARCH]} --target=${ARCH_TARGET[$ARCH]}"
