@@ -60,18 +60,25 @@ AUTOTOOLS_AFTER="--prefix=/usr \
                  --with-default-libstdcxx-abi=gcc4-compatible"
 
 # Cross.
-[ "$ARCH" = "*cross*" ] && AUTOTOOLS_AFTER+=" --host=${ARCH_TARGET[$ARCH]} --target=${ARCH_TARGET[$ARCH]}"
+[[ "${CROSS:-$ARCH}" = *cross* ]] && \
+    AUTOTOOLS_AFTER+=" --host=${ARCH_TARGET[$ARCH]} --target=${ARCH_TARGET[$ARCH]}"
 
-# Mips64 is not yet happy with GNU hashing style.
-[ "$ARCH" != "mipsn32el" ] && AUTOTOOLS_AFTER+=" --with-linker-hash-style=gnu"
+# MIPS n32 is not yet happy with GNU hashing style.
+[ "${CROSS:-$ARCH}" != "mipsn32el" ] && \
+    AUTOTOOLS_AFTER+=" --with-linker-hash-style=gnu"
 
-# ARM and AARCH64 specific.
-[ "$ARCH" = "arm*" ] && \
+# ARM and AArch64 specific.
+[[ "${CROSS:-$ARCH}" = arm* ]] && \
     AUTOTOOLS_AFTER+=" --disable-altivec --disable-fixed-point"
+
 # ARMEL had a weird triplet.
-[ "$ARCH" = "armel" ] && AUTOTOOLS_AFTER+=" --with-arch=armv7-a --with-float=hard --with-fpu=neon \
-                                            --host=${ARCH_TARGET[$ARCH]} --build=${ARCH_TARGET[$ARCH]}"
-[ "$ARCH" = "arm64" ] && AUTOTOOLS_AFTER+=" --with-arch=armv8-a"
+[ "${CROSS:-$ARCH}" = "armel" ] && \
+    AUTOTOOLS_AFTER+=" --with-arch=armv7-a --with-float=hard --with-fpu=neon \
+    --host=${ARCH_TARGET[$ARCH]} --build=${ARCH_TARGET[$ARCH]}"
+
+# AArch64 specific architecture.
+[ "${CROSS:-$ARCH}" = "arm64" ] && \
+    AUTOTOOLS_AFTER+=" --with-arch=armv8-a"
 
 ABRPMAUTOPROVONLY=yes
 NOLTO=yes

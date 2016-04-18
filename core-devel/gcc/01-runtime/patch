@@ -1,14 +1,14 @@
-sed -i 's@\./fixinc\.sh@-c true@' $SRCDIR/gcc/Makefile.in
+sed -i 's@\./fixinc\.sh@-c true@' "$SRCDIR"/gcc/Makefile.in
 
 # PR69140: fixes an issue that prevents Wine from being bulit, when using optimization
 #          levels higher or equal to -O1 (-mincoming-stack-boundary=3).
 patch -Np1 -i autobuild/patches/pr69140.patch
 
 # $CPPFLAGS adjustments.
-sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" $SRCDIR/{libiberty,gcc}/configure
+sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" "$SRCDIR"/{libiberty,gcc}/configure
 
 # You will see this in "gcc -v" output.
 # BASE-VER identifies the GCC version, please DO NOT EDIT.
 # * DEV-PHASE are used as branding identification, you may alter the line.
-echo $PKGVER > $SRCDIR/gcc/BASE-VER
-echo 'AOSC OS, Core' > $SRCDIR/gcc/DEV-PHASE
+echo $PKGVER > "$SRCDIR"/gcc/BASE-VER
+echo 'AOSC OS, Core' > "$SRCDIR"/gcc/DEV-PHASE
