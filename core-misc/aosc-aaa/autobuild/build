@@ -1,8 +1,10 @@
+#
 # A derivative of Linux From Scratch system directory template.
 # Refer to Chapter 6, Section 5 of Linux From Scratch for original
 # design.
 #
 # This is NOT a fully FHS compliant directory tree.
+#
 
 mkdir "$PKGDIR"
 cp -r etc "$PKGDIR"/
@@ -26,12 +28,12 @@ mkdir -pv "$PKGDIR"/var/{opt,cache,local}
 # Avoid confusion.
 #
 ln -sv usr/lib "$PKGDIR"/lib
-case $ARCH in
-	(armel|mipsel)	;;
-	(mipsn32el)
+case ${CROSS:-$ARCH} in
+	(arm*)	;;
+	(*n32*)
 		ln -sv usr/lib "$PKGDIR"/lib32
 		ln -sv lib "$PKGDIR"/usr/lib32;;
-	(amd64|arm64)
+	(*)
 		ln -sv usr/lib "$PKGDIR"/lib64
 		ln -sv lib "$PKGDIR"/usr/lib64;;
 esac
