@@ -16,7 +16,7 @@ AUTOTOOLS_AFTER="--prefix=/usr \
 
 # MIPS (mipsel, mipsn32el) is not quite ready for gold linker.
 # BFD will be the default and only linker for those architectures.
-if [[ "${CROSS:-$ARCH}" = mips* ]; then
+if [[ "${CROSS:-$ARCH}" = mips* ]]; then
 	AUTOTOOLS_AFTER+=" --disable-gold"
 else
 	AUTOTOOLS_AFTER+=" --enable-gold=default"
