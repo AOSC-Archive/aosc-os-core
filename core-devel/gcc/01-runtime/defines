@@ -63,8 +63,8 @@ AUTOTOOLS_AFTER="--prefix=/usr \
 [[ "${CROSS:-$ARCH}" = *cross* ]] && \
     AUTOTOOLS_AFTER+=" --host=${ARCH_TARGET[$ARCH]} --target=${ARCH_TARGET[$ARCH]}"
 
-# MIPS n32 is not yet happy with GNU hashing style.
-[ "${CROSS:-$ARCH}" != "mipsn32el" ] && \
+# MIPS is not yet happy with GNU hashing style.
+[[ "${CROSS:-$ARCH}" != mips* ]] && \
     AUTOTOOLS_AFTER+=" --with-linker-hash-style=gnu"
 
 # ARM and AArch64 specific.
