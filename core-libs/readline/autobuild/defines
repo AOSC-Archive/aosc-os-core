@@ -15,5 +15,5 @@ AUTOTOOLS_AFTER="--with-curses --enable-multibyte --enable-shared"
 MAKE_AFTER="SHLIB_LIBS=-lncursesw"
 
 # Cross parameters.
-[[ "${CROSS:-$ARCH}" = *cross* ] && \
+[[ "${CROSS:-$ARCH}" = *cross* ]] && \
     AUTOTOOLS_AFTER+=" --host=${ARCH_TARGET[$ARCH]}"
