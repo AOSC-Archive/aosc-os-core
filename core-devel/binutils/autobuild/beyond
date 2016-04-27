@@ -6,3 +6,5 @@ cd "$PKGDIR"/usr/bin/
 for i in *; do
 	ln $i ${ARCH_TARGET[$ARCH]}-$i
 done
+
+cd "$SRCDIR"
