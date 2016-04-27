@@ -23,8 +23,10 @@ done
 make -C "${ARCH_TARGET[$ARCH]}"/libsanitizer/tsan DESTDIR="$PKGDIR" install-toolexeclibLTLIBRARIES
 make -C "${ARCH_TARGET[$ARCH]}"/libobjc DESTDIR="$PKGDIR" install-libs
 make -C "${ARCH_TARGET[$ARCH]}"/libstdc++-v3/po DESTDIR="$PKGDIR" install
-
-rm "$PKGDIR"/usr/lib/libmpx.spec
+if [ "${CROSS:-$ARCH}" = "amd64" ]; then
+    make -C "${ARCH_TARGET[$ARCH]}"/libmpx DESTDIR="$PKGDIR" install
+    rm "$PKGDIR"/usr/lib{,64}/libmpx.spec
+fi
 
 for lib in libgomp \
            libitm \

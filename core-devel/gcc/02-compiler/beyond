@@ -4,7 +4,7 @@
 #
 # Remove if you need to prohibit users/developers from using LTO.
 mkdir -p "$PKGDIR"/usr/lib/bfd-plugins
-ln -sv /usr/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/liblto_plugin.so \
+ln -sv /usr/lib/gcc/x86_64-unknown-linux-gnu/$PKGVER/liblto_plugin.so \
        "$PKGDIR"/usr/lib/bfd-plugins/liblto_plugin.so
 
 # FHS expects "cpp" to be in /usr/lib.
@@ -23,6 +23,10 @@ RTLIBS="asan lsan tsan ubsan vtv itm quadmath atomic gcc_s stdc++ gfortran gomp 
 for i in ${RTLIBS[@]}; do
     rm -fv "$PKGDIR"/usr/lib{,32,64}/lib${i}.so*
 done
+
+if [ "${CROSS:-$ARCH}" = "amd64" ]; then
+    rm -fv "$PKGDIR"/usr/lib{,64}/libmpx*.so*
+fi
 
 rm -fv "$PKGDIR"/usr/share/locale/de/LC_MESSAGES/libstdc++.mo
 rm -fv "$PKGDIR"/usr/share/locale/fr/LC_MESSAGES/libstdc++.mo

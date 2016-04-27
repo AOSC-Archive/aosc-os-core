@@ -5,7 +5,7 @@ PKGDES="GNU Compiler Collection (compilers and development tools)"
 
 ABRPMAUTOPROVONLY=yes
 NOSTATIC=no
-NOLTO=no
+NOLTO=yes
 
 AB_FLAGS_PIE=0
 PKGBREAK="gcc-runtime<=5.2.0-2"
