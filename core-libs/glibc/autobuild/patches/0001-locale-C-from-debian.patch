@@ -4,7 +4,7 @@
 
 --- /dev/null
 +++ b/localedata/locales/C
-@@ -0,0 +1,395038 @@
+@@ -0,0 +1,395040 @@
 +escape_char /
 +comment_char %
 +% Locale for C locale in UTF-8
@@ -395012,17 +395012,19 @@
 +%
 +% ISO 8601 conforming applications should use the values 7, 19971201 (a
 +% Monday), and 4 (Thursday), respectively.
-+week    7;19971130;7
++week    7;19971130;4
 +first_weekday	1
 +first_workday	2
 +
 +% Appropriate date and time representation (%c)
-+%	"%a %d %b %Y %r %Z"
-+d_t_fmt "<U0025><U0061><U0020><U0025><U0064><U0020><U0025><U0062><U0020><U0025><U0059><U0020><U0025><U0072><U0020><U0025><U005A>"
++%	"%a %b %e %H:%M:%S %Y"
++d_t_fmt "<U0025><U0061><U0020><U0025><U0062><U0020><U0025><U0065><U0020>/
++<U0025><U0048><U003A><U0025><U004D><U003A><U0025><U0053><U0020>/
++<U0025><U0059>"
 +
 +% Appropriate date representation (%x)
-+%	"%m/%d/%Y"
-+d_fmt   "<U0025><U006D><U002F><U0025><U0064><U002F><U0025><U0059>"
++%	"%m/%d/%y"
++d_fmt   "<U0025><U006D><U002F><U0025><U0064><U002F><U0025><U0079>"
 +
 +% Appropriate time representation (%X)
 +%	"%T"
