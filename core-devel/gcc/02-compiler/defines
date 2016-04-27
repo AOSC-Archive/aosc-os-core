@@ -1,11 +1,11 @@
 PKGNAME=gcc
 PKGSEC=devel
 PKGDEP="binutils mpc gcc-runtime isl"
-PKGDES="GNU Compiler Collection"
+PKGDES="GNU Compiler Collection (compilers and development tools)"
 
 ABRPMAUTOPROVONLY=yes
 NOSTATIC=no
-NOLTO=yes
+NOLTO=no
 
 AB_FLAGS_PIE=0
 PKGBREAK="gcc-runtime<=5.2.0-2"
