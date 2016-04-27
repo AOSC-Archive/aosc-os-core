@@ -1,2 +1,6 @@
 # Declares Bash as the default UNIX shell.
 ln -s bash "$PKGDIR"/bin/sh
+
+# Install examples.
+mkdir -p "$PKGDIR"/usr/share/doc/bash
+cp -ar "$SRCDIR"/examples "$PKGDIR"/usr/share/doc/bash/
