@@ -13,7 +13,17 @@ mknod -m 666 /dev/null c 1 3 2>/dev/null || true
 
 echo -e "\
 
-Welcome to AOSC OS (with the brand new Core 3.6.0)!
+Welcome to AOSC OS (with the brand new Core 3.6.1)!
+
+Core 3.6.1 fixes an issue that GNU libc (glibc) is not providing a full set
+of static libraries useful for static binary productions.
+
+This update is an development support update, users can go on with life like
+it never happened.
+
+------------------------------------------------------------------------------
+Major update information.
+------------------------------------------------------------------------------
 
 Core 3.6.0 is a major update for AOSC OS Core.
 
