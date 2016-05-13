@@ -47,9 +47,6 @@ install -m644 "$SRCDIR"/nscd/nscd.tmpfiles "$PKGDIR"/usr/lib/tmpfiles.d/nscd.con
 # Install "getaddrinfo" configuration file.
 install -m644 "$SRCDIR"/posix/gai.conf "$PKGDIR"/etc/gai.conf
 
-# Unneeded static libraries (because we disabled static library purging for this package.
-rm "$PKGDIR"/usr/lib/lib{anl,BrokenLocale,nsl,resolv,rt,util}.a
-
 # Manual stripping.
 strip --strip-all "$PKGDIR"/usr/bin/{gencat,getconf,getent,iconv,iconvconfig} \
                   "$PKGDIR"/usr/bin/{ldconfig,locale,localedef,nscd,makedb} \

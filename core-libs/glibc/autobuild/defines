@@ -21,6 +21,7 @@ PKGDES="GNU C Library"
 # 10. Enables multiple architecture support 
 #     (mainly used to distinguish among different builds, multiarch is not supported);
 # 11. Disables "warning as error";
+# 12. Ensure that static libraries are installed for development purposes;
 
 AUTOTOOLS_AFTER="--libexecdir=/usr/lib \
                  --with-headers=/usr/include \
@@ -32,7 +33,8 @@ AUTOTOOLS_AFTER="--libexecdir=/usr/lib \
                  --enable-stackguard-randomization \
                  --enable-lock-elision \
                  --enable-multi-arch \
-                 --disable-werror"
+                 --disable-werror \
+                 --enable-static"
 
 # MIPS specific.
 [[ "${CROSS:-$ARCH}" = mips* ]] && \
