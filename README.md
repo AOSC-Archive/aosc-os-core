@@ -1,5 +1,5 @@
 # AOSC OS Core
-AOSC OS Core takes effect as of AOSC OS4's begginning of development. AOSC OS Core will be taken from the original AOSC OS, and be turned into a shared Linux "standard base" and tool chain for AOSC OS itself and its derivatives.
+AOSC OS Core takes effect as of AOSC OS4's beginning of development. AOSC OS Core will be taken from the original AOSC OS, and be turned into a shared Linux "standard base" and tool chain for AOSC OS itself and its derivatives.
 
 ## Rationale
 AOSC OS is a decently large project, with more than 2,800 packages included in the community portal at https://repo.anthonos.org and many of its mirrors. Maintaining such large amount of packages is not merely an easy job for the developers - under the circumstances of security vulnerbilities, major updates, and mass rebuilds, AOSC OS developers may not be effective at finishing the tasks in a timely fashion. Added on periodic full system build updates, AOSC OS will be too time consuming for many of the maintainers.
