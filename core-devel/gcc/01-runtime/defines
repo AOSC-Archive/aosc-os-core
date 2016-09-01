@@ -57,6 +57,7 @@ AUTOTOOLS_AFTER="--prefix=/usr \
                  --with-isl=/usr \
                  --enable-lto --enable-plugin --enable-install-libiberty \
                  --disable-multilib --disable-werror \
+                 --enable-pie \
                  --enable-checking=release \
                  --with-default-libstdcxx-abi=gcc4-compatible"
 
