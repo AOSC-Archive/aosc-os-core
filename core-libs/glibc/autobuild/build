@@ -11,6 +11,9 @@ echo "rootsbindir=/usr/bin" >> configparms
 export CFLAGS=${CFLAGS/-fstack-protector-strong/}
 export CPPFLAGS=${CPPFLAGS/-D_FORTIFY_SOURCE=2/}
 
+# Use -O3 optimization.
+export CFLAGS="${CFLAGS} -O3"
+
 # Configuration
 ../configure ${AUTOTOOLS_DEF} ${AUTOTOOLS_AFTER}
 
