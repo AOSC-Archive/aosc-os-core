@@ -1,2 +1,6 @@
 # Do not use pre-defined configure options.
 export AUTOTOOLS_DEF=""
+
+# -O3 optimization.
+export CFLAGS="${CFLAGS} -O3"
+export CXXFLAGS="${CXXFLAGS} -O3"
