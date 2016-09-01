@@ -1,4 +1,5 @@
 core-devel/linux+api
+core-misc/tzdata
 core-libs/glibc
 core-libs/ncurses
 core-libs/readline
