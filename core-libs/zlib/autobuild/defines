@@ -4,4 +4,3 @@ PKGDEP=glibc
 PKGSEC=libs
 
 ABSHADOW=no
-AB_FLAGS_PIE=0
