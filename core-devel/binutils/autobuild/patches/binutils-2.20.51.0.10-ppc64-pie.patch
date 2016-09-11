@@ -1,0 +1,12 @@
+--- a/bfd/elf64-ppc.c	2012-09-11 12:13:00.637448573 +0100
++++ b/bfd/elf64-ppc.c	2012-09-11 12:13:17.922449052 +0100
+@@ -13523,6 +13523,9 @@
+ 		{
+ 		  BFD_ASSERT (h->elf.dynindx != -1);
+ 		  outrel.r_info = ELF64_R_INFO (h->elf.dynindx, r_type);
++		  if (h->elf.dynindx == -1
++		      && h->elf.root.type == bfd_link_hash_undefweak)
++		    memset (&outrel, 0, sizeof outrel);
+ 		}
+ 	      else
+ 		{

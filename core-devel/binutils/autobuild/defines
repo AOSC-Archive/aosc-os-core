@@ -5,7 +5,6 @@ PKGDES="A set of programs to assemble and manipulate binary and object files"
 
 NOSTATIC=no
 NOLTO=yes
-AB_FLAGS_PIE=0
 
 AUTOTOOLS_AFTER="--prefix=/usr \
                  --with-lib-path=/usr/lib \
@@ -20,6 +19,10 @@ if [[ "${CROSS:-$ARCH}" = mips* ]]; then
 	AUTOTOOLS_AFTER+=" --disable-gold"
 else
 	AUTOTOOLS_AFTER+=" --enable-gold=default"
+fi
+
+if [[ "${CROSS:-$ARCH}" = *64 ]]; then
+	AUTOTOOLS_AFTER+=" --enable-64-bit-bfd"
 fi
 
 alias BUILD_READY='make configure-host'
