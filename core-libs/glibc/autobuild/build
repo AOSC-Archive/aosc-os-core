@@ -32,6 +32,10 @@ make
 sed -i '5,7d' configparms
 LDFLAGS=${LDFLAGS/--as-needed,/}
 
+export LDFLAGS="${LDFLAGS} -specs=$AB/specs/hardened-ld"
+export CFLAGS="${CFLAGS} -specs=$AB/specs/hardened-cc1"
+export CXXFLAGS="${CXXFLAGS} -specs=$AB/specs/hardened-cc1"
+
 # Linker cache configuration, a template and a directory.
 install -dm755 "$PKGDIR"/etc
 touch "$PKGDIR"/etc/ld.so.conf
@@ -63,3 +67,8 @@ strip --strip-unneeded "$PKGDIR"/usr/lib/{libanl,libBrokenLocale,libcidn,libcryp
                        "$PKGDIR"/usr/lib/{libdl,libm,libnsl,libresolv,librt,libutil}-*.so \
                        "$PKGDIR"/usr/lib/{libmemusage,libpcprofile,libSegFault}.so \
                        "$PKGDIR"/usr/lib/{audit,gconv}/*.so
+
+# PowerPC64 dynamic linker standard.
+if [[ "${CROSS:-$ARCH}" = ppc64 ]]; then
+    ln -sv libdl-$PKGVER.so "$PKGDIR"/usr/lib/ld64.so.1
+fi

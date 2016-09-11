@@ -34,19 +34,13 @@ AUTOTOOLS_AFTER="--libexecdir=/usr/lib \
                  --enable-lock-elision \
                  --enable-multi-arch \
                  --disable-werror \
-                 --enable-static"
-
-# MIPS specific.
-[[ "${CROSS:-$ARCH}" = mips* ]] && \
-    AUTOTOOLS_AFTER+=" --disable-multi-arch"
-
-# ARM specific.
-[[ "${CROSS:-$ARCH}" = arm* ]] && \
-    AUTOTOOLS_AFTER+=" --with-__thread"
+                 --enable-static \
+                 --disable-multi-arch \
+                 --with-__thread"
 
 RPMEXTRAPROVIDE="rtld(GNU_HASH)"
 NOSTATIC=no
 
-AB_FLAGS_PIE=0
 AB_FLAGS_FTF=0
 AB_FLAGS_SSP=0
+AB_FLAGS_SPECS=0
