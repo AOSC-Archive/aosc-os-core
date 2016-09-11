@@ -3,4 +3,6 @@ PKGDEP="gmp mpfr"
 PKGSEC=libs
 PKGDES="Library for the arithmetic of complex numbers"
 
-AUTOTOOLS_AFTER="--host=${ARCH_TARGET[$ARCH]} --build=${ARCH_TARGET[$ARCH]} --target=${ARCH_TARGET[$ARCH]}"
+AUTOTOOLS_AFTER="--host=${ARCH_TARGET[$ARCH]} \
+                 --build=${ARCH_TARGET[$ARCH]} \
+                 --target=${ARCH_TARGET[$ARCH]}"
