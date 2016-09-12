@@ -14,7 +14,9 @@ RTLIBS="libatomic libgfortran libgomp libitm libquadmath \
         libsanitizer/asan libsanitizer/lsan libsanitizer/ubsan libstdc++-v3/src libvtv"
 
 # Intel Cilk Runtime is only for x86.
-[ "$ARCH" = "amd64" ] && RTLIBS+=" libcilkrts"
+if [[ "${CROSS:-$ARCH}" = "amd64" ]]; then
+    RTLIBS+=" libcilkrts"
+fi
 
 for lib in ${RTLIBS[@]}; do
     make -C "${ARCH_TARGET[$ARCH]}"/$lib DESTDIR="$PKGDIR" install-toolexeclibLTLIBRARIES
