@@ -7,7 +7,3 @@ sed -i -e "s|BUILD_ZLIB\s*= True|BUILD_ZLIB = False|"           \
        -e "s|INCLUDE\s*= ./zlib-src|INCLUDE    = /usr/include|" \
        -e "s|LIB\s*= ./zlib-src|LIB        = /usr/lib|"         \
        cpan/Compress-Raw-Zlib/config.in
-
-for i in autobuild/patches/*; do
-    patch -Np1 -i $i
-done
