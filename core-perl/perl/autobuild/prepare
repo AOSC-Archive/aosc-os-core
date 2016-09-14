@@ -3,7 +3,3 @@
 # with AB_FLAGS_SPECS=0.
 export CFLAGS="${CFLAGS} -fPIC"
 export CXXFLAGS="${CXXFLAGS} -fPIC"
-
-# Use -O3.
-export CFLAGS="${CFLAGS} -O3"
-export CXXFLAGS="${CXXFLAGS} -O3"
