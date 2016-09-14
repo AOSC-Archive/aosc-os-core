@@ -44,3 +44,14 @@ NOSTATIC=no
 AB_FLAGS_FTF=0
 AB_FLAGS_SSP=0
 AB_FLAGS_SPECS=0
+AB_FLAGS_O3=1
+
+# error: "SIG_BLOCK" is not defined [-Werror=undef]
+# LTO breaks build with a warning-as-error, not taking the chances though.
+NOLTO=yes
+
+LOCALEGENVER="20160914"
+
+# Merges locale-gen at Core 4.
+PKGREP="locale-gen<=20160429"
+PKGBREAK="locale-gen<=20160429"
