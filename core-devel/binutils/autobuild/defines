@@ -11,7 +11,8 @@ AUTOTOOLS_AFTER="--prefix=/usr \
                  --with-bugurl=https://github.com/AOSC-Dev/aosc-os-core \
                  --enable-threads --enable-shared --with-pic \
                  --enable-ld --enable-plugins \
-                 --disable-werror --enable-lto --disable-gdb"
+                 --disable-werror --enable-lto --disable-gdb
+                 --build=${ARCH_TARGET[$ARCH]}"
 
 # MIPS (mipsel, mipsn32el) is not quite ready for gold linker.
 # BFD will be the default and only linker for those architectures.
