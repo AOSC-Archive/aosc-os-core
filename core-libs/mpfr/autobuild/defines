@@ -10,6 +10,5 @@ PKGDES="Functions for multiple precision math"
 # 3. Declares documentation directory;
 AUTOTOOLS_AFTER="--enable-thread-safe --enable-shared \
                  --docdir=/usr/share/doc/mpfr \
-                 --host=${ARCH_TARGET[$ARCH]} \
-                 --build=${ARCH_TARGET[$ARCH]} \
-                 --target=${ARCH_TARGET[$ARCH]}"
+                 --build=${ARCH_TARGET[$ARCH]}"
+AB_FLAGS_O3=1
