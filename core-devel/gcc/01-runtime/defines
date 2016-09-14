@@ -42,7 +42,6 @@ PKGDES="GNU Compiler Collection (runtime libraries only)"
 #     #18 is now accepted by GCC 5.2.0 as gcc4-compatible
 # 19. Enables support for GNU indirect function 
 #     (you may disable this by removing "--enable-gnu-indirect-function");
-# 20. Use bootstrap-lto configuration.
 
 AUTOTOOLS_AFTER="--prefix=/usr \
                  --libdir=/usr/lib --libexecdir=/usr/lib \
@@ -119,3 +118,5 @@ NOLTO=yes
 RECONF=no
 
 PKGBREAK="gcc<=5.2.0-1"
+AB_FLAGS_SPECS=0
+AB_FLAGS_O3=yes
