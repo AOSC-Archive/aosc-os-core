@@ -1,3 +1,0 @@
-# -O3.
-export CFLAGS="${CFLAGS} -O3"
-export CXXFLAGS="${CXXFLAGS} -O3"
