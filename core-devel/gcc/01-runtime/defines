@@ -58,7 +58,8 @@ AUTOTOOLS_AFTER="--prefix=/usr \
                  --disable-multilib --disable-werror \
                  --enable-pie \
                  --enable-checking=release \
-                 --with-default-libstdcxx-abi=gcc4-compatible"
+                 --with-default-libstdcxx-abi=gcc4-compatible \
+                 --build=${ARCH_TARGET[$ARCH]}"
 
 # Cross.
 if [[ "${CROSS:-$ARCH}" = *cross* ]]; then
@@ -81,11 +82,6 @@ if [[ "${CROSS:-$ARCH}" = "armel" ]]; then
     AUTOTOOLS_AFTER+=" --with-arch=armv7-a --with-float=hard \
                        --with-fpu=neon"
 fi
-
-# Retain old triplets.
-AUTOTOOLS_AFTER+=" --host=${ARCH_TARGET[$ARCH]} \
-                   --build=${ARCH_TARGET[$ARCH]} \
-                   --target=${ARCH_TARGET[$ARCH]}"
 
 # AArch64 specific architectural config.
 if [[ "${CROSS:-$ARCH}" = "arm64" ]]; then
