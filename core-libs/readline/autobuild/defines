@@ -17,3 +17,5 @@ MAKE_AFTER="SHLIB_LIBS=-lncursesw"
 if [[ "${CROSS:-$ARCH}" = *cross* ]]; then
     AUTOTOOLS_AFTER+=" --host=${ARCH_TARGET[$ARCH]}"
 fi
+
+RECONF=no
