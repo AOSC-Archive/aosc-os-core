@@ -15,6 +15,6 @@ RPMEXTRAPROVIDE="/bin/sh /bin/bash /sbin/bash"
 # 4. Disables Bash malloc (uses implementation in GLibC);
 # 5. Enables installed readline libraries for extreme cases;
 AUTOTOOLS_AFTER="--bindir=/bin --with-curses --enable-readline \
-                 --without-bash-malloc --with-installed-readline \
-                 --build=${ARCH_TARGET[$ARCH]}"
-RECONF=no
+                 --without-bash-malloc --with-installed-readline"
+
+AB_FLAGS_O3=1
