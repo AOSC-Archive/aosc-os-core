@@ -16,4 +16,10 @@ MAKE_AFTER="SHLIB_LIBS=-lncursesw"
 # Cross parameters.
 if [[ "${CROSS:-$ARCH}" = *cross* ]]; then
     AUTOTOOLS_AFTER+=" --host=${ARCH_TARGET[$ARCH]}"
-fi
+
+PKGBREAK="bash<=4.3.46 bc<=1.06.95-2 bind<=9.10.4.P2 cdecl<=2.5-1 clisp<=2.49-0 fossil<=1.33 gdb<=7.11.1 \
+gnupg<=1:2.1.15 gnuplot<=5.0.2-1 gnutls<=3.4.15 hunspell<=1.3.4 iverilog<=10.0 js<=1.8.5-3 js-17<=17.0.0-2 \
+js-24<=24.2.0-2 js-31<=31.2.0rc0 js-38<=38.2.1.rc0 libisoburn<=1.4.4 libxml2<=2.9.3 lua<=5.1.5-3 \
+lvm2<=2.02.165 nftables<=0.5 openresty<=1.11.2.1-1 pcre<=8.39 pcre2<=10.22 pilot-link<=0.12.5-2 \
+postgresql<=9.5.4 r<=3.3.0 samba<=4.5.0-1 socat<=2.0.0b9 sqlite<=3.14.0 unixodbc<=2.3.4 wpa-supplicant<=2.5-1 \
+zypper<=1.12.27"
