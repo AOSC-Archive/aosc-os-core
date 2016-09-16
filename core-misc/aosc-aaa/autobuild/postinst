@@ -59,7 +59,8 @@ Ncurses:
 
 Readline:
 
-  - Rebuilt with hardening;
+  - Updated to 7.0;
+  - Add compatibility symlink;
 
 Zlib:
 
@@ -99,7 +100,9 @@ GNU Compiler Collection:
 
 Bash:
 
+  - Updated to 4.4;
   - Rebuilt with new triplets;
+  - Switched to -O3 optimization level;
 
 Berkeley DB (db):
 
