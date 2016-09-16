@@ -42,7 +42,6 @@ PKGDES="GNU Compiler Collection (runtime libraries only)"
 #     #18 is now accepted by GCC 5.2.0 as gcc4-compatible
 # 19. Enables support for GNU indirect function 
 #     (you may disable this by removing "--enable-gnu-indirect-function");
-# 20. Use bootstrap-lto configuration.
 
 AUTOTOOLS_AFTER="--prefix=/usr \
                  --libdir=/usr/lib --libexecdir=/usr/lib \
@@ -57,32 +56,49 @@ AUTOTOOLS_AFTER="--prefix=/usr \
                  --with-isl=/usr \
                  --enable-lto --enable-plugin --enable-install-libiberty \
                  --disable-multilib --disable-werror \
+                 --enable-pie \
                  --enable-checking=release \
-                 --with-default-libstdcxx-abi=gcc4-compatible"
+                 --with-default-libstdcxx-abi=gcc4-compatible \
+                 --build=${ARCH_TARGET[$ARCH]}"
 
 # Cross.
-[[ "${CROSS:-$ARCH}" = *cross* ]] && \
-    AUTOTOOLS_AFTER+=" --host=${ARCH_TARGET[$ARCH]} --target=${ARCH_TARGET[$ARCH]}"
+if [[ "${CROSS:-$ARCH}" = *cross* ]]; then
+    AUTOTOOLS_AFTER+=" --host=${ARCH_TARGET[$ARCH]} \
+                       --target=${ARCH_TARGET[$ARCH]}"
+fi
 
 # MIPS is not yet happy with GNU hashing style.
-[[ "${CROSS:-$ARCH}" != mips* ]] && \
+if [[ "${CROSS:-$ARCH}" != mips* ]]; then
     AUTOTOOLS_AFTER+=" --with-linker-hash-style=gnu"
+fi
 
 # ARM and AArch64 specific.
-[[ "${CROSS:-$ARCH}" = arm* ]] && \
+if [[ "${CROSS:-$ARCH}" = arm* ]]; then
     AUTOTOOLS_AFTER+=" --disable-altivec --disable-fixed-point"
+fi
 
 # ARMEL had a weird triplet.
-[ "${CROSS:-$ARCH}" = "armel" ] && \
-    AUTOTOOLS_AFTER+=" --with-arch=armv7-a --with-float=hard --with-fpu=neon"
+if [[ "${CROSS:-$ARCH}" = "armel" ]]; then
+    AUTOTOOLS_AFTER+=" --with-arch=armv7-a --with-float=hard \
+                       --with-fpu=neon"
+fi
 
-# Retain old triplets.
-AUTOTOOLS_AFTER+=" --host=${ARCH_TARGET[$ARCH]} --build=${ARCH_TARGET[$ARCH]} \
-                   --target=${ARCH_TARGET[$ARCH]}"
-
-# AArch64 specific architecture.
-[ "${CROSS:-$ARCH}" = "arm64" ] && \
+# AArch64 specific architectural config.
+if [[ "${CROSS:-$ARCH}" = "arm64" ]]; then
     AUTOTOOLS_AFTER+=" --with-arch=armv8-a"
+fi
+
+# PowerPC specific.
+if [[ "${CROSS:-$ARCH}" = "powerpc" ]]; then
+    AUTOTOOLS_AFTER+=" --with-tune=G4 \
+                       --with-long-double-128 --enable-secureplt"
+fi
+
+# PowerPC64 specific.
+if [[ "${CROSS:-$ARCH}" = "ppc64" ]]; then
+    AUTOTOOLS_AFTER+=" --with-cpu=620 --with-tune=G5 \
+                       --with-long-double-128 --enable-secureplt"
+fi
 
 # Use profiledbootstrap.
 ABMK="profiledbootstrap"
@@ -95,7 +111,8 @@ ABRPMAUTOPROVONLY=yes
 #           ^
 NOLTO=yes
 
-AB_FLAGS_PIE=0
 RECONF=no
 
 PKGBREAK="gcc<=5.2.0-1"
+AB_FLAGS_SPECS=0
+AB_FLAGS_O3=yes

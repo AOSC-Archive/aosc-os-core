@@ -1,4 +1,7 @@
 # To fix the .old issue for rolling up users. As the file is found not to be
 # provided by any package.
-[ -f /usr/lib/libreadline.so.6.3.old ] && rm -f /usr/lib/libreadline.so.6.3.old
+if [[ -e /usr/lib/libreadline.so.*.old ]]; then
+    rm -f /usr/lib/libreadline.so.*.old
+fi
+
 ldconfig

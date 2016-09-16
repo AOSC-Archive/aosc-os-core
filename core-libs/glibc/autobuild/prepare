@@ -1,2 +1,5 @@
 ln -s /usr/bin/ld.bfd "$SRCDIR"/ld
 export PATH="$SRCDIR:$PATH"
+
+git clone --depth 1 -b v"$LOCALEGENVER" \
+    https://github.com/AOSC-Dev/locale-gen

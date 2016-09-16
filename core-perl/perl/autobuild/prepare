@@ -1,0 +1,5 @@
+# FIXME: to adapt for the new -fPIC/-fPIE GCC specs,
+# which does not specify -fPIC by default once disabled
+# with AB_FLAGS_SPECS=0.
+export CFLAGS="${CFLAGS} -fPIC"
+export CXXFLAGS="${CXXFLAGS} -fPIC"

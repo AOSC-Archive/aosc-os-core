@@ -1,8 +1,0 @@
-# Upstream (GNU) patches, usually for security issues.
-for i in autobuild/patches/bash43-*
-do
-	patch -Np0 < $i
-done
-
-# Currently local zh_{CN,TW} translation patches by Arthur Wang.
-patch -Np1 -i autobuild/patches/bash_43_zh.patch

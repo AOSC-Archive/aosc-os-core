@@ -4,7 +4,6 @@ PKGDEP="glibc ncurses"
 PKGDES="GNU realine library"
 
 ABSHADOW=no
-AB_FLAGS_PIE=0
 
 # The following configuration:
 #
@@ -15,5 +14,8 @@ AUTOTOOLS_AFTER="--with-curses --enable-multibyte --enable-shared"
 MAKE_AFTER="SHLIB_LIBS=-lncursesw"
 
 # Cross parameters.
-[[ "${CROSS:-$ARCH}" = *cross* ]] && \
+if [[ "${CROSS:-$ARCH}" = *cross* ]]; then
     AUTOTOOLS_AFTER+=" --host=${ARCH_TARGET[$ARCH]}"
+fi
+
+RECONF=no

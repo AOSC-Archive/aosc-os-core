@@ -5,5 +5,4 @@ rlfe-history.diff
 rlfe-kfreebsd.diff
 rlfe-tinfo.diff
 fix-wformat-security.diff
-configure-tinfo.diff
 rlfe-signal-rvt.diff

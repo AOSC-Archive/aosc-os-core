@@ -5,14 +5,14 @@ PKGDES="A set of programs to assemble and manipulate binary and object files"
 
 NOSTATIC=no
 NOLTO=yes
-AB_FLAGS_PIE=0
 
 AUTOTOOLS_AFTER="--prefix=/usr \
                  --with-lib-path=/usr/lib \
                  --with-bugurl=https://github.com/AOSC-Dev/aosc-os-core \
                  --enable-threads --enable-shared --with-pic \
                  --enable-ld --enable-plugins \
-                 --disable-werror --enable-lto --disable-gdb"
+                 --disable-werror --enable-lto --disable-gdb
+                 --build=${ARCH_TARGET[$ARCH]}"
 
 # MIPS (mipsel, mipsn32el) is not quite ready for gold linker.
 # BFD will be the default and only linker for those architectures.
@@ -20,6 +20,10 @@ if [[ "${CROSS:-$ARCH}" = mips* ]]; then
 	AUTOTOOLS_AFTER+=" --disable-gold"
 else
 	AUTOTOOLS_AFTER+=" --enable-gold=default"
+fi
+
+if [[ "${CROSS:-$ARCH}" = *64 ]]; then
+	AUTOTOOLS_AFTER+=" --enable-64-bit-bfd"
 fi
 
 alias BUILD_READY='make configure-host'
