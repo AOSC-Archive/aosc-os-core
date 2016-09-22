@@ -3,6 +3,8 @@ PKGSEC=perl
 PKGDEP="gdbm db glibc"
 PKGDES="A highly capable and feature rich programming language"
 
+NOPARALLEL=yes
+
 PKGEPOCH=4
 ABRPMAUTOPROVONLY=yes
 RPMEXTRAPROVIDE="perl(abbrev.pl) /sbin/perl /usr/sbin/perl /bin/perl \
