@@ -17,109 +17,18 @@ install -dm1777 /var/tmp
 
 echo -e "\
 
-Welcome to AOSC OS (4.0.0)!
+Welcome to AOSC OS (4.0.1)!
 
-Duang-Duang! Here it comes...
+This is a bugfix release over Core 4.0.0:
 
-AOSC OS Core 4 is a major update over Core 3, which has been the mainline Core
-version since last summer (remember?). With this major version update, we are
-finally free to get our newest and most radical changes for your device.
+- Adds extra PATH for Perl site and vendor directories (#39);
+- Misc. fixes for MIPS32 (mipsel);
 
-With this Core update, you will get higher performance with applications runtime
-and launching speed (it gets better over time for the year to come).
+--------------------------------------------------------------------------------
 
-There are much more changes contained in this update, and we will list them
-below for your reference.
+For a full changelog of Core 4.0.0, please read at:
 
-General/Meta:
-
-  - New architecture supported: PowerPC (PPC, 32-Bit, Big Endian), PowerPC64
-    (PPC64, 64-Bit, Big Endian);
-  - New triplets, all "unknown" notations are replaced with "aosc" (properly
-    defined vendor). For example, on an AMD64 system, the triplet is now
-    "x86_64-aosc-linux-gnu" instead of "x86_64-unknown-linux-gnu";
-  - Build "bash" before "libtool";
-
-Linux API Headers:
-
-  - Updated to 4.7.3;
-  - Enabled PIE via GCC/LD specs (with exceptions in "gcc" and "glibc");
-
-GNU C Library (Glibc):
-
-  - Updated to 2.24;
-  - Switched to -O3 optimization level;
-  - Enabling hardening during build;
-  - Update C.UTF-8 patch from Fedora;
-  - Bundle locale-gen into the "glibc" package;
-
-Ncurses:
-
-  - Only build the "wide" variant, with symlinks to the non-wide variant;
-
-Readline:
-
-  - Updated to 7.0;
-  - Add compatibility symlink;
-
-Zlib:
-
-  - Switched to -O3 optimization level;
-
-Binutils:
-
-  - Updated to 2.27;
-  - Added patch to fix build on PowerPC64 and AArch64 (ARMv8, 64-Bit);
-  - Added support for building Kernel with LTO (Link Time Optimization) enabled;
-
-GNU Multiple Precision Arithmetic Library (GMP):
-
-  - Updated to 6.1.1;
-  - Switched to -O3 optimization level;
-
-GNU Multiple Precision Floating Point Library (GMP):
-
-  - Cleaned up build configuration;
-  - Switched to -O3 optimization level;
-
-GNU MPC:
-
-  - Cleaned up build configuration;
-  - Switched to -O3 optimization level;
-
-Integer Set Library (ISL):
-
-  - Updated to 0.17.1;
-  - Switched to -O3 optimization level;
-
-GNU Compiler Collection:
-
-  - Updated to 6.2.0;
-  - Enable PIE by default;
-  - Switched to -O3 optimization level;
-
-Bash:
-
-  - Updated to 4.4;
-  - Rebuilt with new triplets;
-  - Switched to -O3 optimization level;
-
-Berkeley DB (db):
-
-  - Rebuilt with hardening;
-
-Perl:
-
-  - Updated to 5.24.0;
-  - Switched to architecture-version independent site and vendor directories;
-
-Make:
-
-  - Rebuilt with hardening;
-
-AOSC Base Definition (aosc-aaa):
-
-  - Removed /etc/fstab from package (generate if does not exist);
+  https://github.com/AOSC-Dev/aosc-os-core/releases/tag/v4.0.0
 
 --------------------------------------------------------------------------------
 
