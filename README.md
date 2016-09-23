@@ -48,11 +48,10 @@ AOSC OS Core will include the following packages:
 * readline, "GNU realine library"
 * ncurses, "System V Release 4.0 curses emulation library"
 * bash, "Bourne Again SHell"
-* libtool, "GNU generic library support script"
 * make, "GNU Make, designed for code processing"
 * aosc-aaa, "bed rock level system definitions"
 
-(total of 20 packages)
+(total of 19 packages)
 
 ## Building (theoretical)
 A copy of BuildKit is recommended (instructions will be added when BuildKit is ready), BuildKit contains all packages for AOSC OS Core building (Autobuild3 and a script of AOCS OS Core automatic build).
