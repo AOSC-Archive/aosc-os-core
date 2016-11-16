@@ -68,7 +68,14 @@ if [[ "${CROSS:-$ARCH}" = ppc64 ]]; then
 fi
 
 # Include locale-gen.
-sed -e '1,3d' -e 's|/| |g' -e 's|\\| |g' \
+# We are not biased towards nor against any languages for now,
+# but we are certainly biased towards UTF-8. Cuts down ~40% entries.
+sed -r \
+    -e '1,3d' \
+    -e 's|/| |g' \
+    -e 's|\\| |g' \
+    -e 's|^|#|g' \
+    -e 's|^#\([^ ]*\) UTF-8$|\1 UTF-8|' \
     "$SRCDIR"/localedata/SUPPORTED >> "$SRCDIR"/locale-gen/locale.gen
 install -Dm644 "$SRCDIR"/locale-gen/locale.gen \
                "$PKGDIR"/etc/locale.gen
