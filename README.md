@@ -1,35 +1,82 @@
-# AOSC OS Core
-AOSC OS Core takes effect as of AOSC OS4's beginning of development. AOSC OS Core will be taken from the original AOSC OS, and be turned into a shared Linux "standard base" and tool chain for AOSC OS itself and its derivatives.
+AOSC OS Core
+============
 
-## Rationale
-AOSC OS is a decently large project, with more than 2,800 packages included in the community portal at https://repo.anthonos.org and many of its mirrors. Maintaining such large amount of packages is not merely an easy job for the developers - under the circumstances of security vulnerbilities, major updates, and mass rebuilds, AOSC OS developers may not be effective at finishing the tasks in a timely fashion. Added on periodic full system build updates, AOSC OS will be too time consuming for many of the maintainers.
+AOSC OS Core is introduced after the final debut of AOSC OS3 (the last version
+of AOSC OS with a versioned name), designed to be a standardized base of:
 
-Therefore, AOSC OS Core will serve a standard for **ALL** AOSC OS builds with a version definition of its counterpart, AOSC OS may be released on a non-regulated schedule, thus saving time and potential frustration for developers.
+- Core runtime libraries.
+- Basic toolchains.
 
-## In practice
-The following practices will be taken into account for AOSC OS Core development:
+For AOSC OS and its potential derivatives.
 
-* AOSC OS Core will take the "AOSC OSn" (where "n" is a natural number) version counting rules, however it will count in form of "x.y.z" version numbers;
-* aosc-aaa will be included as the only base-line definition for AOSC OS Core, with filesystem structure and basic configurations that may affect essential system behaviors;
-* AOSC OS Core will **NOT** be presented in a rolling-release sense, any major version bump should be first discussed (fork it if you do need to update, and PR if you feel like doing so);
-* Only tool chain level packages like gcc, llvm, and glibc, etc. will be included;
+The Core also serves as a versioning agent for AOSC OS (provided by the
+`aosc-aaa` package - the base rock definition of AOSC OS).
+
+Rationale
+---------
+
+AOSC OS is a decently large project, holding more than 3,500 packages in the
+[ABBS Tree](https://github.com/AOSC-Dev/aosc-os-abbs/) and is available for
+six architectures:
+
+- AMD64/x86_64 Intel/AMD compatible personal computers, workstations, and
+  servers.
+- ARMv7 32-bit development boards, phones, and tablets.
+- ARMv8 64-bit development boards, phones, tablets, and servers.
+- MIPS32 (MIPS-II) personal computers, workstations, and servers.
+- PowerPC 32-bit (Big Endian) personal computers, Macintosh, workstations,
+  and servers.
+- PowerPC 64-bit (Big Endian) personal computers, Macintosh, workstations,
+  and servers.
+
+Maintaining such large amount of packages across multiple architectures is
+not an easy job for the maintainers of the project: under the circumstances
+of security vulnerbilities, major updates, and mass rebuilds, AOSC OS
+developers may not be effective at finishing the respective tasks in a
+timely fashion. 
+
+Added on with annual/semi-annual (or schedules of similar fashion) releases,
+AOSC OS could be too time consuming for our limited team of maintainers.
+
+Therefore, AOSC OS Core will serve a standard for **ALL** AOSC OS ports 
+with a version definition of its counterpart - released on a non-regulated
+schedule, thus saving time and potential frustration for the maintainers.
+
+In practice
+-----------
+
+The following practices is defined for AOSC OS Core development:
+
+* AOSC OS Core will take in place of the "AOSC OSn" (where "n" is a natural
+  number) versioning rules, however it will be versioned in "x.y.z" format.
+* `aosc-aaa` will be included as the only base-line definition for AOSC OS
+  Core, with filesystem structure and basic configurations that may affect
+  system behaviors
+* AOSC OS Core will **NOT** be updated as soon as new components were
+  released, any major version bump should be first discussed (fork it if you
+  do need to update, and PR if you feel like doing so).
+* Only tool chain level packages like will be included (by definition).
 * **ALL** security updates will be provided when applicable.
 
 ### An example of update cycle
-AOSC OS3, after being released as the last versioned build release (it will start rolling while AOSC OS Core is still versioned), it will release versions like follows:
+
+AOSC OS3, after being released as the last versioned release (it will start
+rolling while AOSC OS Core is still versioned), it will release versions 
+like follows:
 
 * Stable series: 3.1, 3.2, 3.3, ..., 3.10, 3.11, ...
 * Experimental (playground) series: 3.99.1, 3.99.2, ..., 3.99.10, 3.99.11, ...
 
-#### Minor changes (security, and partial updates)
-For updates like this, we will use a sub-version to mark an update, like `x.y.z-n` where `n` is a positive integer.
-
 ![update_model](https://github.com/AOSC-Dev/aosc-os-core/raw/master/assets/images/AOSC%20OS%20Core%20Rationale%2C%20update%20model.png)
 
-Stable and Experimental series will not affect each other, nor do they have a "testing - release" relationship. 3.99 series (Experimental) will become the future 4.0 series... And the cycle continues.
+Stable and Experimental series will not affect each other, nor do they have
+a "testing - release" relationship. 3.99 series (Experimental) will become
+the future 4.0 series... And the cycle continues.
 
-## Packages
-AOSC OS Core will include the following packages:
+Packages
+--------
+
+AOSC OS Core currently include the following packages:
 
 * linux+api, "Linux API Headers for glibc"
 * zlib, "A Massively Spiffy Yet Delicately Unobtrusive Compression Library"
@@ -53,28 +100,28 @@ AOSC OS Core will include the following packages:
 
 (total of 19 packages)
 
-## Building (theoretical)
-A copy of BuildKit is recommended (instructions will be added when BuildKit is ready), BuildKit contains all packages for AOSC OS Core building (Autobuild3 and a script of AOCS OS Core automatic build).
+Building the Core
+-----------------
 
-## Derivatives of AOSC OS Core
-Derivatives may be build upon AOSC OS Core, as the packages provided in AOSC OS Core may form a fully working chroot environment for developers to get started. However, BuildKit can still be used as BuildKit itself builds upon AOSC OS Core (convenient huh).
+Please first refer to our 
+[AOSC Cadet Training](https://github.com/AOSC-Dev/aosc-os-abbs/wiki)
+handbook.
 
-### Guidelines
-The following guidelines is advised for AOSC OS Core derivatives:
+Derivatives of AOSC OS Core
+---------------------------
 
-* Usage of Autobuild3 as the build toolkit for the distribution/derivative;
-* If the AOSC OS Core is modified, do not mark the distribution/derivative as one of the AOSC OS Core derivatives;
-* Support for one of DPKG or RPM as the default package manager;
-* Inclusion of lsb-release for identification of the distribution/derivative;
-* Use Linux Kernel as the default kernel for the distribution/derivative;
-* Use GCC as the default compiler for the distribution/derivative, unless otherwise demanded by packages included;
+Derivatives may be built upon AOSC OS Core, as the packages provided in
+AOSC OS Core may form a fully working chroot environment for developers to
+get started.
 
-### Concerns and condemns
-The following practices are strongly condemned:
+However, BuildKit can still be used as BuildKit itself was built upon AOSC OS 
+Core (convenient huh) - and to be fair, a flavour of AOSC OS release on its
+own.
 
-* Inclusion of licensing-controversial software/packages/intellectual works;
-* Release an "AOSC OS Core derivative" that is built upon a fork or a modified version of AOSC OS Core;
-* Using an outdated AOSC OS Core as the foundation of the distribution/derivative;
+You may obtain a copy of BuildKit [here](https://aosc.io/os-download).
 
-## Seeking for help, and reporting bugs
-Please seek for help, and report bugs in the "Issues" section of this repository.
+Need help?
+----------
+
+All questions and bug reports should be filed to the "Issues" section of 
+this repository.
