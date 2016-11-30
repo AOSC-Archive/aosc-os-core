@@ -75,7 +75,7 @@ sed -r \
     -e 's|/| |g' \
     -e 's| ?\\||g' \
     -e 's|^|#|g' \
-    -e 's|^#\([^ ]*\) UTF-8|\1 UTF-8|' \
+    -e 's|^#([^ ]*) UTF-8|\1 UTF-8|' \
     "$SRCDIR"/localedata/SUPPORTED >> "$SRCDIR"/locale-gen/locale.gen
 install -Dm644 "$SRCDIR"/locale-gen/locale.gen \
                "$PKGDIR"/etc/locale.gen
