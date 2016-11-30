@@ -6,22 +6,9 @@ Subject: [PATCH] gconv: Adjust GBK to support the Euro sign
 Commit aa4d00ca39e604ac4e9fead401ccd4483e11a281 only updated the
 data used by locales.
 ---
- ChangeLog       |    4 ++++
  iconvdata/gbk.c |   17 +++++++++++++++--
- 2 files changed, 19 insertions(+), 2 deletions(-)
+ 1 files changed, 17 insertions(+), 2 deletions(-)
 
-diff --git a/ChangeLog b/ChangeLog
-index 92c96c1..1ae7181 100644
---- a/ChangeLog
-+++ b/ChangeLog
-@@ -1,3 +1,7 @@
-+2016-11-29  Florian Weimer  <fweimer@redhat.com>
-+
-+	* iconvdata/gbk.c (BODY): Add Euro sign support (both directions).
-+
- 2016-11-29  Yury Norov  <ynorov@caviumnetworks.com>
- 	    Steve Ellcey  <sellcey@caviumnetworks.com>
- 
 diff --git a/iconvdata/gbk.c b/iconvdata/gbk.c
 index fc32a50..8e12e95 100644
 --- a/iconvdata/gbk.c
