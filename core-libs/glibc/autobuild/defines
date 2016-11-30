@@ -10,7 +10,7 @@ PKGDES="GNU C Library"
 # 3. Enables add-on support;
 # 4. Disables obsolete RPC (Remote Procedural Call) support  
 #    (--disable-obsolete-rpc to disable such support, if you know what you are doing);
-# 5. Declares that Kernel verion 2.6.32 is the minimum accepted
+# 5. Declares that Kernel verion 3.4.0 is the minimum accepted
 #    (you may raise the version number as you like);
 # 6. Enables "bind now" (dynamic loader) support;
 # 7. Disables profiling support 
@@ -28,7 +28,7 @@ AUTOTOOLS_AFTER="--libexecdir=/usr/lib \
                  --with-bugurl=https://github.com/AOSC-Dev/aosc-os-core \
                  --enable-add-ons \
                  --enable-obsolete-rpc \
-                 --enable-kernel=2.6.32 \
+                 --enable-kernel=3.4.0 \
                  --enable-bind-now --disable-profile \
                  --enable-stackguard-randomization \
                  --enable-lock-elision \

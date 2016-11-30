@@ -1,0 +1,62 @@
+From 0415d32187731ac03ef6c72c6cfb25314d4b0133 Mon Sep 17 00:00:00 2001
+From: Florian Weimer <fweimer@redhat.com>
+Date: Tue, 29 Nov 2016 18:35:12 +0100
+Subject: [PATCH] gconv: Adjust GBK to support the Euro sign
+
+Commit aa4d00ca39e604ac4e9fead401ccd4483e11a281 only updated the
+data used by locales.
+---
+ ChangeLog       |    4 ++++
+ iconvdata/gbk.c |   17 +++++++++++++++--
+ 2 files changed, 19 insertions(+), 2 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 92c96c1..1ae7181 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,7 @@
++2016-11-29  Florian Weimer  <fweimer@redhat.com>
++
++	* iconvdata/gbk.c (BODY): Add Euro sign support (both directions).
++
+ 2016-11-29  Yury Norov  <ynorov@caviumnetworks.com>
+ 	    Steve Ellcey  <sellcey@caviumnetworks.com>
+ 
+diff --git a/iconvdata/gbk.c b/iconvdata/gbk.c
+index fc32a50..8e12e95 100644
+--- a/iconvdata/gbk.c
++++ b/iconvdata/gbk.c
+@@ -13148,8 +13148,17 @@ static const char __gbk_from_ucs4_tab12[][2] =
+       if (__builtin_expect (ch <= 0x80, 0)				      \
+ 	  || __builtin_expect (ch > 0xfe, 0))				      \
+ 	{								      \
+-	  /* This is illegal.  */					      \
+-	  STANDARD_FROM_LOOP_ERR_HANDLER (1);				      \
++	  if (__glibc_likely (ch == 0x80))				      \
++	    {								      \
++	      /* Exception for the Euro sign (see CP936).  */		      \
++	      ch = 0x20ac;						      \
++	      ++inptr;							      \
++	    }								      \
++	  else								      \
++	    {								      \
++	      /* This is illegal.  */					      \
++	      STANDARD_FROM_LOOP_ERR_HANDLER (1);			      \
++	    }								      \
+ 	}								      \
+       else								      \
+ 	{								      \
+@@ -13292,6 +13301,10 @@ static const char __gbk_from_ucs4_tab12[][2] =
+ 	case 0x2010 ... 0x203b:						      \
+ 	  cp = __gbk_from_ucs4_tab4[ch - 0x2010];			      \
+ 	  break;							      \
++	case 0x20ac:							      \
++	  /* Exception for the Euro sign (see CP396).  */		      \
++	  cp = "\x80";							      \
++	  break;							      \
+ 	case 0x2103 ... 0x22bf:						      \
+ 	  cp = __gbk_from_ucs4_tab5[ch - 0x2103];			      \
+ 	  break;							      \
+-- 
+1.7.1
+

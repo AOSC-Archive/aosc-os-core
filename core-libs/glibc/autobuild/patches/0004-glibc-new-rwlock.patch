@@ -1,0 +1,2980 @@
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: [v2] New pthread rwlock that is more scalable.
+From: Torvald Riegel <triegel@redhat.com>
+X-Patchwork-Id: 16618
+Message-Id: <1476800844.7146.1.camel@localhost.localdomain>
+To: GLIBC Devel <libc-alpha@sourceware.org>
+Date: Tue, 18 Oct 2016 16:27:24 +0200
+
+This is a new version that fixes a bug and addresses the minor comments
+received so far.
+
+On Wed, 2016-07-27 at 23:38 +0200, Torvald Riegel wrote:
+> Patch 1/2 adds an additional atomic operation we need.
+> Patch 2/2 is the rwlock rewrite.
+
+The first patch has already been committed, so this is just one patch
+now.
+
+> 
+> Tested on x86_64-linux using the glibc tests.
+> 
+> We intend to do further testing in Rawhide.  Reviews before that testing
+> concludes are nonetheless appreciated :)
+
+And this still holds :)
+
+
+commit 54709d19996bdf750c97dfeb54a8058be9f0e611
+Author: Torvald Riegel <triegel@redhat.com>
+Date:   Thu May 22 16:00:12 2014 +0200
+
+    New pthread rwlock that is more scalable.
+    
+    This replaces the pthread rwlock with a new implementation that uses a
+    more scalable algorithm (primarily through not using a critical section
+    anymore to make state changes).  The fast path for rdlock acquisition and
+    release is now basically a single atomic read-modify write or CAS and a few
+    branches.  See nptl/pthread_rwlock_common.c for details.
+    
+    	* nptl/DESIGN-rwlock.txt: Remove.
+    	* nptl/lowlevelrwlock.sym: Remove.
+    	* nptl/Makefile: Add new tests.
+    	* nptl/pthread_rwlock_common.c: New file.  Contains the new rwlock.
+    	* nptl/pthreadP.h (PTHREAD_RWLOCK_PREFER_READER_P): Remove.
+    	(PTHREAD_RWLOCK_WRPHASE, PTHREAD_RWLOCK_WRLOCKED,
+    	PTHREAD_RWLOCK_RWAITING, PTHREAD_RWLOCK_READER_SHIFT,
+    	PTHREAD_RWLOCK_READER_OVERFLOW, PTHREAD_RWLOCK_WRHANDOVER,
+    	PTHREAD_RWLOCK_FUTEX_USED): New.
+    	* nptl/pthread_rwlock_init.c (__pthread_rwlock_init): Adapt to new
+    	implementation.
+    	* nptl/pthread_rwlock_rdlock.c (__pthread_rwlock_rdlock_slow): Remove.
+    	(__pthread_rwlock_rdlock): Adapt.
+    	* nptl/pthread_rwlock_timedrdlock.c
+    	(pthread_rwlock_timedrdlock): Adapt.
+    	* nptl/pthread_rwlock_timedwrlock.c
+    	(pthread_rwlock_timedwrlock): Adapt.
+    	* nptl/pthread_rwlock_trywrlock.c (pthread_rwlock_trywrlock): Adapt.
+    	* nptl/pthread_rwlock_tryrdlock.c (pthread_rwlock_tryrdlock): Adapt.
+    	* nptl/pthread_rwlock_unlock.c (pthread_rwlock_unlock): Adapt.
+    	* nptl/pthread_rwlock_wrlock.c (__pthread_rwlock_wrlock_slow): Remove.
+    	(__pthread_rwlock_wrlock): Adapt.
+    	* nptl/tst-rwlock10.c: Adapt.
+    	* nptl/tst-rwlock11.c: Adapt.
+    	* nptl/tst-rwlock17.c: New file.
+    	* nptl/tst-rwlock18.c: New file.
+    	* nptl/tst-rwlock19.c: New file.
+    	* nptl/tst-rwlock2b.c: New file.
+    	* nptl/tst-rwlock8.c: Adapt.
+    	* nptl/tst-rwlock9.c: Adapt.
+    	* sysdeps/aarch64/nptl/bits/pthreadtypes.h (pthread_rwlock_t): Adapt.
+    	* sysdeps/arm/nptl/bits/pthreadtypes.h (pthread_rwlock_t): Adapt.
+    	* sysdeps/hppa/nptl/bits/pthreadtypes.h (pthread_rwlock_t): Adapt.
+    	* sysdeps/ia64/nptl/bits/pthreadtypes.h (pthread_rwlock_t): Adapt.
+    	* sysdeps/m68k/nptl/bits/pthreadtypes.h (pthread_rwlock_t): Adapt.
+    	* sysdeps/microblaze/nptl/bits/pthreadtypes.h (pthread_rwlock_t): Adapt.
+    	* sysdeps/mips/nptl/bits/pthreadtypes.h (pthread_rwlock_t): Adapt.
+    	* sysdeps/nios2/nptl/bits/pthreadtypes.h (pthread_rwlock_t): Adapt.
+    	* sysdeps/s390/nptl/bits/pthreadtypes.h (pthread_rwlock_t): Adapt.
+    	* sysdeps/sh/nptl/bits/pthreadtypes.h (pthread_rwlock_t): Adapt.
+    	* sysdeps/sparc/nptl/bits/pthreadtypes.h (pthread_rwlock_t): Adapt.
+    	* sysdeps/tile/nptl/bits/pthreadtypes.h (pthread_rwlock_t): Adapt.
+    	* sysdeps/unix/sysv/linux/alpha/bits/pthreadtypes.h
+    	(pthread_rwlock_t): Adapt.
+    	* sysdeps/unix/sysv/linux/powerpc/bits/pthreadtypes.h
+    	(pthread_rwlock_t): Adapt.
+    	* sysdeps/x86/bits/pthreadtypes.h (pthread_rwlock_t): Adapt.
+
+Index: glibc-2.24-377-g530862a/nptl/DESIGN-rwlock.txt
+===================================================================
+--- glibc-2.24-377-g530862a.orig/nptl/DESIGN-rwlock.txt
++++ /dev/null
+@@ -1,113 +0,0 @@
+-Reader Writer Locks pseudocode
+-==============================
+-
+-	pthread_rwlock_rdlock(pthread_rwlock_t *rwlock);
+-	pthread_rwlock_unlock(pthread_rwlock_t *rwlock);
+-	pthread_rwlock_wrlock(pthread_rwlock_t *rwlock);
+-
+-struct pthread_rwlock_t {
+-
+-   unsigned int lock:
+-         - internal mutex
+-
+-   unsigned int writers_preferred;
+-         - locking mode: 0 recursive, readers preferred
+-                         1 nonrecursive, writers preferred
+-
+-   unsigned int readers;
+-         - number of read-only references various threads have
+-
+-   pthread_t writer;
+-         - descriptor of the writer or 0
+-
+-   unsigned int readers_wakeup;
+-         - 'all readers should wake up' futex.
+-
+-   unsigned int writer_wakeup;
+-         - 'one writer should wake up' futex.
+-
+-   unsigned int nr_readers_queued;
+-         - number of readers queued up.
+-
+-   unsigned int nr_writers_queued;
+-         - number of writers queued up.
+-}
+-
+-pthread_rwlock_rdlock(pthread_rwlock_t *rwlock)
+-{
+-  lll_lock(rwlock->lock);
+-  for (;;) {
+-    if (!rwlock->writer && (!rwlock->nr_writers_queued ||
+-					!rwlock->writers_preferred))
+-        break;
+-
+-    rwlock->nr_readers_queued++;
+-    val = rwlock->readers_wakeup;
+-    lll_unlock(rwlock->lock);
+-
+-    futex_wait(&rwlock->readers_wakeup, val)
+-
+-    lll_lock(rwlock->lock);
+-    rwlock->nr_readers_queued--;
+-  }
+-  rwlock->readers++;
+-  lll_unlock(rwlock->lock);
+-}
+-
+-pthread_rwlock_tryrdlock(pthread_rwlock_t *rwlock)
+-{
+-  int result = EBUSY;
+-  lll_lock(rwlock->lock);
+-  if (!rwlock->writer && (!rwlock->nr_writers_queued ||
+-					!rwlock->writers_preferred))
+-    rwlock->readers++;
+-  lll_unlock(rwlock->lock);
+-  return result;
+-}
+-
+-pthread_rwlock_wrlock(pthread_rwlock_t *rwlock)
+-{
+-  lll_lock(rwlock->lock);
+-  for (;;) {
+-    if (!rwlock->writer && !rwlock->readers)
+-       break;
+-
+-    rwlock->nr_writers_queued++;
+-    val = rwlock->writer_wakeup;
+-    lll_unlock(rwlock->lock);
+-
+-    futex_wait(&rwlock->writer_wakeup, val);
+-
+-    lll_lock(rwlock->lock);
+-    rwlock->nr_writers_queued--;
+-  }
+-  rwlock->writer = pthread_self();
+-  lll_unlock(rwlock->lock);
+-}
+-
+-pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
+-{
+-  lll_lock(rwlock->lock);
+-
+-  if (rwlock->writer)
+-    rwlock->writer = 0;
+-  else
+-    rwlock->readers--;
+-
+-  if (!rwlock->readers) {
+-    if (rwlock->nr_writers_queued) {
+-      ++rwlock->writer_wakeup;
+-      lll_unlock(rwlock->lock);
+-      futex_wake(&rwlock->writer_wakeup, 1);
+-      return;
+-    } else
+-      if (rwlock->nr_readers_queued) {
+-        ++rwlock->readers_wakeup;
+-        lll_unlock(rwlock->lock);
+-        futex_wake(&rwlock->readers_wakeup, MAX_INT);
+-        return;
+-      }
+-  }
+-
+-  lll_unlock(rwlock->lock);
+-}
+Index: glibc-2.24-377-g530862a/nptl/Makefile
+===================================================================
+--- glibc-2.24-377-g530862a.orig/nptl/Makefile
++++ glibc-2.24-377-g530862a/nptl/Makefile
+@@ -238,10 +238,11 @@ tests = tst-typesizes \
+ 	tst-robust6 tst-robust7 tst-robust8 tst-robust9 \
+ 	tst-robustpi1 tst-robustpi2 tst-robustpi3 tst-robustpi4 tst-robustpi5 \
+ 	tst-robustpi6 tst-robustpi7 tst-robustpi8 tst-robustpi9 \
+-	tst-rwlock1 tst-rwlock2 tst-rwlock2a tst-rwlock3 tst-rwlock4 \
+-	tst-rwlock5 tst-rwlock6 tst-rwlock7 tst-rwlock8 tst-rwlock9 \
+-	tst-rwlock10 tst-rwlock11 tst-rwlock12 tst-rwlock13 tst-rwlock14 \
+-	tst-rwlock15 tst-rwlock16 \
++	tst-rwlock1 tst-rwlock2 tst-rwlock2a tst-rwlock2b tst-rwlock3 \
++	tst-rwlock4 tst-rwlock5 tst-rwlock6 tst-rwlock7 tst-rwlock8 \
++	tst-rwlock9 tst-rwlock10 tst-rwlock11 tst-rwlock12 tst-rwlock13 \
++	tst-rwlock14 tst-rwlock15 tst-rwlock16 tst-rwlock17 tst-rwlock18 \
++	tst-rwlock19 \
+ 	tst-once1 tst-once2 tst-once3 tst-once4 tst-once5 \
+ 	tst-key1 tst-key2 tst-key3 tst-key4 \
+ 	tst-sem1 tst-sem2 tst-sem3 tst-sem4 tst-sem5 tst-sem6 tst-sem7 \
+@@ -307,8 +308,7 @@ test-xfail-tst-once5 = yes
+ # Files which must not be linked with libpthread.
+ tests-nolibpthread = tst-unload
+ 
+-gen-as-const-headers = pthread-errnos.sym lowlevelrwlock.sym \
+-		       unwindbuf.sym \
++gen-as-const-headers = pthread-errnos.sym unwindbuf.sym \
+ 		       lowlevelrobustlock.sym pthread-pi-defines.sym
+ 
+ 
+Index: glibc-2.24-377-g530862a/nptl/lowlevelrwlock.sym
+===================================================================
+--- glibc-2.24-377-g530862a.orig/nptl/lowlevelrwlock.sym
++++ /dev/null
+@@ -1,16 +0,0 @@
+-#include <stddef.h>
+-#include <stdio.h>
+-#include <bits/pthreadtypes.h>
+-#include <bits/wordsize.h>
+-
+---
+-
+-MUTEX		offsetof (pthread_rwlock_t, __data.__lock)
+-NR_READERS	offsetof (pthread_rwlock_t, __data.__nr_readers)
+-READERS_WAKEUP	offsetof (pthread_rwlock_t, __data.__readers_wakeup)
+-WRITERS_WAKEUP	offsetof (pthread_rwlock_t, __data.__writer_wakeup)
+-READERS_QUEUED	offsetof (pthread_rwlock_t, __data.__nr_readers_queued)
+-WRITERS_QUEUED	offsetof (pthread_rwlock_t, __data.__nr_writers_queued)
+-FLAGS		offsetof (pthread_rwlock_t, __data.__flags)
+-WRITER		offsetof (pthread_rwlock_t, __data.__writer)
+-PSHARED		offsetof (pthread_rwlock_t, __data.__shared)
+Index: glibc-2.24-377-g530862a/nptl/pthreadP.h
+===================================================================
+--- glibc-2.24-377-g530862a.orig/nptl/pthreadP.h
++++ glibc-2.24-377-g530862a/nptl/pthreadP.h
+@@ -150,9 +150,16 @@ enum
+    | PTHREAD_MUTEXATTR_PROTOCOL_MASK | PTHREAD_MUTEXATTR_PRIO_CEILING_MASK)
+ 
+ 
+-/* Check whether rwlock prefers readers.   */
+-#define PTHREAD_RWLOCK_PREFER_READER_P(rwlock) \
+-  ((rwlock)->__data.__flags == 0)
++/* For the following, see pthread_rwlock_common.c.  */
++#define PTHREAD_RWLOCK_WRPHASE		1
++#define PTHREAD_RWLOCK_WRLOCKED		2
++#define PTHREAD_RWLOCK_RWAITING		4
++#define PTHREAD_RWLOCK_READER_SHIFT	3
++#define PTHREAD_RWLOCK_READER_OVERFLOW	((unsigned int) 1 \
++					 << (sizeof (unsigned int) * 8 - 1))
++#define PTHREAD_RWLOCK_WRHANDOVER	((unsigned int) 1 \
++					 << (sizeof (unsigned int) * 8 - 1))
++#define PTHREAD_RWLOCK_FUTEX_USED	2
+ 
+ 
+ /* Bits used in robust mutex implementation.  */
+Index: glibc-2.24-377-g530862a/nptl/pthread_rwlock_common.c
+===================================================================
+--- /dev/null
++++ glibc-2.24-377-g530862a/nptl/pthread_rwlock_common.c
+@@ -0,0 +1,924 @@
++/* POSIX reader--writer lock: core parts.
++   Copyright (C) 2016 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <http://www.gnu.org/licenses/>.  */
++
++#include <errno.h>
++#include <sysdep.h>
++#include <pthread.h>
++#include <pthreadP.h>
++#include <sys/time.h>
++#include <stap-probe.h>
++#include <atomic.h>
++#include <futex-internal.h>
++
++
++/* A reader--writer lock that fulfills the POSIX requirements (but operations
++   on this lock are not necessarily full barriers, as one may interpret the
++   POSIX requirement about "synchronizing memory").  All critical sections are
++   in a total order, writers synchronize with prior writers and readers, and
++   readers synchronize with prior writers.
++
++   A thread is allowed to acquire a read lock recursively (i.e., have rdlock
++   critical sections that overlap in sequenced-before) unless the kind of the
++   rwlock is set to PTHREAD_RWLOCK_PREFER_WRITERS_NONRECURSIVE_NP.
++
++   This lock is built so that workloads of mostly readers can be executed with
++   low runtime overheads.  This matches that the default kind of the lock is
++   PTHREAD_RWLOCK_PREFER_READER_NP.  Acquiring a read lock requires a single
++   atomic addition if the lock is or was previously acquired by other
++   readers; releasing the lock is a single CAS if there are no concurrent
++   writers.
++   Workloads consisting of mostly writers are of secondary importance.
++   An uncontended write lock acquisition is as fast as for a normal
++   exclusive mutex but writer contention is somewhat more costly due to
++   keeping track of the exact number of writers.  If the rwlock kind requests
++   writers to be preferred (i.e., PTHREAD_RWLOCK_PREFER_WRITERS_NP or the
++   no-recursive-readers variant of it), then writer--to--writer lock ownership
++   hand-over is fairly fast and bypasses lock acquisition attempts by readers.
++   The costs of lock ownership transfer between readers and writers vary.  If
++   the program asserts that there are no recursive readers and writers are
++   preferred, then write lock acquisition attempts will block subsequent read
++   lock acquisition attempts, so that new incoming readers do not prolong a
++   phase in which readers have acquired the lock.
++
++
++   The main components of the rwlock are a writer-only lock that allows only
++   one of the concurrent writers to be the primary writer, and a
++   single-writer-multiple-readers lock that decides between read phases, in
++   which readers have acquired the rwlock, and write phases in which a primary
++   writer or a sequence of different primary writers have acquired the rwlock.
++
++   The single-writer-multiple-readers lock is the central piece of state
++   describing the rwlock and is encoded in the __readers field (see below for
++   a detailed explanation):
++
++   State WP  WL  R   RW  Notes
++   ---------------------------
++   #1    0   0   0   0   Lock is idle (and in a read phase).
++   #2    0   0   >0  0   Readers have acquired the lock.
++   #3    0   1   0   0   Lock is not acquired; a writer is waiting for a write
++			 phase to start or will try to start one.
++   #4    0   1   >0  0   Readers have acquired the lock; a writer is waiting
++			 and explicit hand-over to the writer is required.
++   #4a   0   1   >0  1   Same as #4 except that there are further readers
++			 waiting because the writer is to be preferred.
++   #5    1   0   0   0   Lock is idle (and in a write phase).
++   #6    1   0   >0  0   Write phase; readers are waiting for a read phase to
++			 start or will try to start one.
++   #7    1   1   0   0   Lock is acquired by a writer.
++   #8    1   1   >0  0   Lock acquired by a writer and readers are waiting;
++			 explicit hand-over to the readers is required.
++
++   WP (PTHREAD_RWLOCK_WRPHASE) is true if the lock is in a write phase, so
++   potentially acquired by a primary writer.
++   WL (PTHREAD_RWLOCK_WRLOCKED) is true if there is a primary writer (i.e.,
++   the thread that was able to set this bit from false to true).
++   R (all bits in __readers except the number of least-significant bits
++   denoted in PTHREAD_RWLOCK_READER_SHIFT) is the number of readers that have
++   or are trying to acquired the lock.  There may be more readers waiting if
++   writers are preferred and there will be no recursive readers, in which
++   case RW (PTHREAD_RWLOCK_RWAITING) is true in state #4a.
++
++   We want to block using futexes but using __readers as a futex word directly
++   is not a good solution.  First, we want to wait on different conditions
++   such as waiting for a phase change vs. waiting for the primary writer to
++   release the writer-only lock.  Second, the number of readers could change
++   frequently, which would make it likely that a writer's futex_wait fails
++   frequently too because the expected value does not match the value of
++   __readers anymore.
++   Therefore, we split out the futex words into the __wrphase_futex and
++   __writers_futex fields.  The former tracks the value of the WP bit and is
++   changed after changing WP by the thread that changes WP.  However, because
++   of the POSIX requirements regarding mutex/rwlock destruction (i.e., that
++   destroying a rwlock is allowed as soon as no thread has acquired or will
++   acquire the lock), we have to be careful and hand over lock ownership (via
++   a phase change) carefully to those threads waiting.  Specifically, we must
++   prevent a situation in which we are not quite sure whether we still have
++   to unblock another thread through a change to memory (executing a
++   futex_wake on a former futex word that is now used for something else is
++   fine).
++   The scheme we use for __wrphase_futex is that waiting threads that may
++   use the futex word to block now all have to use the futex word to block; it
++   is not allowed to take the short-cut and spin-wait on __readers because
++   then the waking thread cannot just make one final change to memory to
++   unblock all potentially waiting threads.  If, for example, a reader
++   increments R in states #7 or #8, it has to then block until __wrphase_futex
++   is 0 and it can confirm that the value of 0 was stored by the primary
++   writer; in turn, the primary writer has to change to a read phase too when
++   releasing WL (i.e., to state #2), and it must change __wrphase_futex to 0
++   as the next step.  This ensures that the waiting reader will not be able to
++   acquire, release, and then destroy the lock concurrently with the pending
++   futex unblock operations by the former primary writer.  This scheme is
++   called explicit hand-over in what follows.
++   Note that waiting threads can cancel waiting only if explicit hand-over has
++   not yet started (e.g., if __readers is still in states #7 or #8 in the
++   example above).
++
++   Writers determine the primary writer through WL.  Blocking using futexes
++   is performed using __writers_futex as a futex word; primary writers will
++   enable waiting on this futex by setting it to 1 after they acquired the WL
++   bit and will disable waiting by setting it to 0 before they release WL.
++   This leaves small windows where blocking using futexes is not possible
++   although a primary writer exists, but in turn decreases complexity of the
++   writer--writer synchronization and does not affect correctness.
++   If writers are preferred, writers can hand over WL directly to other
++   waiting writers that registered by incrementing __writers:  If the primary
++   writer can CAS __writers from a non-zero value to the same value with the
++   PTHREAD_RWLOCK_WRHANDOVER bit set, it effectively transfers WL ownership
++   to one of the registered waiting writers and does not reset WL; in turn,
++   a registered writer that can clear PTHREAD_RWLOCK_WRHANDOVER using a CAS
++   then takes over WL.  Note that registered waiting writers can cancel
++   waiting by decrementing __writers, but the last writer to unregister must
++   become the primary writer if PTHREAD_RWLOCK_WRHANDOVER is sedt.
++   Also note that adding another state/bit to signal potential writer--writer
++   contention (e.g., as done in the normal mutex algorithm) would not be
++   helpful because we would have to conservatively assume that there is in
++   fact no other writer, and wake up readers too.
++
++   To avoid having to call futex_wake when no thread uses __wrphase_futex or
++   __writers_futex, threads will set the PTHREAD_RWLOCK_FUTEX_USED bit in the
++   respective futex words before waiting on it (using a CAS so it will only be
++   set if in a state in which waiting would be possible).  In the case of
++   __writers_futex, we wake only one thread but several threads may share
++   PTHREAD_RWLOCK_FUTEX_USED, so we must assume that there are still others.
++   This is similar to what we do in pthread_mutex_lock.  We do not need to
++   do this for __wrphase_futex because there, we always wake all waiting
++   threads.
++
++   Blocking in the state #4a simply uses __readers as futex word.  This
++   simplifies the algorithm but suffers from some of the drawbacks discussed
++   before, though not to the same extent because R can only decrease in this
++   state, so the number of potentially failing futex_wait attempts will be
++   bounded.  All threads moving from state #4a to another state must wake
++   up threads blocked on the __readers futex.
++
++   The ordering invariants that we have to take care of in the implementation
++   are primarily those necessary for a reader--writer lock; this is rather
++   straightforward and happens during write/read phase switching (potentially
++   through explicit hand-over), and between writers through synchronization
++   involving the PTHREAD_RWLOCK_WRLOCKED or PTHREAD_RWLOCK_WRHANDOVER bits.
++   Additionally, we need to take care that modifications of __writers_futex
++   and __wrphase_futex (e.g., by otherwise unordered readers) take place in
++   the writer critical sections or read/write phases, respectively, and that
++   explicit hand-over observes stores from the previous phase.  How this is
++   done is explained in more detail in comments in the code.
++
++   Many of the accesses to the futex words just need relaxed MO.  This is
++   possible because we essentially drive both the core rwlock synchronization
++   and the futex synchronization in parallel.  For example, an unlock will
++   unlock the rwlock and take part in the futex synchronization (using
++   PTHREAD_RWLOCK_FUTEX_USED, see above); even if they are not tightly
++   ordered in some way, the futex synchronization ensures that there are no
++   lost wake-ups, and woken threads will then eventually see the most recent
++   state of the rwlock.  IOW, waiting threads will always be woken up, while
++   not being able to wait using futexes (which can happen) is harmless; in
++   turn, this means that waiting threads don't need special ordering wrt.
++   waking threads.
++
++   The futex synchronization consists of the three-state futex word:
++   (1) cannot block on it, (2) can block on it, and (3) there might be a
++   thread blocked on it (i.e., with PTHREAD_RWLOCK_FUTEX_USED set).
++   Relaxed-MO atomic read-modify-write operations are sufficient to maintain
++   this (e.g., using a CAS to go from (2) to (3) but not from (1) to (3)),
++   but we need ordering of the futex word modifications by the waking threads
++   so that they collectively make correct state changes between (1)-(3).
++   The futex-internal synchronization (i.e., the conceptual critical sections
++   around futex operations in the kernel) then ensures that even an
++   unconstrained load (i.e., relaxed MO) inside of futex_wait will not lead to
++   lost wake-ups because either the waiting thread will see the change from
++   (3) to (1) when a futex_wake came first, or this futex_wake will wake this
++   waiting thread because the waiting thread came first.
++
++
++   POSIX allows but does not require rwlock acquisitions to be a cancellation
++   point.  We do not support cancellation.
++
++   TODO We do not try to elide any read or write lock acquisitions currently.
++   While this would be possible, it is unclear whether HTM performance is
++   currently predictable enough and our runtime tuning is good enough at
++   deciding when to use elision so that enabling it would lead to consistently
++   better performance.  */
++
++
++static int
++__pthread_rwlock_get_private (pthread_rwlock_t *rwlock)
++{
++  return rwlock->__data.__shared != 0 ? FUTEX_SHARED : FUTEX_PRIVATE;
++}
++
++static __always_inline void
++__pthread_rwlock_rdunlock (pthread_rwlock_t *rwlock)
++{
++  int private = __pthread_rwlock_get_private (rwlock);
++  /* We decrease the number of readers, and if we are the last reader and
++     there is a primary writer, we start a write phase.  We use a CAS to
++     make this atomic so that it is clear whether we must hand over ownership
++     explicitly.  */
++  unsigned int r = atomic_load_relaxed (&rwlock->__data.__readers);
++  unsigned int rnew;
++  for (;;)
++    {
++      rnew = r - (1 << PTHREAD_RWLOCK_READER_SHIFT);
++      /* If we are the last reader, we also need to unblock any readers
++	 that are waiting for a writer to go first (PTHREAD_RWLOCK_RWAITING)
++	 so that they can register while the writer is active.  */
++      if ((rnew >> PTHREAD_RWLOCK_READER_SHIFT) == 0)
++	{
++	  if ((rnew & PTHREAD_RWLOCK_WRLOCKED) != 0)
++	    rnew |= PTHREAD_RWLOCK_WRPHASE;
++	  rnew &= ~(unsigned int) PTHREAD_RWLOCK_RWAITING;
++	}
++      /* We need release MO here for three reasons.  First, so that we
++	 synchronize with subsequent writers.  Second, we might have been the
++	 first reader and set __wrphase_futex to 0, so we need to synchronize
++	 with the last reader that will set it to 1 (note that we will always
++	 change __readers before the last reader, or we are the last reader).
++	 Third, a writer that takes part in explicit hand-over needs to see
++	 the first reader's store to __wrphase_futex (or a later value) if
++	 the writer observes that a write phase has been started.  */
++      if (atomic_compare_exchange_weak_release (&rwlock->__data.__readers,
++	  &r, rnew))
++	break;
++      /* TODO Back-off.  */
++    }
++  if ((rnew & PTHREAD_RWLOCK_WRPHASE) != 0)
++    {
++      /* We need to do explicit hand-over.  We need the acquire MO fence so
++	 that our modification of _wrphase_futex happens after a store by
++	 another reader that started a read phase.  Relaxed MO is sufficient
++	 for the modification of __wrphase_futex because it is just used
++	 to delay acquisition by a writer until all threads are unblocked
++	 irrespective of whether they are looking at __readers or
++	 __wrphase_futex; any other synchronizes-with relations that are
++	 necessary are established through __readers.  */
++      atomic_thread_fence_acquire ();
++      if ((atomic_exchange_relaxed (&rwlock->__data.__wrphase_futex, 1)
++	   & PTHREAD_RWLOCK_FUTEX_USED) != 0)
++	futex_wake (&rwlock->__data.__wrphase_futex, INT_MAX, private);
++    }
++  /* Also wake up waiting readers if we did reset the RWAITING flag.  */
++  if ((r & PTHREAD_RWLOCK_RWAITING) != (rnew & PTHREAD_RWLOCK_RWAITING))
++    futex_wake (&rwlock->__data.__readers, INT_MAX, private);
++}
++
++
++static __always_inline int
++__pthread_rwlock_rdlock_full (pthread_rwlock_t *rwlock,
++    const struct timespec *abstime)
++{
++  unsigned int r;
++
++  /* Make sure we are not holding the rwlock as a writer.  This is a deadlock
++     situation we recognize and report.  */
++  if (__glibc_unlikely (atomic_load_relaxed (&rwlock->__data.__cur_writer)
++      == THREAD_GETMEM (THREAD_SELF, tid)))
++    return EDEADLK;
++
++  /* If we prefer writers, recursive rdlock is disallowed, we are in a read
++     phase, and there are other readers present, we try to wait without
++     extending the read phase.  We will be unblocked by either one of the
++     other active readers, or if the writer gives up WRLOCKED (e.g., on
++     timeout).
++     If there are no other readers, we simply race with any existing primary
++     writer; it would have been a race anyway, and changing the odds slightly
++     will likely not make a big difference.  */
++  if (rwlock->__data.__flags == PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP)
++    {
++      r = atomic_load_relaxed (&rwlock->__data.__readers);
++      while (((r & PTHREAD_RWLOCK_WRPHASE) == 0)
++	      && ((r & PTHREAD_RWLOCK_WRLOCKED) != 0)
++	      && ((r >> PTHREAD_RWLOCK_READER_SHIFT) > 0))
++	{
++	  /* TODO Spin first.  */
++	  /* Try setting the flag signaling that we are waiting without having
++	     incremented the number of readers.  Relaxed MO is fine because
++	     this is just about waiting for a state change in __readers.  */
++	  if (atomic_compare_exchange_weak_relaxed
++	      (&rwlock->__data.__readers, &r, r | PTHREAD_RWLOCK_RWAITING))
++	    {
++	      /* Wait for as long as the flag is set.  An ABA situation is
++		 harmless because the flag is just about the state of
++		 __readers, and all threads set the flag under the same
++		 conditions.  */
++	      while ((atomic_load_relaxed (&rwlock->__data.__readers)
++		  & PTHREAD_RWLOCK_RWAITING) != 0)
++		{
++		  int private = __pthread_rwlock_get_private (rwlock);
++		  int err = futex_abstimed_wait (&rwlock->__data.__readers,
++		      r, abstime, private);
++		  /* We ignore EAGAIN and EINTR.  On time-outs, we can just
++		     return because we don't need to clean up anything.  */
++		  if (err == ETIMEDOUT)
++		    return err;
++		}
++	      /* It makes sense to not break out of the outer loop here
++		 because we might be in the same situation again.  */
++	    }
++	  else
++	    {
++	      /* TODO Back-off.  */
++	    }
++	}
++    }
++  /* Register as a reader, using an add-and-fetch so that R can be used as
++     expected value for future operations.  Acquire MO so we synchronize with
++     prior writers as well as the last reader of the previous read phase (see
++     below).  */
++  r = atomic_fetch_add_acquire (&rwlock->__data.__readers,
++      (1 << PTHREAD_RWLOCK_READER_SHIFT)) + (1 << PTHREAD_RWLOCK_READER_SHIFT);
++
++  /* Check whether there is an overflow in the number of readers.  We assume
++     that the total number of threads is less than half the maximum number
++     of readers that we have bits for in __readers (i.e., with 32-bit int and
++     PTHREAD_RWLOCK_READER_SHIFT of 3, we assume there are less than
++     1 << (32-3-1) concurrent threads).
++     If there is an overflow, we use a CAS to try to decrement the number of
++     readers if there still is an overflow situation.  If so, we return
++     EAGAIN; if not, we are not a thread causing an overflow situation, and so
++     we just continue.  Using a fetch-add instead of the CAS isn't possible
++     because other readers might release the lock concurrently, which could
++     make us the last reader and thus responsible for handing ownership over
++     to writers (which requires a CAS too to make the decrement and ownership
++     transfer indivisible).  */
++  while (__glibc_unlikely (r >= PTHREAD_RWLOCK_READER_OVERFLOW))
++    {
++      /* Relaxed MO is okay because we just want to undo our registration and
++	 cannot have changed the rwlock state substantially if the CAS
++	 succeeds.  */
++      if (atomic_compare_exchange_weak_relaxed (&rwlock->__data.__readers, &r,
++	  r - (1 << PTHREAD_RWLOCK_READER_SHIFT)))
++	return EAGAIN;
++    }
++
++  /* We have registered as a reader, so if we are in a read phase, we have
++     acquired a read lock.  This is also the reader--reader fast-path.
++     Even if there is a primary writer, we just return.  If writers are to
++     be preferred and we are the only active reader, we could try to enter a
++     write phase to let the writer proceed.  This would be okay because we
++     cannot have acquired the lock previously as a reader (which could result
++     in deadlock if we would wait for the primary writer to run).  However,
++     this seems to be a corner case and handling it specially not be worth the
++     complexity.  */
++  if (__glibc_likely ((r & PTHREAD_RWLOCK_WRPHASE) == 0))
++    return 0;
++
++  /* If there is no primary writer but we are in a write phase, we can try
++     to install a read phase ourself.  */
++  while (((r & PTHREAD_RWLOCK_WRPHASE) != 0)
++      && ((r & PTHREAD_RWLOCK_WRLOCKED) == 0))
++    {
++       /* Try to enter a read phase: If the CAS below succeeds, we have
++	 ownership; if it fails, we will simply retry and reassess the
++	 situation.
++	 Acquire MO so we synchronize with prior writers.  */
++      if (atomic_compare_exchange_weak_acquire (&rwlock->__data.__readers, &r,
++	  r ^ PTHREAD_RWLOCK_WRPHASE))
++	{
++	  /* We started the read phase, so we are also responsible for
++	     updating the write-phase futex.  Relaxed MO is sufficient.
++	     Note that there can be no other reader that we have to wake
++	     because all other readers will see the read phase started by us
++	     (or they will try to start it themselves); if a writer started
++	     the read phase, we cannot have started it.  Furthermore, we
++	     cannot discard a PTHREAD_RWLOCK_FUTEX_USED flag because we will
++	     overwrite the value set by the most recent writer (or the readers
++	     before it in case of explicit hand-over) and we know that there
++	     are no waiting readers.  */
++	  atomic_store_relaxed (&rwlock->__data.__wrphase_futex, 0);
++	  return 0;
++	}
++      else
++	{
++	  /* TODO Back off before retrying.  Also see above.  */
++	}
++    }
++
++  if ((r & PTHREAD_RWLOCK_WRPHASE) != 0)
++    {
++      /* We are in a write phase, and there must be a primary writer because
++	 of the previous loop.  Block until the primary writer gives up the
++	 write phase.  This case requires explicit hand-over using
++	 __wrphase_futex.
++	 However, __wrphase_futex might not have been set to 1 yet (either
++	 because explicit hand-over to the writer is still ongoing, or because
++	 the writer has started the write phase but does not yet have updated
++	 __wrphase_futex).  The least recent value of __wrphase_futex we can
++	 read from here is the modification of the last read phase (because
++	 we synchronize with the last reader in this read phase through
++	 __readers; see the use of acquire MO on the fetch_add above).
++	 Therefore, if we observe a value of 0 for __wrphase_futex, we need
++	 to subsequently check that __readers now indicates a read phase; we
++	 need to use acquire MO for this so that if we observe a read phase,
++	 we will also see the modification of __wrphase_futex by the previous
++	 writer.  We then need to load __wrphase_futex again and continue to
++	 wait if it is not 0, so that we do not skip explicit hand-over.
++	 Relaxed MO is sufficient for the load from __wrphase_futex because
++	 we just use it as an indicator for when we can proceed; we use
++	 __readers and the acquire MO accesses to it to eventually read from
++	 the proper stores to __wrphase_futex.  */
++      unsigned int wpf;
++      bool ready = false;
++      for (;;)
++	{
++	  while (((wpf = atomic_load_relaxed (&rwlock->__data.__wrphase_futex))
++	      | PTHREAD_RWLOCK_FUTEX_USED) == (1 | PTHREAD_RWLOCK_FUTEX_USED))
++	    {
++	      int private = __pthread_rwlock_get_private (rwlock);
++	      if (((wpf & PTHREAD_RWLOCK_FUTEX_USED) == 0)
++		  && !atomic_compare_exchange_weak_relaxed
++		      (&rwlock->__data.__wrphase_futex,
++		       &wpf, wpf | PTHREAD_RWLOCK_FUTEX_USED))
++		continue;
++	      int err = futex_abstimed_wait (&rwlock->__data.__wrphase_futex,
++		  1 | PTHREAD_RWLOCK_FUTEX_USED, abstime, private);
++	      if (err == ETIMEDOUT)
++		{
++		  /* If we timed out, we need to unregister.  If no read phase
++		     has been installed while we waited, we can just decrement
++		     the number of readers.  Otherwise, we just acquire the
++		     lock, which is allowed because we give no precise timing
++		     guarantees, and because the timeout is only required to
++		     be in effect if we would have had to wait for other
++		     threads (e.g., if futex_wait would time-out immediately
++		     because the given absolute time is in the past).  */
++		  r = atomic_load_relaxed (&rwlock->__data.__readers);
++		  while ((r & PTHREAD_RWLOCK_WRPHASE) != 0)
++		    {
++		      /* We don't need to make anything else visible to
++			 others besides unregistering, so relaxed MO is
++			 sufficient.  */
++		      if (atomic_compare_exchange_weak_relaxed
++			  (&rwlock->__data.__readers, &r,
++			   r - (1 << PTHREAD_RWLOCK_READER_SHIFT)))
++			return ETIMEDOUT;
++		      /* TODO Back-off.  */
++		    }
++		  /* Use the acquire MO fence to mirror the steps taken in the
++		     non-timeout case.  Note that the read can happen both
++		     in the atomic_load above as well as in the failure case
++		     of the CAS operation.  */
++		  atomic_thread_fence_acquire ();
++		  /* We still need to wait for explicit hand-over, but we must
++		     not use futex_wait anymore because we would just time out
++		     in this case and thus make the spin-waiting we need
++		     unnecessarily expensive.  */
++		  while ((atomic_load_relaxed (&rwlock->__data.__wrphase_futex)
++		      | PTHREAD_RWLOCK_FUTEX_USED)
++		      == (1 | PTHREAD_RWLOCK_FUTEX_USED))
++		    {
++		      /* TODO Back-off?  */
++		    }
++		  ready = true;
++		  break;
++		}
++	      /* If we got interrupted (EINTR) or the futex word does not have the
++		 expected value (EAGAIN), retry.  */
++	    }
++	  if (ready)
++	    /* See below.  */
++	    break;
++	  /* We need acquire MO here so that we synchronize with the lock
++	     release of the writer, and so that we observe a recent value of
++	     __wrphase_futex (see below).  */
++	  if ((atomic_load_acquire (&rwlock->__data.__readers)
++	      & PTHREAD_RWLOCK_WRPHASE) == 0)
++	    /* We are in a read phase now, so the least recent modification of
++	       __wrphase_futex we can read from is the store by the writer
++	       with value 1.  Thus, only now we can assume that if we observe
++	       a value of 0, explicit hand-over is finished. Retry the loop
++	       above one more time.  */
++	    ready = true;
++	}
++    }
++
++  return 0;
++}
++
++
++static __always_inline void
++__pthread_rwlock_wrunlock (pthread_rwlock_t *rwlock)
++{
++  int private = __pthread_rwlock_get_private (rwlock);
++
++  atomic_store_relaxed (&rwlock->__data.__cur_writer, 0);
++  /* Disable waiting by writers.  We will wake up after we decided how to
++     proceed.  */
++  bool wake_writers = ((atomic_exchange_relaxed
++      (&rwlock->__data.__writers_futex, 0) & PTHREAD_RWLOCK_FUTEX_USED) != 0);
++
++  if (rwlock->__data.__flags != PTHREAD_RWLOCK_PREFER_READER_NP)
++    {
++      /* First, try to hand over to another writer.  */
++      unsigned int w = atomic_load_relaxed (&rwlock->__data.__writers);
++      while (w != 0)
++	{
++	  /* Release MO so that another writer that gets WRLOCKED from us will
++	     synchronize with us and thus can take over our view of
++	     __readers (including, for example, whether we are in a write
++	     phase or not).  */
++	  if (atomic_compare_exchange_weak_release (&rwlock->__data.__writers,
++	      &w, w | PTHREAD_RWLOCK_WRHANDOVER))
++	    /* Another writer will take over.  */
++	    goto done;
++	  /* TODO Back-off.  */
++	}
++    }
++
++  /* We have done everything we needed to do to prefer writers, so now we
++     either hand over explicitly to readers if there are any, or we simply
++     stay in a write phase.  See pthread_rwlock_rdunlock for more details.  */
++  unsigned int r = atomic_load_relaxed (&rwlock->__data.__readers);
++  /* Release MO so that subsequent readers or writers synchronize with us.  */
++  while (!atomic_compare_exchange_weak_release
++      (&rwlock->__data.__readers, &r, (r ^ PTHREAD_RWLOCK_WRLOCKED)
++	  ^ ((r >> PTHREAD_RWLOCK_READER_SHIFT) == 0 ? 0
++	      : PTHREAD_RWLOCK_WRPHASE)))
++    {
++      /* TODO Back-off.  */
++    }
++  if ((r >> PTHREAD_RWLOCK_READER_SHIFT) != 0)
++    {
++      /* We must hand over explicitly through __wrphase_futex.  Relaxed MO is
++	 sufficient because it is just used to delay acquisition by a writer;
++	 any other synchronizes-with relations that are necessary are
++	 established through __readers.  */
++      if ((atomic_exchange_relaxed (&rwlock->__data.__wrphase_futex, 0)
++	   & PTHREAD_RWLOCK_FUTEX_USED) != 0)
++	futex_wake (&rwlock->__data.__wrphase_futex, INT_MAX, private);
++    }
++
++ done:
++  /* We released WRLOCKED in some way, so wake a writer.  */
++  if (wake_writers)
++    futex_wake (&rwlock->__data.__writers_futex, 1, private);
++}
++
++
++static __always_inline int
++__pthread_rwlock_wrlock_full (pthread_rwlock_t *rwlock,
++    const struct timespec *abstime)
++{
++  /* Make sure we are not holding the rwlock as a writer.  This is a deadlock
++     situation we recognize and report.  */
++  if (__glibc_unlikely (atomic_load_relaxed (&rwlock->__data.__cur_writer)
++      == THREAD_GETMEM (THREAD_SELF, tid)))
++    return EDEADLK;
++
++  /* First we try to acquire the role of primary writer by setting WRLOCKED;
++     if it was set before, there already is a primary writer.  Acquire MO so
++     that we synchronize with previous primary writers.
++
++     We do not try to change to a write phase right away using a fetch_or
++     because we would have to reset it again and wake readers if there are
++     readers present (some readers could try to acquire the lock more than
++     once, so setting a write phase in the middle of this could cause
++     deadlock).  Changing to a write phase eagerly would only speed up the
++     transition from a read phase to a write phase in the uncontended case,
++     but it would slow down the contended case if readers are preferred (which
++     is the default).
++     We could try to CAS from a state with no readers to a write phase, but
++     this could be less scalable if readers arrive and leave frequently.  */
++  bool may_share_futex_used_flag = false;
++  unsigned int r = atomic_fetch_or_acquire (&rwlock->__data.__readers,
++      PTHREAD_RWLOCK_WRLOCKED);
++  if (__glibc_unlikely ((r & PTHREAD_RWLOCK_WRLOCKED) != 0))
++    {
++      /* There is another primary writer.  */
++      bool prefer_writer =
++	  (rwlock->__data.__flags != PTHREAD_RWLOCK_PREFER_READER_NP);
++      if (prefer_writer)
++	{
++	  /* We register as a waiting writer, so that we can make use of
++	     writer--writer hand-over.  Relaxed MO is fine because we just
++	     want to register.  We assume that the maximum number of threads
++	     is less than the capacity in __writers.  */
++	  atomic_fetch_add_relaxed (&rwlock->__data.__writers, 1);
++	}
++      for (;;)
++	{
++	  /* TODO Spin until WRLOCKED is 0 before trying the CAS below.
++	     But pay attention to not delay trying writer--writer hand-over
++	     for too long (which we must try eventually anyway).  */
++	  if ((r & PTHREAD_RWLOCK_WRLOCKED) == 0)
++	    {
++	      /* Try to become the primary writer or retry.  Acquire MO as in
++		 the fetch_or above.  */
++	      if (atomic_compare_exchange_weak_acquire
++		  (&rwlock->__data.__readers, &r,
++		      r | PTHREAD_RWLOCK_WRLOCKED))
++		{
++		  if (prefer_writer)
++		    {
++		      /* Unregister as a waiting writer.  Note that because we
++			 acquired WRLOCKED, WRHANDOVER will not be set.
++			 Acquire MO on the CAS above ensures that
++			 unregistering happens after the previous writer;
++			 this sorts the accesses to __writers by all
++			 primary writers in a useful way (e.g., any other
++			 primary writer acquiring after us or getting it from
++			 us through WRHANDOVER will see both our changes to
++			 __writers).
++			 ??? Perhaps this is not strictly necessary for
++			 reasons we do not yet know of.  */
++		      atomic_fetch_add_relaxed (&rwlock->__data.__writers,
++			  -1);
++		    }
++		  break;
++		}
++	      /* Retry if the CAS fails (r will have been updated).  */
++	      continue;
++	    }
++	  /* If writer--writer hand-over is available, try to become the
++	     primary writer this way by grabbing the WRHANDOVER token.  If we
++	     succeed, we own WRLOCKED.  */
++	  if (prefer_writer)
++	    {
++	      unsigned int w = atomic_load_relaxed
++		  (&rwlock->__data.__writers);
++	      if ((w & PTHREAD_RWLOCK_WRHANDOVER) != 0)
++		{
++		  /* Acquire MO is required here so that we synchronize with
++		     the writer that handed over WRLOCKED.  We also need this
++		     for the reload of __readers below because our view of
++		     __readers must be at least as recent as the view of the
++		     writer that handed over WRLOCKED; we must avoid an ABA
++		     through WRHANDOVER, which could, for example, lead to us
++		     assuming we are still in a write phase when in fact we
++		     are not.  */
++		  if (atomic_compare_exchange_weak_acquire
++		      (&rwlock->__data.__writers,
++		       &w, (w - PTHREAD_RWLOCK_WRHANDOVER - 1)))
++		    {
++		      /* Reload so our view is consistent with the view of
++			 the previous owner of WRLOCKED.  See above.  */
++		      r = atomic_load_relaxed (&rwlock->__data.__readers);
++		      break;
++		    }
++		  /* We do not need to reload __readers here.  We should try
++		     to perform writer--writer hand-over if possible; if it
++		     is not possible anymore, we will reload __readers
++		     elsewhere in this loop.  */
++		  continue;
++		}
++	    }
++	  /* We did not acquire WRLOCKED nor were able to use writer--writer
++	     hand-over, so we block on __writers_futex.  */
++	  int private = __pthread_rwlock_get_private (rwlock);
++	  unsigned int wf = atomic_load_relaxed
++	      (&rwlock->__data.__writers_futex);
++	  if (((wf & ~(unsigned int) PTHREAD_RWLOCK_FUTEX_USED) != 1)
++	      || ((wf != (1 | PTHREAD_RWLOCK_FUTEX_USED))
++		  && !atomic_compare_exchange_weak_relaxed
++		      (&rwlock->__data.__writers_futex, &wf,
++		       1 | PTHREAD_RWLOCK_FUTEX_USED)))
++	    {
++	      /* If we cannot block on __writers_futex because there is no
++		 primary writer, or we cannot set PTHREAD_RWLOCK_FUTEX_USED,
++		 we retry.  We must reload __readers here in case we cannot
++		 block on __writers_futex so that we can become the primary
++		 writer and are not stuck in a loop that just continuously
++		 fails to block on __writers_futex.  */
++	      r = atomic_load_relaxed (&rwlock->__data.__readers);
++	      continue;
++	    }
++	  /* We set the flag that signals that the futex is used, or we could
++	     have set it if we had been faster than other waiters.  As a
++	     result, we may share the flag with an unknown number of other
++	     writers.  Therefore, we must keep this flag set when we acquire
++	     the lock.  We do not need to do this when we do not reach this
++	     point here because then we are not part of the group that may
++	     share the flag, and another writer will wake one of the writers
++	     in this group.  */
++	  may_share_futex_used_flag = true;
++	  int err = futex_abstimed_wait (&rwlock->__data.__writers_futex,
++	      1 | PTHREAD_RWLOCK_FUTEX_USED, abstime, private);
++	  if (err == ETIMEDOUT)
++	    {
++	      if (prefer_writer)
++		{
++		  /* We need to unregister as a waiting writer.  If we are the
++		     last writer and writer--writer hand-over is available,
++		     we must make use of it because nobody else will reset
++		     WRLOCKED otherwise.  (If we use it, we simply pretend
++		     that this happened before the timeout; see
++		     pthread_rwlock_rdlock_full for the full reasoning.)
++		     Also see the similar code above.  */
++		  unsigned int w = atomic_load_relaxed
++		      (&rwlock->__data.__writers);
++		  while (!atomic_compare_exchange_weak_acquire
++		      (&rwlock->__data.__writers, &w,
++			  (w == PTHREAD_RWLOCK_WRHANDOVER + 1 ? 0 : w - 1)))
++		    {
++		      /* TODO Back-off.  */
++		    }
++		  if (w == PTHREAD_RWLOCK_WRHANDOVER + 1)
++		    {
++		      /* We must continue as primary writer.  See above.  */
++		      r = atomic_load_relaxed (&rwlock->__data.__readers);
++		      break;
++		    }
++		}
++	      /* We cleaned up and cannot have stolen another waiting writer's
++		 futex wake-up, so just return.  */
++	      return ETIMEDOUT;
++	    }
++	  /* If we got interrupted (EINTR) or the futex word does not have the
++	     expected value (EAGAIN), retry after reloading __readers.  */
++	  r = atomic_load_relaxed (&rwlock->__data.__readers);
++	}
++      /* Our snapshot of __readers is up-to-date at this point because we
++	 either set WRLOCKED using a CAS or were handed over WRLOCKED from
++	 another writer whose snapshot of __readers we inherit.  */
++    }
++
++  /* If we are in a read phase and there are no readers, try to start a write
++     phase.  */
++  while (((r & PTHREAD_RWLOCK_WRPHASE) == 0)
++      && ((r >> PTHREAD_RWLOCK_READER_SHIFT) == 0))
++    {
++      /* Acquire MO so that we synchronize with prior writers and do
++	 not interfere with their updates to __writers_futex, as well
++	 as regarding prior readers and their updates to __wrphase_futex,
++	 respectively.  */
++      if (atomic_compare_exchange_weak_acquire (&rwlock->__data.__readers,
++	  &r, r | PTHREAD_RWLOCK_WRPHASE))
++	{
++	  /* We have started a write phase, so need to enable readers to wait.
++	     See the similar case in__pthread_rwlock_rdlock_full.  */
++	  atomic_store_relaxed (&rwlock->__data.__wrphase_futex, 1);
++	  /* Make sure we fall through to the end of the function.  */
++	  r |= PTHREAD_RWLOCK_WRPHASE;
++	  break;
++	}
++      /* TODO Back-off.  */
++    }
++
++  /* We are the primary writer; enable blocking on __writers_futex.  Relaxed
++     MO is sufficient for futex words; acquire MO on the previous
++     modifications of __readers ensures that this store happens after the
++     store of value 0 by the previous primary writer.  */
++  atomic_store_relaxed (&rwlock->__data.__writers_futex,
++      1 | (may_share_futex_used_flag ? PTHREAD_RWLOCK_FUTEX_USED : 0));
++
++  if (__glibc_unlikely ((r & PTHREAD_RWLOCK_WRPHASE) == 0))
++    {
++      /* We are not in a read phase and there are readers (because of the
++	 previous loop).  Thus, we have to wait for explicit hand-over from
++	 one of these readers.
++	 We basically do the same steps as for the similar case in
++	 __pthread_rwlock_rdlock_full, except that we additionally might try
++	 to directly hand over to another writer and need to wake up
++	 other writers or waiting readers (i.e., PTHREAD_RWLOCK_RWAITING).  */
++      unsigned int wpf;
++      bool ready = false;
++      for (;;)
++	{
++	  while (((wpf = atomic_load_relaxed (&rwlock->__data.__wrphase_futex))
++	      | PTHREAD_RWLOCK_FUTEX_USED) == PTHREAD_RWLOCK_FUTEX_USED)
++	    {
++	      int private = __pthread_rwlock_get_private (rwlock);
++	      if (((wpf & PTHREAD_RWLOCK_FUTEX_USED) == 0)
++		  && !atomic_compare_exchange_weak_relaxed
++		      (&rwlock->__data.__wrphase_futex, &wpf,
++		       PTHREAD_RWLOCK_FUTEX_USED))
++		continue;
++	      int err = futex_abstimed_wait (&rwlock->__data.__wrphase_futex,
++		  PTHREAD_RWLOCK_FUTEX_USED, abstime, private);
++	      if (err == ETIMEDOUT)
++		{
++		  if (rwlock->__data.__flags
++		      != PTHREAD_RWLOCK_PREFER_READER_NP)
++		    {
++		      /* We try writer--writer hand-over.  */
++		      unsigned int w = atomic_load_relaxed
++			  (&rwlock->__data.__writers);
++		      if (w != 0)
++			{
++			  /* We are about to hand over WRLOCKED, so we must
++			     release __writers_futex too; otherwise, we'd have
++			     a pending store, which could at least prevent
++			     other threads from waiting using the futex
++			     because it could interleave with the stores
++			     by subsequent writers.  In turn, this means that
++			     we have to clean up when we do not hand over
++			     WRLOCKED.
++			     Release MO so that another writer that gets
++			     WRLOCKED from us can take over our view of
++			     __readers.  */
++			  unsigned int wf = atomic_exchange_relaxed
++			      (&rwlock->__data.__writers_futex, 0);
++			  while (w != 0)
++			    {
++			      if (atomic_compare_exchange_weak_release
++				  (&rwlock->__data.__writers, &w,
++				      w | PTHREAD_RWLOCK_WRHANDOVER))
++				{
++				  /* Wake other writers.  */
++				  if ((wf & PTHREAD_RWLOCK_FUTEX_USED) != 0)
++				    futex_wake
++					(&rwlock->__data.__writers_futex, 1,
++					 private);
++				  return ETIMEDOUT;
++				}
++			      /* TODO Back-off.  */
++			    }
++			  /* We still own WRLOCKED and someone else might set
++			     a write phase concurrently, so enable waiting
++			     again.  Make sure we don't loose the flag that
++			     signals whether there are threads waiting on
++			     this futex.  */
++			  atomic_store_relaxed
++			      (&rwlock->__data.__writers_futex, wf);
++			}
++		    }
++		  /* If we timed out and we are not in a write phase, we can
++		     just stop being a primary writer.  Otherwise, we just
++		     acquire the lock.  */
++		  r = atomic_load_relaxed (&rwlock->__data.__readers);
++		  if ((r & PTHREAD_RWLOCK_WRPHASE) == 0)
++		    {
++		      /* We are about to release WRLOCKED, so we must release
++			 __writers_futex too; see the handling of
++			 writer--writer hand-over above.  */
++		      unsigned int wf = atomic_exchange_relaxed
++			  (&rwlock->__data.__writers_futex, 0);
++		      while ((r & PTHREAD_RWLOCK_WRPHASE) == 0)
++			{
++			  /* While we don't need to make anything from a
++			     caller's critical section visible to other
++			     threads, we need to ensure that our changes to
++			     __writers_futex are properly ordered.
++			     Therefore, use release MO to synchronize with
++			     subsequent primary writers.  Also wake up any
++			     waiting readers as they are waiting because of
++			     us.  */
++			  if (atomic_compare_exchange_weak_release
++			      (&rwlock->__data.__readers, &r,
++			       (r ^ PTHREAD_RWLOCK_WRLOCKED)
++			       & ~(unsigned int) PTHREAD_RWLOCK_RWAITING))
++			    {
++			      /* Wake other writers.  */
++			      if ((wf & PTHREAD_RWLOCK_FUTEX_USED) != 0)
++				futex_wake (&rwlock->__data.__writers_futex,
++				    1, private);
++			      /* Wake waiting readers.  */
++			      if ((r & PTHREAD_RWLOCK_RWAITING) != 0)
++				futex_wake (&rwlock->__data.__readers,
++				    INT_MAX, private);
++			      return ETIMEDOUT;
++			    }
++			}
++		      /* We still own WRLOCKED and someone else might set a
++			 write phase concurrently, so enable waiting again.
++			 Make sure we don't loose the flag that signals
++			 whether there are threads waiting on this futex.  */
++		      atomic_store_relaxed (&rwlock->__data.__writers_futex,
++			  wf);
++		    }
++		  /* Use the acquire MO fence to mirror the steps taken in the
++		     non-timeout case.  Note that the read can happen both
++		     in the atomic_load above as well as in the failure case
++		     of the CAS operation.  */
++		  atomic_thread_fence_acquire ();
++		  /* We still need to wait for explicit hand-over, but we must
++		     not use futex_wait anymore.  */
++		  while ((atomic_load_relaxed
++		      (&rwlock->__data.__wrphase_futex)
++		       | PTHREAD_RWLOCK_FUTEX_USED)
++		      == PTHREAD_RWLOCK_FUTEX_USED)
++		    {
++		      /* TODO Back-off.  */
++		    }
++		  ready = true;
++		  break;
++		}
++	      /* If we got interrupted (EINTR) or the futex word does not have
++		 the expected value (EAGAIN), retry.  */
++	    }
++	  /* See pthread_rwlock_rdlock_full.  */
++	  if (ready)
++	    break;
++	  if ((atomic_load_acquire (&rwlock->__data.__readers)
++	      & PTHREAD_RWLOCK_WRPHASE) != 0)
++	    ready = true;
++	}
++    }
++
++  atomic_store_relaxed (&rwlock->__data.__cur_writer,
++      THREAD_GETMEM (THREAD_SELF, tid));
++  return 0;
++}
+Index: glibc-2.24-377-g530862a/nptl/pthread_rwlock_init.c
+===================================================================
+--- glibc-2.24-377-g530862a.orig/nptl/pthread_rwlock_init.c
++++ glibc-2.24-377-g530862a/nptl/pthread_rwlock_init.c
+@@ -18,7 +18,6 @@
+ 
+ #include "pthreadP.h"
+ #include <string.h>
+-#include <kernel-features.h>
+ 
+ 
+ static const struct pthread_rwlockattr default_rwlockattr =
+@@ -28,6 +27,7 @@ static const struct pthread_rwlockattr d
+   };
+ 
+ 
++/* See pthread_rwlock_common.c.  */
+ int
+ __pthread_rwlock_init (pthread_rwlock_t *rwlock,
+ 		       const pthread_rwlockattr_t *attr)
+@@ -38,27 +38,10 @@ __pthread_rwlock_init (pthread_rwlock_t
+ 
+   memset (rwlock, '\0', sizeof (*rwlock));
+ 
+-  rwlock->__data.__flags
+-    = iattr->lockkind == PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP;
++  rwlock->__data.__flags = iattr->lockkind;
+ 
+-  /* The __SHARED field is computed to minimize the work that needs to
+-     be done while handling the futex.  There are two inputs: the
+-     availability of private futexes and whether the rwlock is shared
+-     or private.  Unfortunately the value of a private rwlock is
+-     fixed: it must be zero.  The PRIVATE_FUTEX flag has the value
+-     0x80 in case private futexes are available and zero otherwise.
+-     This leads to the following table:
+-
+-		 |     pshared     |     result
+-		 | shared  private | shared  private |
+-     ------------+-----------------+-----------------+
+-     !avail 0    |     0       0   |     0       0   |
+-      avail 0x80 |  0x80       0   |     0    0x80   |
+-
+-     If the pshared value is in locking functions XORed with avail
+-     we get the expected result.  */
+-  rwlock->__data.__shared = (iattr->pshared == PTHREAD_PROCESS_PRIVATE
+-			     ? 0 : FUTEX_PRIVATE_FLAG);
++  /* The value of __SHARED in a private rwlock must be zero.  */
++  rwlock->__data.__shared = (iattr->pshared != PTHREAD_PROCESS_PRIVATE);
+ 
+   return 0;
+ }
+Index: glibc-2.24-377-g530862a/nptl/pthread_rwlock_rdlock.c
+===================================================================
+--- glibc-2.24-377-g530862a.orig/nptl/pthread_rwlock_rdlock.c
++++ glibc-2.24-377-g530862a/nptl/pthread_rwlock_rdlock.c
+@@ -16,165 +16,17 @@
+    License along with the GNU C Library; if not, see
+    <http://www.gnu.org/licenses/>.  */
+ 
+-#include <errno.h>
+-#include <sysdep.h>
+-#include <lowlevellock.h>
+-#include <futex-internal.h>
+-#include <pthread.h>
+-#include <pthreadP.h>
+-#include <stap-probe.h>
+-#include <elide.h>
+-#include <stdbool.h>
+-
+-
+-/* Acquire read lock for RWLOCK.  Slow path.  */
+-static int __attribute__((noinline))
+-__pthread_rwlock_rdlock_slow (pthread_rwlock_t *rwlock)
+-{
+-  int result = 0;
+-  bool wake = false;
+-  int futex_shared =
+-      rwlock->__data.__shared == LLL_PRIVATE ? FUTEX_PRIVATE : FUTEX_SHARED;
+-
+-  /* Lock is taken in caller.  */
+-
+-  while (1)
+-    {
+-      /* Make sure we are not holding the rwlock as a writer.  This is
+-	 a deadlock situation we recognize and report.  */
+-      if (__builtin_expect (rwlock->__data.__writer
+-			    == THREAD_GETMEM (THREAD_SELF, tid), 0))
+-	{
+-	  result = EDEADLK;
+-	  break;
+-	}
+-
+-      /* Remember that we are a reader.  */
+-      if (__glibc_unlikely (++rwlock->__data.__nr_readers_queued == 0))
+-	{
+-	  /* Overflow on number of queued readers.  */
+-	  --rwlock->__data.__nr_readers_queued;
+-	  result = EAGAIN;
+-	  break;
+-	}
+-
+-      int waitval = rwlock->__data.__readers_wakeup;
+-
+-      /* Free the lock.  */
+-      lll_unlock (rwlock->__data.__lock, rwlock->__data.__shared);
+-
+-      /* Wait for the writer to finish.  We do not check the return value
+-	 because we decide how to continue based on the state of the rwlock.  */
+-      futex_wait_simple (&rwlock->__data.__readers_wakeup, waitval,
+-			 futex_shared);
+-
+-      /* Get the lock.  */
+-      lll_lock (rwlock->__data.__lock, rwlock->__data.__shared);
+-
+-      --rwlock->__data.__nr_readers_queued;
+-
+-      /* Get the rwlock if there is no writer...  */
+-      if (rwlock->__data.__writer == 0
+-	  /* ...and if either no writer is waiting or we prefer readers.  */
+-	  && (!rwlock->__data.__nr_writers_queued
+-	      || PTHREAD_RWLOCK_PREFER_READER_P (rwlock)))
+-	{
+-	  /* Increment the reader counter.  Avoid overflow.  */
+-	  if (__glibc_unlikely (++rwlock->__data.__nr_readers == 0))
+-	    {
+-	      /* Overflow on number of readers.	 */
+-	      --rwlock->__data.__nr_readers;
+-	      result = EAGAIN;
+-	    }
+-	  else
+-	    {
+-	      LIBC_PROBE (rdlock_acquire_read, 1, rwlock);
+-	      /* See pthread_rwlock_rdlock.  */
+-	      if (rwlock->__data.__nr_readers == 1
+-		  && rwlock->__data.__nr_readers_queued > 0
+-		  && rwlock->__data.__nr_writers_queued > 0)
+-		{
+-		  ++rwlock->__data.__readers_wakeup;
+-		  wake = true;
+-		}
+-	    }
+-
+-	  break;
+-	}
+-    }
+-
+-  /* We are done, free the lock.  */
+-  lll_unlock (rwlock->__data.__lock, rwlock->__data.__shared);
+-
+-  if (wake)
+-    futex_wake (&rwlock->__data.__readers_wakeup, INT_MAX, futex_shared);
+-
+-  return result;
+-}
+-
+-
+-/* Fast path of acquiring read lock on RWLOCK.  */
++#include "pthread_rwlock_common.c"
+ 
++/* See pthread_rwlock_common.c.  */
+ int
+ __pthread_rwlock_rdlock (pthread_rwlock_t *rwlock)
+ {
+-  int result = 0;
+-  bool wake = false;
+-  int futex_shared =
+-      rwlock->__data.__shared == LLL_PRIVATE ? FUTEX_PRIVATE : FUTEX_SHARED;
+-
+   LIBC_PROBE (rdlock_entry, 1, rwlock);
+ 
+-  if (ELIDE_LOCK (rwlock->__data.__rwelision,
+-		  rwlock->__data.__lock == 0
+-		  && rwlock->__data.__writer == 0
+-		  && rwlock->__data.__nr_readers == 0))
+-    return 0;
+-
+-  /* Make sure we are alone.  */
+-  lll_lock (rwlock->__data.__lock, rwlock->__data.__shared);
+-
+-  /* Get the rwlock if there is no writer...  */
+-  if (rwlock->__data.__writer == 0
+-      /* ...and if either no writer is waiting or we prefer readers.  */
+-      && (!rwlock->__data.__nr_writers_queued
+-	  || PTHREAD_RWLOCK_PREFER_READER_P (rwlock)))
+-    {
+-      /* Increment the reader counter.  Avoid overflow.  */
+-      if (__glibc_unlikely (++rwlock->__data.__nr_readers == 0))
+-	{
+-	  /* Overflow on number of readers.	 */
+-	  --rwlock->__data.__nr_readers;
+-	  result = EAGAIN;
+-	}
+-      else
+-	{
+-	  LIBC_PROBE (rdlock_acquire_read, 1, rwlock);
+-	  /* If we are the first reader, and there are blocked readers and
+-	     writers (which we don't prefer, see above), then it can be the
+-	     case that we stole the lock from a writer that was already woken
+-	     to acquire it.  That means that we need to take over the writer's
+-	     responsibility to wake all readers (see pthread_rwlock_unlock).
+-	     Thus, wake all readers in this case.  */
+-	  if (rwlock->__data.__nr_readers == 1
+-	      && rwlock->__data.__nr_readers_queued > 0
+-	      && rwlock->__data.__nr_writers_queued > 0)
+-	    {
+-	      ++rwlock->__data.__readers_wakeup;
+-	      wake = true;
+-	    }
+-	}
+-
+-      /* We are done, free the lock.  */
+-      lll_unlock (rwlock->__data.__lock, rwlock->__data.__shared);
+-
+-      if (wake)
+-	futex_wake (&rwlock->__data.__readers_wakeup, INT_MAX, futex_shared);
+-
+-      return result;
+-    }
+-
+-  return __pthread_rwlock_rdlock_slow (rwlock);
++  int result = __pthread_rwlock_rdlock_full (rwlock, NULL);
++  LIBC_PROBE (rdlock_acquire_read, 1, rwlock);
++  return result;
+ }
+ 
+ weak_alias (__pthread_rwlock_rdlock, pthread_rwlock_rdlock)
+Index: glibc-2.24-377-g530862a/nptl/pthread_rwlock_timedrdlock.c
+===================================================================
+--- glibc-2.24-377-g530862a.orig/nptl/pthread_rwlock_timedrdlock.c
++++ glibc-2.24-377-g530862a/nptl/pthread_rwlock_timedrdlock.c
+@@ -16,121 +16,22 @@
+    License along with the GNU C Library; if not, see
+    <http://www.gnu.org/licenses/>.  */
+ 
+-#include <errno.h>
+-#include <sysdep.h>
+-#include <lowlevellock.h>
+-#include <futex-internal.h>
+-#include <pthread.h>
+-#include <pthreadP.h>
+-#include <sys/time.h>
+-#include <stdbool.h>
++#include "pthread_rwlock_common.c"
+ 
+-
+-/* Try to acquire read lock for RWLOCK or return after specfied time.  */
++/* See pthread_rwlock_common.c.  */
+ int
+ pthread_rwlock_timedrdlock (pthread_rwlock_t *rwlock,
+-			    const struct timespec *abstime)
++    const struct timespec *abstime)
+ {
+-  int result = 0;
+-  bool wake = false;
+-  int futex_shared =
+-      rwlock->__data.__shared == LLL_PRIVATE ? FUTEX_PRIVATE : FUTEX_SHARED;
+-
+-  /* Make sure we are alone.  */
+-  lll_lock(rwlock->__data.__lock, rwlock->__data.__shared);
+-
+-  while (1)
+-    {
+-      int err;
+-
+-      /* Get the rwlock if there is no writer...  */
+-      if (rwlock->__data.__writer == 0
+-	  /* ...and if either no writer is waiting or we prefer readers.  */
+-	  && (!rwlock->__data.__nr_writers_queued
+-	      || PTHREAD_RWLOCK_PREFER_READER_P (rwlock)))
+-	{
+-	  /* Increment the reader counter.  Avoid overflow.  */
+-	  if (++rwlock->__data.__nr_readers == 0)
+-	    {
+-	      /* Overflow on number of readers.	 */
+-	      --rwlock->__data.__nr_readers;
+-	      result = EAGAIN;
+-	    }
+-	  else
+-	    {
+-	      /* See pthread_rwlock_rdlock.  */
+-	      if (rwlock->__data.__nr_readers == 1
+-		  && rwlock->__data.__nr_readers_queued > 0
+-		  && rwlock->__data.__nr_writers_queued > 0)
+-		{
+-		  ++rwlock->__data.__readers_wakeup;
+-		  wake = true;
+-		}
+-	    }
+-
+-	  break;
+-	}
+-
+-      /* Make sure we are not holding the rwlock as a writer.  This is
+-	 a deadlock situation we recognize and report.  */
+-      if (__builtin_expect (rwlock->__data.__writer
+-			    == THREAD_GETMEM (THREAD_SELF, tid), 0))
+-	{
+-	  result = EDEADLK;
+-	  break;
+-	}
+-
+-      /* Make sure the passed in timeout value is valid.  Ideally this
+-	 test would be executed once.  But since it must not be
+-	 performed if we would not block at all simply moving the test
+-	 to the front is no option.  Replicating all the code is
+-	 costly while this test is not.  */
+-      if (__builtin_expect (abstime->tv_nsec >= 1000000000
+-                            || abstime->tv_nsec < 0, 0))
+-	{
+-	  result = EINVAL;
+-	  break;
+-	}
+-
+-      /* Remember that we are a reader.  */
+-      if (++rwlock->__data.__nr_readers_queued == 0)
+-	{
+-	  /* Overflow on number of queued readers.  */
+-	  --rwlock->__data.__nr_readers_queued;
+-	  result = EAGAIN;
+-	  break;
+-	}
+-
+-      int waitval = rwlock->__data.__readers_wakeup;
+-
+-      /* Free the lock.  */
+-      lll_unlock (rwlock->__data.__lock, rwlock->__data.__shared);
+-
+-      /* Wait for the writer to finish.  We handle ETIMEDOUT below; on other
+-	 return values, we decide how to continue based on the state of the
+-	 rwlock.  */
+-      err = futex_abstimed_wait (&rwlock->__data.__readers_wakeup, waitval,
+-				 abstime, futex_shared);
+-
+-      /* Get the lock.  */
+-      lll_lock (rwlock->__data.__lock, rwlock->__data.__shared);
+-
+-      --rwlock->__data.__nr_readers_queued;
+-
+-      /* Did the futex call time out?  */
+-      if (err == ETIMEDOUT)
+-	{
+-	  /* Yep, report it.  */
+-	  result = ETIMEDOUT;
+-	  break;
+-	}
+-    }
+-
+-  /* We are done, free the lock.  */
+-  lll_unlock (rwlock->__data.__lock, rwlock->__data.__shared);
+-
+-  if (wake)
+-    futex_wake (&rwlock->__data.__readers_wakeup, INT_MAX, futex_shared);
++  /* Make sure the passed in timeout value is valid.  Note that the previous
++     implementation assumed that this check *must* not be performed if there
++     would in fact be no blocking; however, POSIX only requires that "the
++     validity of the abstime parameter need not be checked if the lock can be
++     immediately acquired" (i.e., we need not but may check it).  */
++  /* ??? Just move this to __pthread_rwlock_rdlock_full?  */
++  if (__glibc_unlikely (abstime->tv_nsec >= 1000000000
++      || abstime->tv_nsec < 0))
++    return EINVAL;
+ 
+-  return result;
++  return __pthread_rwlock_rdlock_full (rwlock, abstime);
+ }
+Index: glibc-2.24-377-g530862a/nptl/pthread_rwlock_timedwrlock.c
+===================================================================
+--- glibc-2.24-377-g530862a.orig/nptl/pthread_rwlock_timedwrlock.c
++++ glibc-2.24-377-g530862a/nptl/pthread_rwlock_timedwrlock.c
+@@ -16,121 +16,22 @@
+    License along with the GNU C Library; if not, see
+    <http://www.gnu.org/licenses/>.  */
+ 
+-#include <errno.h>
+-#include <sysdep.h>
+-#include <lowlevellock.h>
+-#include <futex-internal.h>
+-#include <pthread.h>
+-#include <pthreadP.h>
+-#include <sys/time.h>
+-#include <stdbool.h>
++#include "pthread_rwlock_common.c"
+ 
+-
+-/* Try to acquire write lock for RWLOCK or return after specfied time.	*/
++/* See pthread_rwlock_common.c.  */
+ int
+ pthread_rwlock_timedwrlock (pthread_rwlock_t *rwlock,
+-			    const struct timespec *abstime)
++    const struct timespec *abstime)
+ {
+-  int result = 0;
+-  bool wake_readers = false;
+-  int futex_shared =
+-      rwlock->__data.__shared == LLL_PRIVATE ? FUTEX_PRIVATE : FUTEX_SHARED;
+-
+-  /* Make sure we are alone.  */
+-  lll_lock (rwlock->__data.__lock, rwlock->__data.__shared);
+-
+-  while (1)
+-    {
+-      int err;
+-
+-      /* Get the rwlock if there is no writer and no reader.  */
+-      if (rwlock->__data.__writer == 0 && rwlock->__data.__nr_readers == 0)
+-	{
+-	  /* Mark self as writer.  */
+-	  rwlock->__data.__writer = THREAD_GETMEM (THREAD_SELF, tid);
+-	  break;
+-	}
+-
+-      /* Make sure we are not holding the rwlock as a writer.  This is
+-	 a deadlock situation we recognize and report.  */
+-      if (__builtin_expect (rwlock->__data.__writer
+-			    == THREAD_GETMEM (THREAD_SELF, tid), 0))
+-	{
+-	  result = EDEADLK;
+-	  break;
+-	}
+-
+-      /* Make sure the passed in timeout value is valid.  Ideally this
+-	 test would be executed once.  But since it must not be
+-	 performed if we would not block at all simply moving the test
+-	 to the front is no option.  Replicating all the code is
+-	 costly while this test is not.  */
+-      if (__builtin_expect (abstime->tv_nsec >= 1000000000
+-                            || abstime->tv_nsec < 0, 0))
+-	{
+-	  result = EINVAL;
+-	  break;
+-	}
+-
+-      /* Remember that we are a writer.  */
+-      if (++rwlock->__data.__nr_writers_queued == 0)
+-	{
+-	  /* Overflow on number of queued writers.  */
+-	  --rwlock->__data.__nr_writers_queued;
+-	  result = EAGAIN;
+-	  break;
+-	}
+-
+-      int waitval = rwlock->__data.__writer_wakeup;
+-
+-      /* Free the lock.  */
+-      lll_unlock (rwlock->__data.__lock, rwlock->__data.__shared);
+-
+-      /* Wait for the writer or reader(s) to finish.  We handle ETIMEDOUT
+-	 below; on other return values, we decide how to continue based on
+-	 the state of the rwlock.  */
+-      err = futex_abstimed_wait (&rwlock->__data.__writer_wakeup, waitval,
+-				 abstime, futex_shared);
+-
+-      /* Get the lock.  */
+-      lll_lock (rwlock->__data.__lock, rwlock->__data.__shared);
+-
+-      /* To start over again, remove the thread from the writer list.  */
+-      --rwlock->__data.__nr_writers_queued;
+-
+-      /* Did the futex call time out?  */
+-      if (err == ETIMEDOUT)
+-	{
+-	  result = ETIMEDOUT;
+-	  /* If we prefer writers, it can have happened that readers blocked
+-	     for us to acquire the lock first.  If we have timed out, we need
+-	     to wake such readers if there are any, and if there is no writer
+-	     currently (otherwise, the writer will take care of wake-up).
+-	     Likewise, even if we prefer readers, we can be responsible for
+-	     wake-up (see pthread_rwlock_unlock) if no reader or writer has
+-	     acquired the lock.  We have timed out and thus not consumed a
+-	     futex wake-up; therefore, if there is no other blocked writer
+-	     that would consume the wake-up and thus take over responsibility,
+-	     we need to wake blocked readers.  */
+-	  if ((!PTHREAD_RWLOCK_PREFER_READER_P (rwlock)
+-	       || ((rwlock->__data.__nr_readers == 0)
+-		   && (rwlock->__data.__nr_writers_queued == 0)))
+-	      && (rwlock->__data.__nr_readers_queued > 0)
+-	      && (rwlock->__data.__writer == 0))
+-	    {
+-	      ++rwlock->__data.__readers_wakeup;
+-	      wake_readers = true;
+-	    }
+-	  break;
+-	}
+-    }
+-
+-  /* We are done, free the lock.  */
+-  lll_unlock (rwlock->__data.__lock, rwlock->__data.__shared);
+-
+-  /* Might be required after timeouts.  */
+-  if (wake_readers)
+-    futex_wake (&rwlock->__data.__readers_wakeup, INT_MAX, futex_shared);
++  /* Make sure the passed in timeout value is valid.  Note that the previous
++     implementation assumed that this check *must* not be performed if there
++     would in fact be no blocking; however, POSIX only requires that "the
++     validity of the abstime parameter need not be checked if the lock can be
++     immediately acquired" (i.e., we need not but may check it).  */
++  /* ??? Just move this to __pthread_rwlock_wrlock_full?  */
++  if (__glibc_unlikely (abstime->tv_nsec >= 1000000000
++      || abstime->tv_nsec < 0))
++    return EINVAL;
+ 
+-  return result;
++  return __pthread_rwlock_wrlock_full (rwlock, abstime);
+ }
+Index: glibc-2.24-377-g530862a/nptl/pthread_rwlock_tryrdlock.c
+===================================================================
+--- glibc-2.24-377-g530862a.orig/nptl/pthread_rwlock_tryrdlock.c
++++ glibc-2.24-377-g530862a/nptl/pthread_rwlock_tryrdlock.c
+@@ -18,56 +18,86 @@
+ 
+ #include <errno.h>
+ #include "pthreadP.h"
+-#include <lowlevellock.h>
+-#include <futex-internal.h>
+-#include <elide.h>
++#include <atomic.h>
+ #include <stdbool.h>
++#include "pthread_rwlock_common.c"
+ 
+ 
++/* See pthread_rwlock_common.c for an overview.  */
+ int
+ __pthread_rwlock_tryrdlock (pthread_rwlock_t *rwlock)
+ {
+-  int result = EBUSY;
+-  bool wake = false;
+-  int futex_shared =
+-      rwlock->__data.__shared == LLL_PRIVATE ? FUTEX_PRIVATE : FUTEX_SHARED;
+-
+-  if (ELIDE_TRYLOCK (rwlock->__data.__rwelision,
+-		     rwlock->__data.__lock == 0
+-		     && rwlock->__data.__nr_readers == 0
+-		     && rwlock->__data.__writer, 0))
+-    return 0;
+-
+-  lll_lock (rwlock->__data.__lock, rwlock->__data.__shared);
+-
+-  if (rwlock->__data.__writer == 0
+-      && (rwlock->__data.__nr_writers_queued == 0
+-	  || PTHREAD_RWLOCK_PREFER_READER_P (rwlock)))
++  /* For tryrdlock, we could speculate that we will succeed and go ahead and
++     register as a reader.  However, if we misspeculate, we have to do the
++     same steps as a timed-out rdlock, which will increase contention.
++     Therefore, there is a trade-off between being able to use a combinable
++     read-modify-write operation and a CAS loop as used below; we pick the
++     latter because it simplifies the code, and should perform better when
++     tryrdlock is used in cases where writers are infrequent.
++     Because POSIX does not require a failed trylock to "synchronize memory",
++     relaxed MO is sufficient here and on the failure path of the CAS
++     below.  */
++  unsigned int r = atomic_load_relaxed (&rwlock->__data.__readers);
++  unsigned int rnew;
++  do
+     {
+-      if (__glibc_unlikely (++rwlock->__data.__nr_readers == 0))
++      if ((r & PTHREAD_RWLOCK_WRPHASE) == 0)
+ 	{
+-	  --rwlock->__data.__nr_readers;
+-	  result = EAGAIN;
++	  /* If we are in a read phase, try to acquire unless there is a
++	     primary writer and we prefer writers and there will be no
++	     recursive read locks.  */
++	  if (((r & PTHREAD_RWLOCK_WRLOCKED) != 0)
++	      && (rwlock->__data.__flags
++		  == PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP))
++	    return EBUSY;
++	  rnew = r + (1 << PTHREAD_RWLOCK_READER_SHIFT);
++	  /* If we could have caused an overflow or take effect during an
++	     overflow, we just can / need to return EAGAIN.  There is no need
++	     to have modified the number of readers because we could have
++	     done that and cleaned up immediately.  */
++	  if (rnew >= PTHREAD_RWLOCK_READER_OVERFLOW)
++	    return EAGAIN;
+ 	}
+       else
+ 	{
+-	  result = 0;
+-	  /* See pthread_rwlock_rdlock.  */
+-	  if (rwlock->__data.__nr_readers == 1
+-	      && rwlock->__data.__nr_readers_queued > 0
+-	      && rwlock->__data.__nr_writers_queued > 0)
++	  /* If there is a writer that has acquired the lock and we are in
++	     a write phase, fail.  */
++	  if ((r & PTHREAD_RWLOCK_WRLOCKED) != 0)
++	    return EBUSY;
++	  else
+ 	    {
+-	      ++rwlock->__data.__readers_wakeup;
+-	      wake = true;
++	      /* If we do not care about potentially waiting writers, just
++		 try to acquire.  */
++	      rnew = (r + (1 << PTHREAD_RWLOCK_READER_SHIFT))
++		  ^ PTHREAD_RWLOCK_WRPHASE;
+ 	    }
+ 	}
+     }
++  /* If the CAS fails, we retry; this prevents that tryrdlock fails spuriously
++     (i.e., fails to acquire the lock although there is no writer), which is
++     fine for C++14 but not currently allowed by POSIX.
++     However, because tryrdlock must not appear to block, we should avoid
++     starving this CAS loop due to constant changes to __readers:
++     While normal rdlock readers that won't be able to acquire will just block
++     (and we expect timeouts on timedrdlock to be longer than one retry of the
++     CAS loop), we can have concurrently failing tryrdlock calls due to
++     readers or writers that acquire and release in the meantime.  Using
++     randomized exponential back-off to make a live-lock unlikely should be
++     sufficient.
++     Acquire MO so we synchronize with prior writers.  */
++  while (!atomic_compare_exchange_weak_acquire (&rwlock->__data.__readers,
++      &r, rnew));
+ 
+-  lll_unlock (rwlock->__data.__lock, rwlock->__data.__shared);
++  if ((r & PTHREAD_RWLOCK_WRPHASE) != 0)
++    {
++      //FIXME / TODO same as in rdlock_full
++      int private = __pthread_rwlock_get_private (rwlock);
++      atomic_store_release (&rwlock->__data.__wrphase_futex, 0);
++      futex_wake (&rwlock->__data.__wrphase_futex, INT_MAX, private);
++    }
++
++  return 0;
+ 
+-  if (wake)
+-    futex_wake (&rwlock->__data.__readers_wakeup, INT_MAX, futex_shared);
+ 
+-  return result;
+ }
+ strong_alias (__pthread_rwlock_tryrdlock, pthread_rwlock_tryrdlock)
+Index: glibc-2.24-377-g530862a/nptl/pthread_rwlock_trywrlock.c
+===================================================================
+--- glibc-2.24-377-g530862a.orig/nptl/pthread_rwlock_trywrlock.c
++++ glibc-2.24-377-g530862a/nptl/pthread_rwlock_trywrlock.c
+@@ -18,31 +18,44 @@
+ 
+ #include <errno.h>
+ #include "pthreadP.h"
+-#include <lowlevellock.h>
+-#include <elide.h>
+-
++#include <atomic.h>
+ 
++/* See pthread_rwlock_common.c for an overview.  */
+ int
+ __pthread_rwlock_trywrlock (pthread_rwlock_t *rwlock)
+ {
+-  int result = EBUSY;
+-
+-  if (ELIDE_TRYLOCK (rwlock->__data.__rwelision,
+-		     rwlock->__data.__lock == 0
+-		     && rwlock->__data.__nr_readers == 0
+-		     && rwlock->__data.__writer, 1))
+-    return 0;
+-
+-  lll_lock (rwlock->__data.__lock, rwlock->__data.__shared);
+-
+-  if (rwlock->__data.__writer == 0 && rwlock->__data.__nr_readers == 0)
++  /* When in a trywrlock, we can acquire the write lock if it is in states
++     #1 (idle and read phase) and #5 (idle and write phase), and also in #6
++     (readers waiting, write phase) if we prefer writers.
++     If we observe any other state, we are allowed to fail and do not need to
++     "synchronize memory" as specified by POSIX (hence relaxed MO is
++     sufficient for the first load and the CAS failure path).
++     We face a similar issue as in tryrdlock in that we need to both avoid
++     live-locks / starvation and must not fail spuriously (see there for
++     further comments) -- and thus must loop until we get a definitive
++     observation or state change.  */
++  unsigned int r = atomic_load_relaxed (&rwlock->__data.__readers);
++  bool prefer_writer =
++      (rwlock->__data.__flags != PTHREAD_RWLOCK_PREFER_READER_NP);
++  while (((r & PTHREAD_RWLOCK_WRLOCKED) == 0)
++      && (((r >> PTHREAD_RWLOCK_READER_SHIFT) == 0)
++	  || (prefer_writer && ((r & PTHREAD_RWLOCK_WRPHASE) != 0))))
+     {
+-      rwlock->__data.__writer = THREAD_GETMEM (THREAD_SELF, tid);
+-      result = 0;
++      /* Try to transition to states #7 or #8 (i.e., acquire the lock).  */
++      if (atomic_compare_exchange_weak_acquire (
++	  &rwlock->__data.__readers, &r,
++	  r | PTHREAD_RWLOCK_WRPHASE | PTHREAD_RWLOCK_WRLOCKED))
++	{
++	  atomic_store_relaxed (&rwlock->__data.__writers_futex, 1);
++	  atomic_store_relaxed (&rwlock->__data.__wrphase_futex, 1);
++	  atomic_store_relaxed (&rwlock->__data.__cur_writer,
++	      THREAD_GETMEM (THREAD_SELF, tid));
++	  return 0;
++	}
++      /* TODO Back-off.  */
++      /* See above.  */
+     }
+-
+-  lll_unlock (rwlock->__data.__lock, rwlock->__data.__shared);
+-
+-  return result;
++  return EBUSY;
+ }
++
+ strong_alias (__pthread_rwlock_trywrlock, pthread_rwlock_trywrlock)
+Index: glibc-2.24-377-g530862a/nptl/pthread_rwlock_unlock.c
+===================================================================
+--- glibc-2.24-377-g530862a.orig/nptl/pthread_rwlock_unlock.c
++++ glibc-2.24-377-g530862a/nptl/pthread_rwlock_unlock.c
+@@ -18,60 +18,29 @@
+ 
+ #include <errno.h>
+ #include <sysdep.h>
+-#include <lowlevellock.h>
+ #include <futex-internal.h>
+ #include <pthread.h>
+ #include <pthreadP.h>
+ #include <stap-probe.h>
+-#include <elide.h>
+ 
++#include "pthread_rwlock_common.c"
+ 
+-/* Unlock RWLOCK.  */
++/* See pthread_rwlock_common.c for an overview.  */
+ int
+ __pthread_rwlock_unlock (pthread_rwlock_t *rwlock)
+ {
+-  int futex_shared =
+-      rwlock->__data.__shared == LLL_PRIVATE ? FUTEX_PRIVATE : FUTEX_SHARED;
+-
+   LIBC_PROBE (rwlock_unlock, 1, rwlock);
+ 
+-  /* Trying to elide an unlocked lock may crash the process.  This
+-     is expected and is compatible with POSIX.1-2008: "results are
+-     undefined if the read-write lock rwlock is not held by the
+-     calling thread".  */
+-  if (ELIDE_UNLOCK (rwlock->__data.__writer == 0
+-		    && rwlock->__data.__nr_readers == 0))
+-    return 0;
+-
+-  lll_lock (rwlock->__data.__lock, rwlock->__data.__shared);
+-  if (rwlock->__data.__writer)
+-    rwlock->__data.__writer = 0;
++  /* We distinguish between having acquired a read vs. a write lock by looking
++     at the writer TID.  If it's equal to our TID, we must be the writer
++     because nobody else can have stored this value.  Also, if we are a
++     reader, we will read from the wrunlock store with value 0 by the most
++     recent writer because that writer happens-before us.  */
++  if (atomic_load_relaxed (&rwlock->__data.__cur_writer)
++      == THREAD_GETMEM (THREAD_SELF, tid))
++    __pthread_rwlock_wrunlock (rwlock);
+   else
+-    --rwlock->__data.__nr_readers;
+-  /* If there are still readers present, we do not yet need to wake writers
+-     nor are responsible to wake any readers.  */
+-  if (rwlock->__data.__nr_readers == 0)
+-    {
+-      /* Note that if there is a blocked writer, we effectively make it
+-	 responsible for waking any readers because we don't wake readers in
+-	 this case.  */
+-      if (rwlock->__data.__nr_writers_queued)
+-	{
+-	  ++rwlock->__data.__writer_wakeup;
+-	  lll_unlock (rwlock->__data.__lock, rwlock->__data.__shared);
+-	  futex_wake (&rwlock->__data.__writer_wakeup, 1, futex_shared);
+-	  return 0;
+-	}
+-      else if (rwlock->__data.__nr_readers_queued)
+-	{
+-	  ++rwlock->__data.__readers_wakeup;
+-	  lll_unlock (rwlock->__data.__lock, rwlock->__data.__shared);
+-	  futex_wake (&rwlock->__data.__readers_wakeup, INT_MAX,
+-		      futex_shared);
+-	  return 0;
+-	}
+-    }
+-  lll_unlock (rwlock->__data.__lock, rwlock->__data.__shared);
++    __pthread_rwlock_rdunlock (rwlock);
+   return 0;
+ }
+ 
+Index: glibc-2.24-377-g530862a/nptl/pthread_rwlock_wrlock.c
+===================================================================
+--- glibc-2.24-377-g530862a.orig/nptl/pthread_rwlock_wrlock.c
++++ glibc-2.24-377-g530862a/nptl/pthread_rwlock_wrlock.c
+@@ -16,114 +16,18 @@
+    License along with the GNU C Library; if not, see
+    <http://www.gnu.org/licenses/>.  */
+ 
+-#include <errno.h>
+-#include <sysdep.h>
+-#include <lowlevellock.h>
+-#include <futex-internal.h>
+-#include <pthread.h>
+-#include <pthreadP.h>
+-#include <stap-probe.h>
+-#include <elide.h>
+-
+-
+-/* Acquire write lock for RWLOCK.  */
+-static int __attribute__((noinline))
+-__pthread_rwlock_wrlock_slow (pthread_rwlock_t *rwlock)
+-{
+-  int result = 0;
+-  int futex_shared =
+-      rwlock->__data.__shared == LLL_PRIVATE ? FUTEX_PRIVATE : FUTEX_SHARED;
+-
+-  /* Caller has taken the lock.  */
+-
+-  while (1)
+-    {
+-      /* Make sure we are not holding the rwlock as a writer.  This is
+-	 a deadlock situation we recognize and report.  */
+-      if (__builtin_expect (rwlock->__data.__writer
+-			    == THREAD_GETMEM (THREAD_SELF, tid), 0))
+-	{
+-	  result = EDEADLK;
+-	  break;
+-	}
+-
+-      /* Remember that we are a writer.  */
+-      if (++rwlock->__data.__nr_writers_queued == 0)
+-	{
+-	  /* Overflow on number of queued writers.  */
+-	  --rwlock->__data.__nr_writers_queued;
+-	  result = EAGAIN;
+-	  break;
+-	}
+-
+-      int waitval = rwlock->__data.__writer_wakeup;
+-
+-      /* Free the lock.  */
+-      lll_unlock (rwlock->__data.__lock, rwlock->__data.__shared);
+-
+-      /* Wait for the writer or reader(s) to finish.  We do not check the
+-	 return value because we decide how to continue based on the state of
+-	 the rwlock.  */
+-      futex_wait_simple (&rwlock->__data.__writer_wakeup, waitval,
+-			 futex_shared);
+-
+-      /* Get the lock.  */
+-      lll_lock (rwlock->__data.__lock, rwlock->__data.__shared);
+-
+-      /* To start over again, remove the thread from the writer list.  */
+-      --rwlock->__data.__nr_writers_queued;
+-
+-      /* Get the rwlock if there is no writer and no reader.  */
+-      if (rwlock->__data.__writer == 0 && rwlock->__data.__nr_readers == 0)
+-	{
+-	  /* Mark self as writer.  */
+-	  rwlock->__data.__writer = THREAD_GETMEM (THREAD_SELF, tid);
+-
+-	  LIBC_PROBE (wrlock_acquire_write, 1, rwlock);
+-	  break;
+-	}
+-    }
+-
+-  /* We are done, free the lock.  */
+-  lll_unlock (rwlock->__data.__lock, rwlock->__data.__shared);
+-
+-  return result;
+-}
+-
+-/* Fast path of acquiring write lock for RWLOCK.  */
++#include "pthread_rwlock_common.c"
+ 
++/* See pthread_rwlock_common.c.  */
+ int
+ __pthread_rwlock_wrlock (pthread_rwlock_t *rwlock)
+ {
+   LIBC_PROBE (wrlock_entry, 1, rwlock);
+ 
+-  if (ELIDE_LOCK (rwlock->__data.__rwelision,
+-		  rwlock->__data.__lock == 0
+-		  && rwlock->__data.__writer == 0
+-		  && rwlock->__data.__nr_readers == 0))
+-    return 0;
+-
+-  /* Make sure we are alone.  */
+-  lll_lock (rwlock->__data.__lock, rwlock->__data.__shared);
+-
+-  /* Get the rwlock if there is no writer and no reader.  */
+-  if (__glibc_likely((rwlock->__data.__writer |
+-	rwlock->__data.__nr_readers) == 0))
+-    {
+-      /* Mark self as writer.  */
+-      rwlock->__data.__writer = THREAD_GETMEM (THREAD_SELF, tid);
+-
+-      LIBC_PROBE (wrlock_acquire_write, 1, rwlock);
+-
+-      /* We are done, free the lock.  */
+-      lll_unlock (rwlock->__data.__lock, rwlock->__data.__shared);
+-
+-      return 0;
+-    }
+-
+-  return __pthread_rwlock_wrlock_slow (rwlock);
++  int result = __pthread_rwlock_wrlock_full (rwlock, NULL);
++  LIBC_PROBE (wrlock_acquire_write, 1, rwlock);
++  return result;
+ }
+ 
+-
+ weak_alias (__pthread_rwlock_wrlock, pthread_rwlock_wrlock)
+ hidden_def (__pthread_rwlock_wrlock)
+Index: glibc-2.24-377-g530862a/nptl/tst-rwlock10.c
+===================================================================
+--- glibc-2.24-377-g530862a.orig/nptl/tst-rwlock10.c
++++ glibc-2.24-377-g530862a/nptl/tst-rwlock10.c
+@@ -16,5 +16,5 @@
+    License along with the GNU C Library; see the file COPYING.LIB.  If
+    not, see <http://www.gnu.org/licenses/>.  */
+ 
+-#define INIT PTHREAD_RWLOCK_INITIALIZER
++#define KIND PTHREAD_RWLOCK_PREFER_READER_NP
+ #include "tst-rwlock8.c"
+Index: glibc-2.24-377-g530862a/nptl/tst-rwlock11.c
+===================================================================
+--- glibc-2.24-377-g530862a.orig/nptl/tst-rwlock11.c
++++ glibc-2.24-377-g530862a/nptl/tst-rwlock11.c
+@@ -16,5 +16,5 @@
+    License along with the GNU C Library; see the file COPYING.LIB.  If
+    not, see <http://www.gnu.org/licenses/>.  */
+ 
+-#define INIT PTHREAD_RWLOCK_INITIALIZER
++#define KIND PTHREAD_RWLOCK_PREFER_READER_NP
+ #include "tst-rwlock9.c"
+Index: glibc-2.24-377-g530862a/nptl/tst-rwlock17.c
+===================================================================
+--- /dev/null
++++ glibc-2.24-377-g530862a/nptl/tst-rwlock17.c
+@@ -0,0 +1,19 @@
++/* Test program for timedout read/write lock functions.
++   Copyright (C) 2016 Free Software Foundation, Inc.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public License as
++   published by the Free Software Foundation; either version 2.1 of the
++   License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; see the file COPYING.LIB.  If
++   not, see <http://www.gnu.org/licenses/>.  */
++
++#define KIND PTHREAD_RWLOCK_PREFER_WRITER_NP
++#include "tst-rwlock8.c"
+Index: glibc-2.24-377-g530862a/nptl/tst-rwlock18.c
+===================================================================
+--- /dev/null
++++ glibc-2.24-377-g530862a/nptl/tst-rwlock18.c
+@@ -0,0 +1,19 @@
++/* Test program for timedout read/write lock functions.
++   Copyright (C) 2016 Free Software Foundation, Inc.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public License as
++   published by the Free Software Foundation; either version 2.1 of the
++   License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; see the file COPYING.LIB.  If
++   not, see <http://www.gnu.org/licenses/>.  */
++
++#define KIND PTHREAD_RWLOCK_PREFER_WRITER_NP
++#include "tst-rwlock9.c"
+Index: glibc-2.24-377-g530862a/nptl/tst-rwlock19.c
+===================================================================
+--- /dev/null
++++ glibc-2.24-377-g530862a/nptl/tst-rwlock19.c
+@@ -0,0 +1,127 @@
++/* Test rdlock overflow.
++   Copyright (C) 2000-2016 Free Software Foundation, Inc.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public License as
++   published by the Free Software Foundation; either version 2.1 of the
++   License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; see the file COPYING.LIB.  If
++   not, see <http://www.gnu.org/licenses/>.  */
++
++#include <errno.h>
++#include <error.h>
++#include <pthread.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <time.h>
++#include <unistd.h>
++#include <pthreadP.h>
++
++
++#define NREADERS 15
++#define READTRIES 5000
++
++#define DELAY   1000000
++
++static pthread_rwlock_t lock = PTHREAD_RWLOCK_INITIALIZER;
++static int eagain_returned = 0;
++static int success_returned = 0;
++
++static void *
++reader_thread (void *nr)
++{
++  struct timespec delay;
++  int n;
++
++  delay.tv_sec = 0;
++  delay.tv_nsec = DELAY;
++
++  for (n = 0; n < READTRIES; ++n)
++    {
++      int err = pthread_rwlock_rdlock (&lock);
++      if (err == EAGAIN)
++	{
++	  atomic_store_relaxed (&eagain_returned, 1);
++	  continue;
++	}
++      else if (err == 0)
++	atomic_store_relaxed (&success_returned, 1);
++      else
++	{
++	  puts ("rdlock failed");
++	  exit (1);
++	}
++
++      nanosleep (&delay, NULL);
++
++      if (pthread_rwlock_unlock (&lock) != 0)
++	{
++	  puts ("unlock for reader failed");
++	  exit (1);
++	}
++    }
++
++  return NULL;
++}
++
++
++static int
++do_test (void)
++{
++  pthread_t thrd[NREADERS];
++  int n;
++  void *res;
++
++  /* Set the rwlock so that it's close to a reader overflow.
++     PTHREAD_RWLOCK_WRPHASE and PTHREAD_RWLOCK_WRLOCK are zero initially.  */
++  unsigned int readers = PTHREAD_RWLOCK_READER_OVERFLOW
++      - ((NREADERS / 3) << PTHREAD_RWLOCK_READER_SHIFT);
++  lock.__data.__readers = readers;
++
++  for (n = 0; n < NREADERS; ++n)
++    if (pthread_create (&thrd[n], NULL, reader_thread,
++			(void *) (long int) n) != 0)
++      {
++	puts ("reader create failed");
++	exit (1);
++      }
++
++  /* Wait for all the threads.  */
++  for (n = 0; n < NREADERS; ++n)
++    if (pthread_join (thrd[n], &res) != 0)
++      {
++	puts ("reader join failed");
++	exit (1);
++      }
++
++  if (atomic_load_relaxed (&eagain_returned) == 0)
++    {
++      puts ("EAGAIN has never been returned");
++      exit (1);
++    }
++
++  if (atomic_load_relaxed (&success_returned) == 0)
++    {
++      puts ("rdlock was never successfully acquired");
++      exit (1);
++    }
++
++  if (lock.__data.__readers != readers)
++    {
++      puts ("__readers in rwlock differs from initial value");
++      exit (1);
++    }
++
++  return 0;
++}
++
++#define TIMEOUT 30
++#define TEST_FUNCTION do_test ()
++#include "../test-skeleton.c"
+Index: glibc-2.24-377-g530862a/nptl/tst-rwlock2b.c
+===================================================================
+--- /dev/null
++++ glibc-2.24-377-g530862a/nptl/tst-rwlock2b.c
+@@ -0,0 +1,2 @@
++#define TYPE PTHREAD_RWLOCK_PREFER_WRITER_NP
++#include "tst-rwlock2.c"
+Index: glibc-2.24-377-g530862a/nptl/tst-rwlock8.c
+===================================================================
+--- glibc-2.24-377-g530862a.orig/nptl/tst-rwlock8.c
++++ glibc-2.24-377-g530862a/nptl/tst-rwlock8.c
+@@ -32,11 +32,11 @@
+ 
+ #define DELAY   1000000
+ 
+-#ifndef INIT
+-# define INIT PTHREAD_RWLOCK_WRITER_NONRECURSIVE_INITIALIZER_NP
++#ifndef KIND
++# define KIND PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP
+ #endif
+ 
+-static pthread_rwlock_t lock = INIT;
++static pthread_rwlock_t lock;
+ 
+ 
+ static void *
+@@ -118,6 +118,25 @@ do_test (void)
+   pthread_t thrd[NREADERS];
+   int n;
+   void *res;
++  pthread_rwlockattr_t a;
++
++  if (pthread_rwlockattr_init (&a) != 0)
++    {
++      puts ("rwlockattr_t failed");
++      exit (1);
++    }
++
++  if (pthread_rwlockattr_setkind_np (&a, KIND) != 0)
++    {
++      puts ("rwlockattr_setkind failed");
++      exit (1);
++    }
++
++  if (pthread_rwlock_init (&lock, &a) != 0)
++    {
++      puts ("rwlock_init failed");
++      exit (1);
++    }
+ 
+   /* Make standard error the same as standard output.  */
+   dup2 (1, 2);
+Index: glibc-2.24-377-g530862a/nptl/tst-rwlock9.c
+===================================================================
+--- glibc-2.24-377-g530862a.orig/nptl/tst-rwlock9.c
++++ glibc-2.24-377-g530862a/nptl/tst-rwlock9.c
+@@ -34,11 +34,11 @@
+ #define TIMEOUT 1000000
+ #define DELAY   1000000
+ 
+-#ifndef INIT
+-# define INIT PTHREAD_RWLOCK_WRITER_NONRECURSIVE_INITIALIZER_NP
++#ifndef KIND
++# define KIND PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP
+ #endif
+ 
+-static pthread_rwlock_t lock = INIT;
++static pthread_rwlock_t lock;
+ 
+ 
+ static void *
+@@ -156,6 +156,25 @@ do_test (void)
+   pthread_t thrd[NREADERS];
+   int n;
+   void *res;
++  pthread_rwlockattr_t a;
++
++  if (pthread_rwlockattr_init (&a) != 0)
++    {
++      puts ("rwlockattr_t failed");
++      exit (1);
++    }
++
++  if (pthread_rwlockattr_setkind_np (&a, KIND) != 0)
++    {
++      puts ("rwlockattr_setkind failed");
++      exit (1);
++    }
++
++  if (pthread_rwlock_init (&lock, &a) != 0)
++    {
++      puts ("rwlock_init failed");
++      exit (1);
++    }
+ 
+   /* Make standard error the same as standard output.  */
+   dup2 (1, 2);
+Index: glibc-2.24-377-g530862a/sysdeps/aarch64/nptl/bits/pthreadtypes.h
+===================================================================
+--- glibc-2.24-377-g530862a.orig/sysdeps/aarch64/nptl/bits/pthreadtypes.h
++++ glibc-2.24-377-g530862a/sysdeps/aarch64/nptl/bits/pthreadtypes.h
+@@ -142,13 +142,13 @@ typedef union
+ {
+   struct
+   {
+-    int __lock;
+-    unsigned int __nr_readers;
+-    unsigned int __readers_wakeup;
+-    unsigned int __writer_wakeup;
+-    unsigned int __nr_readers_queued;
+-    unsigned int __nr_writers_queued;
+-    int __writer;
++    unsigned int __readers;
++    unsigned int __writers;
++    unsigned int __wrphase_futex;
++    unsigned int __writers_futex;
++    unsigned int __pad3;
++    unsigned int __pad4;
++    int __cur_writer;
+     int __shared;
+     unsigned long int __pad1;
+     unsigned long int __pad2;
+Index: glibc-2.24-377-g530862a/sysdeps/arm/nptl/bits/pthreadtypes.h
+===================================================================
+--- glibc-2.24-377-g530862a.orig/sysdeps/arm/nptl/bits/pthreadtypes.h
++++ glibc-2.24-377-g530862a/sysdeps/arm/nptl/bits/pthreadtypes.h
+@@ -143,12 +143,12 @@ typedef union
+ {
+   struct
+   {
+-    int __lock;
+-    unsigned int __nr_readers;
+-    unsigned int __readers_wakeup;
+-    unsigned int __writer_wakeup;
+-    unsigned int __nr_readers_queued;
+-    unsigned int __nr_writers_queued;
++    unsigned int __readers;
++    unsigned int __writers;
++    unsigned int __wrphase_futex;
++    unsigned int __writers_futex;
++    unsigned int __pad3;
++    unsigned int __pad4;
+ #if __BYTE_ORDER == __BIG_ENDIAN
+     unsigned char __pad1;
+     unsigned char __pad2;
+@@ -164,7 +164,7 @@ typedef union
+     unsigned char __pad1;
+     unsigned char __pad2;
+ #endif
+-    int __writer;
++    int __cur_writer;
+   } __data;
+   char __size[__SIZEOF_PTHREAD_RWLOCK_T];
+   long int __align;
+Index: glibc-2.24-377-g530862a/sysdeps/hppa/nptl/bits/pthreadtypes.h
+===================================================================
+--- glibc-2.24-377-g530862a.orig/sysdeps/hppa/nptl/bits/pthreadtypes.h
++++ glibc-2.24-377-g530862a/sysdeps/hppa/nptl/bits/pthreadtypes.h
+@@ -168,13 +168,13 @@ typedef union
+        next four words are all set to 1 by the Linuxthreads
+        PTHREAD_RWLOCK_INITIALIZER. We ignore them in NPTL.  */
+     int __compat_padding[4] __attribute__ ((__aligned__(16)));
+-    int __lock;
+-    unsigned int __nr_readers;
+-    unsigned int __readers_wakeup;
+-    unsigned int __writer_wakeup;
+-    unsigned int __nr_readers_queued;
+-    unsigned int __nr_writers_queued;
+-    int __writer;
++    unsigned int __readers;
++    unsigned int __writers;
++    unsigned int __wrphase_futex;
++    unsigned int __writers_futex;
++    unsigned int __pad3;
++    unsigned int __pad4;
++    int __cur_writer;
+     /* An unused word, reserved for future use. It was added
+        to maintain the location of the flags from the Linuxthreads
+        layout of this structure.  */
+Index: glibc-2.24-377-g530862a/sysdeps/ia64/nptl/bits/pthreadtypes.h
+===================================================================
+--- glibc-2.24-377-g530862a.orig/sysdeps/ia64/nptl/bits/pthreadtypes.h
++++ glibc-2.24-377-g530862a/sysdeps/ia64/nptl/bits/pthreadtypes.h
+@@ -140,13 +140,13 @@ typedef union
+ {
+   struct
+   {
+-    int __lock;
+-    unsigned int __nr_readers;
+-    unsigned int __readers_wakeup;
+-    unsigned int __writer_wakeup;
+-    unsigned int __nr_readers_queued;
+-    unsigned int __nr_writers_queued;
+-    int __writer;
++    unsigned int __readers;
++    unsigned int __writers;
++    unsigned int __wrphase_futex;
++    unsigned int __writers_futex;
++    unsigned int __pad3;
++    unsigned int __pad4;
++    int __cur_writer;
+     int __shared;
+     unsigned long int __pad1;
+     unsigned long int __pad2;
+Index: glibc-2.24-377-g530862a/sysdeps/m68k/nptl/bits/pthreadtypes.h
+===================================================================
+--- glibc-2.24-377-g530862a.orig/sysdeps/m68k/nptl/bits/pthreadtypes.h
++++ glibc-2.24-377-g530862a/sysdeps/m68k/nptl/bits/pthreadtypes.h
+@@ -144,19 +144,19 @@ typedef union
+ {
+   struct
+   {
+-    int __lock __attribute__ ((__aligned__ (4)));
+-    unsigned int __nr_readers;
+-    unsigned int __readers_wakeup;
+-    unsigned int __writer_wakeup;
+-    unsigned int __nr_readers_queued;
+-    unsigned int __nr_writers_queued;
++    unsigned int __readers  __attribute__ ((__aligned__ (4)));
++    unsigned int __writers;
++    unsigned int __wrphase_futex;
++    unsigned int __writers_futex;
++    unsigned int __pad3;
++    unsigned int __pad4;
+     unsigned char __pad1;
+     unsigned char __pad2;
+     unsigned char __shared;
+     /* FLAGS must stay at this position in the structure to maintain
+        binary compatibility.  */
+     unsigned char __flags;
+-    int __writer;
++    int __cur_writer;
+   } __data;
+   char __size[__SIZEOF_PTHREAD_RWLOCK_T];
+   long int __align;
+Index: glibc-2.24-377-g530862a/sysdeps/microblaze/nptl/bits/pthreadtypes.h
+===================================================================
+--- glibc-2.24-377-g530862a.orig/sysdeps/microblaze/nptl/bits/pthreadtypes.h
++++ glibc-2.24-377-g530862a/sysdeps/microblaze/nptl/bits/pthreadtypes.h
+@@ -138,12 +138,12 @@ typedef union
+ {
+   struct
+   {
+-    int __lock;
+-    unsigned int __nr_readers;
+-    unsigned int __readers_wakeup;
+-    unsigned int __writer_wakeup;
+-    unsigned int __nr_readers_queued;
+-    unsigned int __nr_writers_queued;
++    unsigned int __readers;
++    unsigned int __writers;
++    unsigned int __wrphase_futex;
++    unsigned int __writers_futex;
++    unsigned int __pad3;
++    unsigned int __pad4;
+ #  if __BYTE_ORDER == __BIG_ENDIAN
+     unsigned char __pad1;
+     unsigned char __pad2;
+@@ -159,7 +159,7 @@ typedef union
+     unsigned char __pad1;
+     unsigned char __pad2;
+ #  endif
+-    int __writer;
++    int __cur_writer;
+   } __data;
+   char __size[__SIZEOF_PTHREAD_RWLOCK_T];
+   long int __align;
+Index: glibc-2.24-377-g530862a/sysdeps/mips/nptl/bits/pthreadtypes.h
+===================================================================
+--- glibc-2.24-377-g530862a.orig/sysdeps/mips/nptl/bits/pthreadtypes.h
++++ glibc-2.24-377-g530862a/sysdeps/mips/nptl/bits/pthreadtypes.h
+@@ -173,13 +173,13 @@ typedef union
+ # if _MIPS_SIM == _ABI64
+   struct
+   {
+-    int __lock;
+-    unsigned int __nr_readers;
+-    unsigned int __readers_wakeup;
+-    unsigned int __writer_wakeup;
+-    unsigned int __nr_readers_queued;
+-    unsigned int __nr_writers_queued;
+-    int __writer;
++    unsigned int __readers;
++    unsigned int __writers;
++    unsigned int __wrphase_futex;
++    unsigned int __writers_futex;
++    unsigned int __pad3;
++    unsigned int __pad4;
++    int __cur_writer;
+     int __shared;
+     unsigned long int __pad1;
+     unsigned long int __pad2;
+@@ -190,12 +190,12 @@ typedef union
+ # else
+   struct
+   {
+-    int __lock;
+-    unsigned int __nr_readers;
+-    unsigned int __readers_wakeup;
+-    unsigned int __writer_wakeup;
+-    unsigned int __nr_readers_queued;
+-    unsigned int __nr_writers_queued;
++    unsigned int __readers;
++    unsigned int __writers;
++    unsigned int __wrphase_futex;
++    unsigned int __writers_futex;
++    unsigned int __pad3;
++    unsigned int __pad4;
+ #if __BYTE_ORDER == __BIG_ENDIAN
+     unsigned char __pad1;
+     unsigned char __pad2;
+@@ -211,7 +211,7 @@ typedef union
+     unsigned char __pad1;
+     unsigned char __pad2;
+ #endif
+-    int __writer;
++    int __cur_writer;
+   } __data;
+ # endif
+   char __size[__SIZEOF_PTHREAD_RWLOCK_T];
+Index: glibc-2.24-377-g530862a/sysdeps/nios2/nptl/bits/pthreadtypes.h
+===================================================================
+--- glibc-2.24-377-g530862a.orig/sysdeps/nios2/nptl/bits/pthreadtypes.h
++++ glibc-2.24-377-g530862a/sysdeps/nios2/nptl/bits/pthreadtypes.h
+@@ -143,12 +143,12 @@ typedef union
+ {
+   struct
+   {
+-    int __lock;
+-    unsigned int __nr_readers;
+-    unsigned int __readers_wakeup;
+-    unsigned int __writer_wakeup;
+-    unsigned int __nr_readers_queued;
+-    unsigned int __nr_writers_queued;
++    unsigned int __readers;
++    unsigned int __writers;
++    unsigned int __wrphase_futex;
++    unsigned int __writers_futex;
++    unsigned int __pad3;
++    unsigned int __pad4;
+ #if __BYTE_ORDER == __BIG_ENDIAN
+     unsigned char __pad1;
+     unsigned char __pad2;
+@@ -164,7 +164,7 @@ typedef union
+     unsigned char __pad1;
+     unsigned char __pad2;
+ #endif
+-    int __writer;
++    int __cur_writer;
+   } __data;
+   char __size[__SIZEOF_PTHREAD_RWLOCK_T];
+   long int __align;
+Index: glibc-2.24-377-g530862a/sysdeps/s390/nptl/bits/pthreadtypes.h
+===================================================================
+--- glibc-2.24-377-g530862a.orig/sysdeps/s390/nptl/bits/pthreadtypes.h
++++ glibc-2.24-377-g530862a/sysdeps/s390/nptl/bits/pthreadtypes.h
+@@ -193,13 +193,13 @@ typedef union
+ # if __WORDSIZE == 64
+   struct
+   {
+-    int __lock;
+-    unsigned int __nr_readers;
+-    unsigned int __readers_wakeup;
+-    unsigned int __writer_wakeup;
+-    unsigned int __nr_readers_queued;
+-    unsigned int __nr_writers_queued;
+-    int __writer;
++    unsigned int __readers;
++    unsigned int __writers;
++    unsigned int __wrphase_futex;
++    unsigned int __writers_futex;
++    unsigned int __pad3;
++    unsigned int __pad4;
++    int __cur_writer;
+     int __shared;
+     unsigned long int __pad1;
+     unsigned long int __pad2;
+@@ -210,19 +210,19 @@ typedef union
+ # else
+   struct
+   {
+-    int __lock;
+-    unsigned int __nr_readers;
+-    unsigned int __readers_wakeup;
+-    unsigned int __writer_wakeup;
+-    unsigned int __nr_readers_queued;
+-    unsigned int __nr_writers_queued;
++    unsigned int __readers;
++    unsigned int __writers;
++    unsigned int __wrphase_futex;
++    unsigned int __writers_futex;
++    unsigned int __pad3;
++    unsigned int __pad4;
+     unsigned char __pad1;
+     unsigned char __pad2;
+     unsigned char __shared;
+     /* FLAGS must stay at this position in the structure to maintain
+        binary compatibility.  */
+     unsigned char __flags;
+-    int __writer;
++    int __cur_writer;
+   } __data;
+ # endif
+   char __size[__SIZEOF_PTHREAD_RWLOCK_T];
+Index: glibc-2.24-377-g530862a/sysdeps/sh/nptl/bits/pthreadtypes.h
+===================================================================
+--- glibc-2.24-377-g530862a.orig/sysdeps/sh/nptl/bits/pthreadtypes.h
++++ glibc-2.24-377-g530862a/sysdeps/sh/nptl/bits/pthreadtypes.h
+@@ -143,12 +143,12 @@ typedef union
+ {
+   struct
+   {
+-    int __lock;
+-    unsigned int __nr_readers;
+-    unsigned int __readers_wakeup;
+-    unsigned int __writer_wakeup;
+-    unsigned int __nr_readers_queued;
+-    unsigned int __nr_writers_queued;
++    unsigned int __readers;
++    unsigned int __writers;
++    unsigned int __wrphase_futex;
++    unsigned int __writers_futex;
++    unsigned int __pad3;
++    unsigned int __pad4;
+ #if __BYTE_ORDER == __BIG_ENDIAN
+     unsigned char __pad1;
+     unsigned char __pad2;
+@@ -164,7 +164,7 @@ typedef union
+     unsigned char __pad1;
+     unsigned char __pad2;
+ #endif
+-    pthread_t __writer;
++    pthread_t __cur_writer;
+   } __data;
+   char __size[__SIZEOF_PTHREAD_RWLOCK_T];
+   long int __align;
+Index: glibc-2.24-377-g530862a/sysdeps/sparc/nptl/bits/pthreadtypes.h
+===================================================================
+--- glibc-2.24-377-g530862a.orig/sysdeps/sparc/nptl/bits/pthreadtypes.h
++++ glibc-2.24-377-g530862a/sysdeps/sparc/nptl/bits/pthreadtypes.h
+@@ -158,13 +158,13 @@ typedef union
+ # if __WORDSIZE == 64
+   struct
+   {
+-    int __lock;
+-    unsigned int __nr_readers;
+-    unsigned int __readers_wakeup;
+-    unsigned int __writer_wakeup;
+-    unsigned int __nr_readers_queued;
+-    unsigned int __nr_writers_queued;
+-    int __writer;
++    unsigned int __readers;
++    unsigned int __writers;
++    unsigned int __wrphase_futex;
++    unsigned int __writers_futex;
++    unsigned int __pad3;
++    unsigned int __pad4;
++    int __cur_writer;
+     int __shared;
+     unsigned long int __pad1;
+     unsigned long int __pad2;
+@@ -175,19 +175,19 @@ typedef union
+ # else
+   struct
+   {
+-    int __lock;
+-    unsigned int __nr_readers;
+-    unsigned int __readers_wakeup;
+-    unsigned int __writer_wakeup;
+-    unsigned int __nr_readers_queued;
+-    unsigned int __nr_writers_queued;
++    unsigned int __readers;
++    unsigned int __writers;
++    unsigned int __wrphase_futex;
++    unsigned int __writers_futex;
++    unsigned int __pad3;
++    unsigned int __pad4;
+     unsigned char __pad1;
+     unsigned char __pad2;
+     unsigned char __shared;
+     /* FLAGS must stay at this position in the structure to maintain
+        binary compatibility.  */
+     unsigned char __flags;
+-    int __writer;
++    int __cur_writer;
+   } __data;
+ # endif
+   char __size[__SIZEOF_PTHREAD_RWLOCK_T];
+Index: glibc-2.24-377-g530862a/sysdeps/tile/nptl/bits/pthreadtypes.h
+===================================================================
+--- glibc-2.24-377-g530862a.orig/sysdeps/tile/nptl/bits/pthreadtypes.h
++++ glibc-2.24-377-g530862a/sysdeps/tile/nptl/bits/pthreadtypes.h
+@@ -173,13 +173,13 @@ typedef union
+ # if __WORDSIZE == 64
+   struct
+   {
+-    int __lock;
+-    unsigned int __nr_readers;
+-    unsigned int __readers_wakeup;
+-    unsigned int __writer_wakeup;
+-    unsigned int __nr_readers_queued;
+-    unsigned int __nr_writers_queued;
+-    int __writer;
++    unsigned int __readers;
++    unsigned int __writers;
++    unsigned int __wrphase_futex;
++    unsigned int __writers_futex;
++    unsigned int __pad3;
++    unsigned int __pad4;
++    int __cur_writer;
+     int __shared;
+     unsigned long int __pad1;
+     unsigned long int __pad2;
+@@ -190,19 +190,19 @@ typedef union
+ # else
+   struct
+   {
+-    int __lock;
+-    unsigned int __nr_readers;
+-    unsigned int __readers_wakeup;
+-    unsigned int __writer_wakeup;
+-    unsigned int __nr_readers_queued;
+-    unsigned int __nr_writers_queued;
++    unsigned int __readers;
++    unsigned int __writers;
++    unsigned int __wrphase_futex;
++    unsigned int __writers_futex;
++    unsigned int __pad3;
++    unsigned int __pad4;
+     /* FLAGS must stay at this position in the structure to maintain
+        binary compatibility.  */
+     unsigned char __flags;
+     unsigned char __shared;
+     unsigned char __pad1;
+     unsigned char __pad2;
+-    int __writer;
++    int __cur_writer;
+   } __data;
+ # endif
+   char __size[__SIZEOF_PTHREAD_RWLOCK_T];
+Index: glibc-2.24-377-g530862a/sysdeps/unix/sysv/linux/alpha/bits/pthreadtypes.h
+===================================================================
+--- glibc-2.24-377-g530862a.orig/sysdeps/unix/sysv/linux/alpha/bits/pthreadtypes.h
++++ glibc-2.24-377-g530862a/sysdeps/unix/sysv/linux/alpha/bits/pthreadtypes.h
+@@ -139,13 +139,13 @@ typedef union
+ {
+   struct
+   {
+-    int __lock;
+-    unsigned int __nr_readers;
+-    unsigned int __readers_wakeup;
+-    unsigned int __writer_wakeup;
+-    unsigned int __nr_readers_queued;
+-    unsigned int __nr_writers_queued;
+-    int __writer;
++    unsigned int __readers;
++    unsigned int __writers;
++    unsigned int __wrphase_futex;
++    unsigned int __writers_futex;
++    unsigned int __pad3;
++    unsigned int __pad4;
++    int __cur_writer;
+     int __shared;
+     unsigned long int __pad1;
+     unsigned long int __pad2;
+Index: glibc-2.24-377-g530862a/sysdeps/unix/sysv/linux/powerpc/bits/pthreadtypes.h
+===================================================================
+--- glibc-2.24-377-g530862a.orig/sysdeps/unix/sysv/linux/powerpc/bits/pthreadtypes.h
++++ glibc-2.24-377-g530862a/sysdeps/unix/sysv/linux/powerpc/bits/pthreadtypes.h
+@@ -179,13 +179,13 @@ typedef union
+ # if __WORDSIZE == 64
+   struct
+   {
+-    int __lock;
+-    unsigned int __nr_readers;
+-    unsigned int __readers_wakeup;
+-    unsigned int __writer_wakeup;
+-    unsigned int __nr_readers_queued;
+-    unsigned int __nr_writers_queued;
+-    int __writer;
++    unsigned int __readers;
++    unsigned int __writers;
++    unsigned int __wrphase_futex;
++    unsigned int __writers_futex;
++    unsigned int __pad3;
++    unsigned int __pad4;
++    int __cur_writer;
+     int __shared;
+     unsigned char __rwelision;
+     unsigned char __pad1[7];
+@@ -198,19 +198,19 @@ typedef union
+ # else
+   struct
+   {
+-    int __lock;
+-    unsigned int __nr_readers;
+-    unsigned int __readers_wakeup;
+-    unsigned int __writer_wakeup;
+-    unsigned int __nr_readers_queued;
+-    unsigned int __nr_writers_queued;
++    unsigned int __readers;
++    unsigned int __writers;
++    unsigned int __wrphase_futex;
++    unsigned int __writers_futex;
++    unsigned int __pad3;
++    unsigned int __pad4;
+     unsigned char __rwelision;
+     unsigned char __pad2;
+     unsigned char __shared;
+     /* FLAGS must stay at this position in the structure to maintain
+        binary compatibility.  */
+     unsigned char __flags;
+-    int __writer;
++    int __cur_writer;
+ #define __PTHREAD_RWLOCK_ELISION_EXTRA 0
+   } __data;
+ # endif
+Index: glibc-2.24-377-g530862a/sysdeps/x86/bits/pthreadtypes.h
+===================================================================
+--- glibc-2.24-377-g530862a.orig/sysdeps/x86/bits/pthreadtypes.h
++++ glibc-2.24-377-g530862a/sysdeps/x86/bits/pthreadtypes.h
+@@ -191,13 +191,13 @@ typedef union
+ # ifdef __x86_64__
+   struct
+   {
+-    int __lock;
+-    unsigned int __nr_readers;
+-    unsigned int __readers_wakeup;
+-    unsigned int __writer_wakeup;
+-    unsigned int __nr_readers_queued;
+-    unsigned int __nr_writers_queued;
+-    int __writer;
++    unsigned int __readers;
++    unsigned int __writers;
++    unsigned int __wrphase_futex;
++    unsigned int __writers_futex;
++    unsigned int __pad3;
++    unsigned int __pad4;
++    int __cur_writer;
+     int __shared;
+     signed char __rwelision;
+ #  ifdef  __ILP32__
+@@ -216,12 +216,12 @@ typedef union
+ # else
+   struct
+   {
+-    int __lock;
+-    unsigned int __nr_readers;
+-    unsigned int __readers_wakeup;
+-    unsigned int __writer_wakeup;
+-    unsigned int __nr_readers_queued;
+-    unsigned int __nr_writers_queued;
++    unsigned int __readers;
++    unsigned int __writers;
++    unsigned int __wrphase_futex;
++    unsigned int __writers_futex;
++    unsigned int __pad3;
++    unsigned int __pad4;
+     /* FLAGS must stay at this position in the structure to maintain
+        binary compatibility.  */
+     unsigned char __flags;
+@@ -229,7 +229,7 @@ typedef union
+     signed char __rwelision;
+ # define __PTHREAD_RWLOCK_ELISION_EXTRA 0
+     unsigned char __pad2;
+-    int __writer;
++    int __cur_writer;
+   } __data;
+ # endif
+   char __size[__SIZEOF_PTHREAD_RWLOCK_T];
