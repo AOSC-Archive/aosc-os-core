@@ -15,7 +15,8 @@ mkdir -pv "$PKGDIR"/usr/share/gdb/auto-load/usr/lib
 mv -v "$PKGDIR"/usr/lib64/*gdb.py "$PKGDIR"/usr/share/gdb/auto-load/usr/lib
 
 # Remove files in gcc-runtime.
-RTLIBS="asan lsan tsan ubsan vtv itm quadmath atomic gcc_s stdc++ gfortran gomp gomp-plugin-host_nonshm objc"
+RTLIBS="asan lsan tsan ubsan vtv itm quadmath atomic gcc_s stdc++ gfortran gomp \
+        gomp-plugin-host_nonshm objc go"
 
 # Intel Cilk Runtime is only for x86.
 if [[ "${CROSS:-$ARCH}" = "amd64" ]]; then

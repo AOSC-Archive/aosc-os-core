@@ -11,7 +11,7 @@ rm `find "$PKGDIR" -name 'libgcc_eh.a'`
 
 # Common runtimes.
 RTLIBS="libatomic libgfortran libgomp libitm libquadmath \
-        libsanitizer/asan libsanitizer/lsan libsanitizer/ubsan libstdc++-v3/src libvtv"
+        libsanitizer/asan libsanitizer/lsan libsanitizer/ubsan libstdc++-v3/src libvtv libgo"
 
 # Intel Cilk Runtime is only for x86.
 if [[ "${CROSS:-$ARCH}" = "amd64" ]]; then
