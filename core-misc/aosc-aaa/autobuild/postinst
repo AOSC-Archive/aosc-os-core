@@ -17,18 +17,20 @@ install -dm1777 /var/tmp
 
 echo -e "\
 
-Welcome to AOSC OS (4.0.1)!
+Welcome to AOSC OS (4.1.0)!
 
-This is a bugfix release over Core 4.0.0:
+This is feature release over Core 4.0:
 
-- Adds extra PATH for Perl site and vendor directories (#39);
-- Misc. fixes for MIPS32 (mipsel);
+- Added Go language support to GCC.
+- Various features, changes, and security fixes to Glibc.
+- Updated IANA Timezone Data to version 2016j.
+- Updated Linux API headers to 4.8.11.
 
 --------------------------------------------------------------------------------
 
-For a full changelog of Core 4.0.0, please read at:
+For a full changelog of Core 4.1.0, please read at:
 
-  https://github.com/AOSC-Dev/aosc-os-core/releases/tag/v4.0.0
+  https://github.com/AOSC-Dev/aosc-os-core/releases/tag/v4.1.0
 
 --------------------------------------------------------------------------------
 
