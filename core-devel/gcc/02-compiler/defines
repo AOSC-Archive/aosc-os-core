@@ -9,4 +9,5 @@ NOLTO=yes
 AB_FLAGS_SPECS=0
 AB_FLAGS_O3=yes
 
-PKGBREAK="gcc-runtime<=5.2.0-2"
+PKGBREAK="gcc-runtime<=5.2.0-2 go<=1.7.3"
+PKGREP="go<=1.7.3"
