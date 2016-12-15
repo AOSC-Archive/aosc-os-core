@@ -8,7 +8,7 @@ PKGDES="GNU C Library"
 # 1. Declares that libraries should be installed into /usr/lib instead of /lib64;
 # 2. Declares bug tracking URL (should not be changed unless you are building a derivative);
 # 3. Enables add-on support;
-# 4. Disables obsolete RPC (Remote Procedural Call) support  
+# 4. Enables obsolete RPC (Remote Procedural Call) support  
 #    (--disable-obsolete-rpc to disable such support, if you know what you are doing);
 # 5. Declares that Kernel verion 3.4.0 is the minimum accepted
 #    (you may raise the version number as you like);
