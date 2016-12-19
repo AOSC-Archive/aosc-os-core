@@ -68,9 +68,10 @@ if [[ "${CROSS:-$ARCH}" = *cross* ]]; then
 fi
 
 # MIPS is not yet happy with GNU hashing style.
-if [[ "${CROSS:-$ARCH}" != mips* ]]; then
-    AUTOTOOLS_AFTER+=" --with-linker-hash-style=gnu"
-fi
+# Really?
+#if [[ "${CROSS:-$ARCH}" != mips* ]]; then
+#    AUTOTOOLS_AFTER+=" --with-linker-hash-style=gnu"
+#fi
 
 # ARM and AArch64 specific.
 if [[ "${CROSS:-$ARCH}" = arm* ]]; then
@@ -99,6 +100,11 @@ if [[ "${CROSS:-$ARCH}" = "ppc64" ]]; then
     AUTOTOOLS_AFTER+=" --with-cpu=620 --with-tune=G5 \
                        --with-long-double-128 --enable-secureplt"
 fi
+
+# MIPS64EL specific.
+if [[ "${CROSS:-$ARCH}" = "mips64el" ]]; then
+    AUTOTOOLS_AFTER+=" --with-abi=64 --with-arch=mips64r2 \
+                       --with-tune=loongson3a" 
 
 # Use profiledbootstrap.
 ABMK="profiledbootstrap"
