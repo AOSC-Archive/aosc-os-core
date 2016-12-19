@@ -1,6 +1,9 @@
 # Apply custom flags to GMP build.
 export CC="gcc ${CPPFLAGS} ${CFLAGS} ${LDFLAGS}"
 export CXX="g++ ${CPPFLAGS} ${CFLAGS} ${LDFLAGS}"
+if [[ "${CROSS:-$ARCH}" = mips64el ]]; then
+        export ABI=64
+fi
 
 # Tweak configuration probing.
 cp /usr/share/automake-1.15/config.* "$SRCDIR"
