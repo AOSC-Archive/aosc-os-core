@@ -12,7 +12,6 @@ core-libs/isl
 core-devel/gcc
 core-devel/binutils
 core-shells/bash
-core-devel/libtool
 core-libs/gdbm
 core-database/db
 core-perl/perl
