@@ -68,10 +68,12 @@ if [[ "${CROSS:-$ARCH}" = *cross* ]]; then
 fi
 
 # MIPS is not yet happy with GNU hashing style.
-# Really?
-#if [[ "${CROSS:-$ARCH}" != mips* ]]; then
-#    AUTOTOOLS_AFTER+=" --with-linker-hash-style=gnu"
-#fi
+# Q: Really?
+# A: At least our MIPS-II (o32) still couldn't be built with GNU hash style.
+#    It is a ABI incompatibility, not an emulation error...
+if [[ "${CROSS:-$ARCH}" != mips32 ]]; then
+    AUTOTOOLS_AFTER+=" --with-linker-hash-style=gnu"
+fi
 
 # ARM and AArch64 specific.
 if [[ "${CROSS:-$ARCH}" = arm* ]]; then
