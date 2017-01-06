@@ -106,7 +106,8 @@ fi
 # MIPS64EL specific.
 if [[ "${CROSS:-$ARCH}" = "mips64el" ]]; then
     AUTOTOOLS_AFTER+=" --with-abi=64 --with-arch=mips64r2 \
-                       --with-tune=loongson3a" 
+                       --with-tune=loongson3a"
+fi
 
 # Use profiledbootstrap.
 ABMK="profiledbootstrap"
