@@ -12,15 +12,8 @@ AUTOTOOLS_AFTER="--prefix=/usr \
                  --enable-threads --enable-shared --with-pic \
                  --enable-ld --enable-plugins \
                  --disable-werror --enable-lto --disable-gdb
-                 --build=${ARCH_TARGET[$ARCH]}"
-
-# MIPS (mipsel, mipsn32el) is not quite ready for gold linker.
-# BFD will be the default and only linker for those architectures.
-if [[ "${CROSS:-$ARCH}" = mips* || "${CROSS:-$ARCH}" = powerpc ]]; then
-	AUTOTOOLS_AFTER+=" --disable-gold"
-else
-	AUTOTOOLS_AFTER+=" --enable-gold=default"
-fi
+                 --build=${ARCH_TARGET[$ARCH]} \
+                 --enable-gold=default"
 
 if [[ "${CROSS:-$ARCH}" = *64 ]]; then
 	AUTOTOOLS_AFTER+=" --enable-64-bit-bfd"
