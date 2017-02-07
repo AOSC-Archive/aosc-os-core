@@ -1,7 +1,9 @@
 # Apply custom flags to GMP build.
 export CC="gcc ${CPPFLAGS} ${CFLAGS} ${LDFLAGS}"
 export CXX="g++ ${CPPFLAGS} ${CFLAGS} ${LDFLAGS}"
-if [[ "${CROSS:-$ARCH}" = mips64el ]]; then
+
+# 64-bit ABI.
+if [[ "${CROSS:-$ARCH}" = *64* ]]; then
         export ABI=64
 fi
 

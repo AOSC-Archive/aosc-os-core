@@ -1,2 +1,2 @@
-VER=6.1.1
+VER=6.1.2
 SRCTBL="https://ftp.gnu.org/gnu/gmp/gmp-$VER.tar.xz"
