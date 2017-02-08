@@ -17,24 +17,40 @@ install -dm1777 /var/tmp
 
 echo -e "\
 
-Welcome to AOSC OS (4.1.0)!
+Welcome to AOSC OS (4.2.0)!
 
-This is feature release over Core 4.0:
+This is feature release over Core 4.1.0:
 
-- Added Go language support to GCC.
-- Various features, changes, and security fixes to Glibc.
-- Updated IANA Timezone Data to version 2016j.
-- Updated Linux API headers to 4.8.11.
+- Bash updated to 4.4.12.
+- Berkeley DB updated to 6.2.23.
+- Binutils updated to 2.27.90.
+- GNU C Library updated to 2.25.
+- GNU Compiler Collection updated to 6.3.0
+- GNU MultiPrecision Library updated to 6.1.2.
+- Linux API Headers updated to 4.9.8.
+- Perl updated to 5.24.1.
+- Readline updated to 7.0.003.
+- zlib updated to 1.2.11.
 
---------------------------------------------------------------------------------
+And...
 
-For a full changelog of Core 4.1.0, please read at:
+- Network configuration updates to compliment our switch to BBR as our default
+  TCP Congestion Control Algorithm (as configured in our default Kernel).
 
-  https://github.com/AOSC-Dev/aosc-os-core/releases/tag/v4.1.0
+Other changes...
 
---------------------------------------------------------------------------------
+- Let's say hello to a new member to our AOSC OS family, as Core 4.2 now
+  supports MIPS64el (MIPS64R2, N64 ABI)!
 
-For any questions encountered, please report at:
+-------------------------------------------------------------------------------
+
+For a full changelog of Core 4.2.0, please read at:
+
+  https://github.com/AOSC-Dev/aosc-os-core/releases/tag/v4.2.0
+
+-------------------------------------------------------------------------------
+
+For any issues, questions, or concerns, please contact us at:
 
   https://github.com/AOSC-Dev/aosc-os-core/issues
 "
