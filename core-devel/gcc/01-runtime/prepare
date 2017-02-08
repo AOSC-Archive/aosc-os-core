@@ -1,5 +1,8 @@
 # Do not use pre-defined configure options.
 export AUTOTOOLS_DEF=""
 
+# Get more architecture-dependent flags.
+source "$AB"/arch/${CROSS:-$ARCH}.sh
+
 # GCC only passes CPPFLAGS in some stages.
-export CPPFLAGS="${CPPFLAGS} -O3"
+export CPPFLAGS="${CPPFLAGS} -O3 ${CFLAGS_COMMON_ARCH}"
