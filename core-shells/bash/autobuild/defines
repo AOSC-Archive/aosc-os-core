@@ -17,5 +17,4 @@ RPMEXTRAPROVIDE="/bin/sh /bin/bash /sbin/bash"
 AUTOTOOLS_AFTER="--bindir=/bin --with-curses --enable-readline \
                  --without-bash-malloc --with-installed-readline \
                  --build=${ARCH_TARGET[$ARCH]}"
-
 AB_FLAGS_O3=1
