@@ -13,8 +13,11 @@ AUTOTOOLS_AFTER="--prefix=/usr \
                  --enable-threads --enable-shared --with-pic \
                  --enable-ld --enable-plugins \
                  --disable-werror --enable-lto --disable-gdb
-                 --build=${ARCH_TARGET[$ARCH]} \
-                 --enable-gold=default"
+                 --build=${ARCH_TARGET[$ARCH]}"
+
+if [[ "${CROSS:-$ARCH}" != "powerpc" ]]; then
+    AUTOTOOLS_AFTER+=" --enable-gold=default"
+fi
 
 if [[ "${CROSS:-$ARCH}" = *64 ]]; then
 	AUTOTOOLS_AFTER+=" --enable-64-bit-bfd"
