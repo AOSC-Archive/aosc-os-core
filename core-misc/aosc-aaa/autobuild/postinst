@@ -17,7 +17,15 @@ install -dm1777 /var/tmp
 
 echo -e "\
 
-Welcome to AOSC OS (4.2.0)!
+Welcome to AOSC OS (4.2.1)!
+
+This is a bugfix release over Core 4.2.0:
+
+- Fixed a typo in network-related system configuration.
+
+-------------------------------------------------------------------------------
+
+Major update information:
 
 This is feature release over Core 4.1.0:
 
@@ -47,6 +55,12 @@ Other changes...
 For a full changelog of Core 4.2.0, please read at:
 
   https://github.com/AOSC-Dev/aosc-os-core/releases/tag/v4.2.0
+
+-------------------------------------------------------------------------------
+
+For a full changelog of Core 4.2.1, please read at:
+
+  https://github.com/AOSC-Dev/aosc-os-core/releases/tag/v4.2.1
 
 -------------------------------------------------------------------------------
 
