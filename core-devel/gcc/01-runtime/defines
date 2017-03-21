@@ -88,7 +88,7 @@ fi
 
 # AArch64 specific architectural config.
 if [[ "${CROSS:-$ARCH}" = "arm64" ]]; then
-    AUTOTOOLS_AFTER+=" --with-arch=armv8-a"
+    AUTOTOOLS_AFTER+=" --with-arch=armv8-a --enable-fix-cortex-a53-835769 --enable-fix-cortex-a53-843419"
 fi
 
 # PowerPC specific.
