@@ -58,8 +58,7 @@ AUTOTOOLS_AFTER="--prefix=/usr \
                  --disable-multilib --disable-werror \
                  --enable-pie \
                  --enable-checking=release \
-                 --with-default-libstdcxx-abi=gcc4-compatible \
-                 --build=${ARCH_TARGET[$ARCH]}"
+                 --with-default-libstdcxx-abi=gcc4-compatible"
 
 # Cross.
 if [[ "${CROSS:-$ARCH}" = *cross* ]]; then
