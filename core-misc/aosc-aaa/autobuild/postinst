@@ -17,11 +17,11 @@ install -dm1777 /var/tmp
 
 echo -e "\
 
-Welcome to AOSC OS (4.2.1)!
+Welcome to AOSC OS (4.2.2)!
 
-This is a bugfix release over Core 4.2.0:
+This is a bugfix release over the Core 4.2 series:
 
-- Fixed a typo in network-related system configuration.
+- Bumping Linux API Headers to 4.11.3.
 
 -------------------------------------------------------------------------------
 
@@ -38,7 +38,7 @@ This is feature release over Core 4.1.0:
 - Linux API Headers updated to 4.9.8.
 - Perl updated to 5.24.1.
 - Readline updated to 7.0.003.
-- zlib updated to 1.2.11.
+- zlib updated updated to 1.2.11.
 
 And...
 
@@ -58,9 +58,9 @@ For a full changelog of Core 4.2.0, please read at:
 
 -------------------------------------------------------------------------------
 
-For a full changelog of Core 4.2.1, please read at:
+For a full changelog of Core 4.2.2, please read at:
 
-  https://github.com/AOSC-Dev/aosc-os-core/releases/tag/v4.2.1
+  https://github.com/AOSC-Dev/aosc-os-core/releases/tag/v4.2.2
 
 -------------------------------------------------------------------------------
 
