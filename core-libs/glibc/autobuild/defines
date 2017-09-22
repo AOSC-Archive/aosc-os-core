@@ -1,6 +1,6 @@
 PKGNAME=glibc
 PKGSEC=libs
-PKGDEP="tzdata linux+api"
+PKGDEP="linux+api"
 PKGDES="GNU C Library"
 
 # The following configuration:
