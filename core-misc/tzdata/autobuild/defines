@@ -1,6 +1,0 @@
-PKGNAME=tzdata
-PKGSEC=misc
-PKGDEP=""
-PKGDES="Timezone data from IANA"
-
-ABHOST=noarch
