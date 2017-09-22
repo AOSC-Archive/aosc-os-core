@@ -5,23 +5,26 @@ PKGDES="GNU C Library"
 
 # The following configuration:
 #
-# 1. Declares that libraries should be installed into /usr/lib instead of /lib64;
-# 2. Declares bug tracking URL (should not be changed unless you are building a derivative);
-# 3. Enables add-on support;
-# 4. Enables obsolete RPC (Remote Procedural Call) support  
-#    (--disable-obsolete-rpc to disable such support, if you know what you are doing);
-# 5. Declares that Kernel verion 3.4.0 is the minimum accepted
-#    (you may raise the version number as you like);
-# 6. Enables "bind now" (dynamic loader) support;
-# 7. Disables profiling support 
-#    (you may enable, using --enable-profile to your need, however this is not realistic in
-#    a "Core" environment);
-# 8. Enables stackguard randomization for extra security;
-# 9. Enables lock elision (essential for GUILE, and many others that is lock-sensitive);
-# 10. Enables multiple architecture support 
+# 1.  Declares that libraries should be installed into /usr/lib instead of /lib64;
+# 2.  Declares bug tracking URL (should not be changed unless you are building a derivative);
+# 3.  Enables add-on support;
+# 4.  Enables obsolete RPC (Remote Procedural Call) support  
+#     (--disable-obsolete-rpc to disable such support, if you know what you are doing);
+# 5.  Declares that Kernel verion 3.4.0 is the minimum accepted
+#     (you may raise the version number as you like);
+# 6.  Enables "bind now" (dynamic loader) support;
+# 7.  Disables profiling support 
+#     (you may enable, using --enable-profile to your need, however this is not realistic in
+#     a "Core" environment);
+# 8.  Enables stackguard randomization for extra security;
+# 9.  Enables stack protector (libssp);
+# 10. Enables tunables (allows for altering of runtime libraries);
+# 10. Enables lock elision (essential for GUILE, and many others that is lock-sensitive);
+# 11. Enables multiple architecture support 
 #     (mainly used to distinguish among different builds, multiarch is not supported);
-# 11. Disables "warning as error";
-# 12. Ensure that static libraries are installed for development purposes;
+# 12. Disables "warning as error";
+# 13. Ensure that static libraries are installed for development purposes;
+# 14. Enable deprecated NSL and RPC headers (<= 2.14) for compatibility;
 
 AUTOTOOLS_AFTER="--libexecdir=/usr/lib \
                  --with-headers=/usr/include \
@@ -31,12 +34,16 @@ AUTOTOOLS_AFTER="--libexecdir=/usr/lib \
                  --enable-kernel=3.4.0 \
                  --enable-bind-now --disable-profile \
                  --enable-stackguard-randomization \
+                 --enable-stack-protector=strong \
+                 --enable-tunables \
                  --enable-lock-elision \
                  --enable-multi-arch \
                  --disable-werror \
                  --enable-static \
                  --disable-multi-arch \
-                 --with-__thread"
+                 --with-__thread \
+                 --enable-obsolete-nsl \
+                 --enable-obsolete-rpc"
 
 RPMEXTRAPROVIDE="rtld(GNU_HASH)"
 NOSTATIC=no
