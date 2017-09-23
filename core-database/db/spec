@@ -1,2 +1,2 @@
-VER=6.2.23
+VER=6.2.32
 SRCTBL="http://download.oracle.com/berkeley-db/db-$VER.tar.gz"
