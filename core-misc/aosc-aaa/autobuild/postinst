@@ -15,7 +15,7 @@ mknod -m 666 /dev/null c 1 3 2>/dev/null || true
 rm -rf /var/tmp
 install -dm1777 /var/tmp
 
-echo -e "\
+echo -e '\
 
 Welcome to AOSC OS (5.0.0)!
 
@@ -56,7 +56,7 @@ For a full changelog of Core 5.0.0, please read at:
 For any issues, questions, or concerns, please contact us at:
 
   https://github.com/AOSC-Dev/aosc-os-core/issues
-"
+'
 
 if [[ ! -e /etc/fstab ]]; then
 cat > /etc/fstab << EOF
