@@ -27,9 +27,6 @@ for template in "$SRCDIR"/*.template; do
     install -Dm644 "$template" "$PKGDIR"/usr/share/makepkg-template/"${template##*/}"
 done
 
-ln -s perl-binary-module-dependency-1.template \
-      "$PKGDIR"/usr/share/makepkg-template/perl-binary-module-dependency.template
-
 # From Arch Linux:
 
 ### CPAN Settings ###
@@ -37,10 +34,6 @@ ln -s perl-binary-module-dependency-1.template \
 sed -e '/(makepl_arg =>/   s/""/"INSTALLDIRS=site"/' \
     -e '/(mbuildpl_arg =>/ s/""/"installdirs=site"/' \
     -i "$PKGDIR"/usr/share/perl5/core_perl/CPAN/FirstTime.pm
-
-# Profile script to set paths to perl scripts.
-install -D -m755 "$SRCDIR"/perlbin.sh \
-                 "$PKGDIR"/etc/profile.d/perlbin.sh
 
 # Add the dirs so new installs will already have them in PATH once they
 # install their first perl programm
