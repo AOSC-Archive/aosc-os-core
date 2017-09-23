@@ -112,14 +112,15 @@ fi
 ABMK="profiledbootstrap"
 
 ABRPMAUTOPROVONLY=yes
+
 # FIXME: LTO leads to linker/compiler error at libmpxwrapper.
 # /var/lib/abbs/build/tmp.oxb17wrLIQ/gcc-6.1.0/libmpx/mpxwrap/mpx_wrappers.c:35:9:
 #   internal compiler error: in ultimate_transparent_alias_target, at varasm.c:1263
 #     void *p = (void *)malloc (size);
 #           ^
-NOLTO=yes
+NOLTO=1
 
-RECONF=no
+RECONF=0
 
 PKGBREAK="gcc<=5.2.0-1"
 AB_FLAGS_SPECS=0
