@@ -22,7 +22,9 @@ for lib in ${RTLIBS[@]}; do
     make -C "${ARCH_TARGET[$ARCH]}"/$lib DESTDIR="$PKGDIR" install-toolexeclibLTLIBRARIES
 done
 
-make -C "${ARCH_TARGET[$ARCH]}"/libsanitizer/tsan DESTDIR="$PKGDIR" install-toolexeclibLTLIBRARIES
+if [[ "${CROSS:-$ARCH}" != "armel" ]]; then
+    make -C "${ARCH_TARGET[$ARCH]}"/libsanitizer/tsan DESTDIR="$PKGDIR" install-toolexeclibLTLIBRARIES
+fi
 make -C "${ARCH_TARGET[$ARCH]}"/libobjc DESTDIR="$PKGDIR" install-libs
 make -C "${ARCH_TARGET[$ARCH]}"/libstdc++-v3/po DESTDIR="$PKGDIR" install
 if [ "${CROSS:-$ARCH}" = "amd64" ]; then

@@ -109,7 +109,9 @@ if [[ "${CROSS:-$ARCH}" = "mips64el" ]]; then
 fi
 
 # Use profiledbootstrap.
-ABMK="profiledbootstrap"
+if [[ "${CROSS:-$ARCH}" != "armel" ]]; then
+    ABMK="profiledbootstrap"
+fi
 
 ABRPMAUTOPROVONLY=yes
 
