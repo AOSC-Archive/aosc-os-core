@@ -20,12 +20,17 @@ else
 fi
 
 # Remove files in gcc-runtime.
-RTLIBS="asan lsan tsan ubsan vtv itm quadmath atomic gcc_s stdc++ gfortran gomp \
+RTLIBS="asan lsan ubsan vtv itm quadmath atomic gcc_s stdc++ gfortran gomp \
         gomp-plugin-host_nonshm objc go"
 
 # VTV not available for PowerPC 32/64.
 if [[ "${CROSS:-$ARCH}" != "powerpc" && "${CROSS:-$ARCH}" != "ppc64" ]]; then
     RTLIBS+=" libvtv "
+fi
+
+# Tsan not available for PowerPC 32.
+if [[ "${CROSS:-$ARCH}" != "powerpc" ]]; then
+    RTLIBS+=" tsan "
 fi
 
 # Intel Cilk Runtime is only for x86.

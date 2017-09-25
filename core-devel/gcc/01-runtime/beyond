@@ -27,7 +27,7 @@ for lib in ${RTLIBS[@]}; do
     make -C "${ARCH_TARGET[$ARCH]}"/$lib DESTDIR="$PKGDIR" install-toolexeclibLTLIBRARIES
 done
 
-if [[ "${CROSS:-$ARCH}" != "armel" ]]; then
+if [[ "${CROSS:-$ARCH}" != "armel" && "${CROSS:-$ARCH}" != "powerpc" ]]; then
     make -C "${ARCH_TARGET[$ARCH]}"/libsanitizer/tsan DESTDIR="$PKGDIR" install-toolexeclibLTLIBRARIES
 fi
 make -C "${ARCH_TARGET[$ARCH]}"/libobjc DESTDIR="$PKGDIR" install-libs
