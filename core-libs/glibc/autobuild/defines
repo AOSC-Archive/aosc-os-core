@@ -32,9 +32,7 @@ AUTOTOOLS_AFTER="--libexecdir=/usr/lib \
                  --enable-add-ons \
                  --enable-obsolete-rpc \
                  --enable-kernel=3.4.0 \
-                 --enable-bind-now --disable-profile \
-                 --enable-stackguard-randomization \
-                 --enable-stack-protector=strong \
+                 --disable-profile \
                  --enable-tunables \
                  --enable-lock-elision \
                  --enable-multi-arch \
@@ -44,6 +42,12 @@ AUTOTOOLS_AFTER="--libexecdir=/usr/lib \
                  --with-__thread \
                  --enable-obsolete-nsl \
                  --enable-obsolete-rpc"
+
+if [[ "${CROSS:-$ARCH}" != "powerpc" ]]; then
+    AUTOTOOLS_AFTER+=" --enable-bind-now \
+                       --enable-stackguard-randomization \
+                       --enable-stack-protector=strong "
+fi
 
 RPMEXTRAPROVIDE="rtld(GNU_HASH)"
 NOSTATIC=no

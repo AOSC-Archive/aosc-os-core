@@ -22,13 +22,17 @@ echo "build-programs=no" >> configparms
 
 # Re-enable hardening for GLibc utilities.
 sed -i "/build-programs=/s#no#yes#" configparms
-export CFLAGS="${CFLAGS} -fstack-protector-strong -D_FORTIFY_SOURCE=2"
-export CXXFLAGS="${CXXFLAGS} -fstack-protector-strong -D_FORTIFY_SOURCE=2"
+if [[ "${CROSS:-$ARCH}" != "powerpc" ]]; then
+    export CFLAGS="${CFLAGS} -fstack-protector-strong -D_FORTIFY_SOURCE=2"
+    export CXXFLAGS="${CXXFLAGS} -fstack-protector-strong -D_FORTIFY_SOURCE=2"
+fi
 
 make
 
-sed -i '5,7d' configparms
-LDFLAGS=${LDFLAGS/--as-needed,/}
+if [[ "${CROSS:-$ARCH}" != "powerpc" ]]; then
+    sed -i '5,7d' configparms
+    LDFLAGS=${LDFLAGS/--as-needed,/}
+fi
 
 # Linker cache configuration, a template and a directory.
 install -dm755 "$PKGDIR"/etc
