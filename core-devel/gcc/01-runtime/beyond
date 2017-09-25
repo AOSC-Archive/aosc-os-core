@@ -11,11 +11,16 @@ rm `find "$PKGDIR" -name 'libgcc_eh.a'`
 
 # Common runtimes.
 RTLIBS="libatomic libgfortran libgomp libitm libquadmath \
-        libsanitizer/asan libsanitizer/lsan libsanitizer/ubsan libstdc++-v3/src libvtv libgo"
+        libsanitizer/asan libsanitizer/lsan libsanitizer/ubsan libstdc++-v3/src libgo"
+
+# VTV not available for PowerPC 32/64.
+if [[ "${CROSS:-$ARCH}" != "powerpc" && "${CROSS:-$ARCH}" != "ppc64" ]]; then
+    RTLIBS+=" libvtv "
+fi
 
 # Intel Cilk Runtime is only for x86.
 if [[ "${CROSS:-$ARCH}" = "amd64" ]]; then
-    RTLIBS+=" libcilkrts"
+    RTLIBS+=" libcilkrts "
 fi
 
 for lib in ${RTLIBS[@]}; do
