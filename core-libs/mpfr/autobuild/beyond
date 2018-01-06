@@ -1,0 +1,1 @@
+ln -sv libmpfr.so.6.0.0 "$PKGDIR"/usr/lib/libmpfr.so.4
