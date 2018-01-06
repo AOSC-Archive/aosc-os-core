@@ -1,3 +1,4 @@
 VER=2.26
-REL=4
-SRCTBL="https://ftp.gnu.org/gnu/glibc/glibc-$VER.tar.xz"
+REL=5
+GITSRC="https://sourceware.org/git/glibc.git"
+GITCO="bfda785841346038d338b8c4c8eb590737c6dbf5"
