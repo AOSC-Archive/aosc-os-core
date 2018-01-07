@@ -17,39 +17,33 @@ install -dm1777 /var/tmp
 
 echo -e \
 '
-Welcome to AOSC OS (5.0.0)!
+Welcome to AOSC OS (5.1.0)!
 
-This is a new series of AOSC OS Core with major updates and fixes over the old
-Core 4 series.
+This is a feature update to the Core 5 series...
 
 Updates:
 
-- Updated GNU C Library to 2.26.
-- Updated GNU Binutils to 2.29.
-- Updated GNU MPFR Library to 3.1.3.
-- Updated Interger Set Library to 0.18.
-- Updated GNU Compiler Compilation (GCC) to 7.2.0.
-- Updated GNU DBM to 1.13.
-- Updated Berkeley DB to 6.2.32.
-- Updated Perl to 5.24.3.
+- Updated GNU C Library with the newest changes on the 2.26 branch.
+- Updated Linux API Headers to 4.14.12.
+- Updated Ncurses to 6.0+20171230 to include security and bug fixes.
+- Updated Binutils with the newest changes on the 2.29.1 branch.
+- Updated MPFR to 4.0.0 (ABI version 6).
+- Updated GDBM to 1.14.1.
 
-Changes:
+Changes and Fixes:
 
-- Moved GCC specs from `autobuild3` to `gcc`, avoids potential build failures
-  with software that records build-time compiler flags - when Autobuild3 is
-  not installed.
-- Moved Timezone Data out of Core tree, to allow for more timely updates.
+- Disabled binary stripping in GNU C Library to aid with debugging.
+- Rebuilt GMP to adapt to ABI changes in LibLTO.
 
 What to Expect:
 
 - A smooth update with little incompatibility, though it could happen.
-- Minor performance gain from GNU C Library and GCC Runtime enhancements.
 
 -------------------------------------------------------------------------------
 
-For a full changelog of Core 5.0.0, please read at:
+For a full changelog of Core 5.1.0, please read at:
 
-  https://github.com/AOSC-Dev/aosc-os-core/releases/tag/v5.0.0
+  https://github.com/AOSC-Dev/aosc-os-core/releases/tag/v5.1.0
 
 -------------------------------------------------------------------------------
 
