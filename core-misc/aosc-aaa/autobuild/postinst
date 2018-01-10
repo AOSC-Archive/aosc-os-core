@@ -17,9 +17,9 @@ install -dm1777 /var/tmp
 
 echo -e \
 '
-Welcome to AOSC OS (5.1.0)!
+Welcome to AOSC OS (5.1.1)!
 
-This is a feature update to the Core 5 series...
+This is a feature and security update to the Core 5 series.
 
 Updates:
 
@@ -29,6 +29,8 @@ Updates:
 - Updated Binutils with the newest changes on the 2.29.1 branch.
 - Updated MPFR to 4.0.0 (ABI version 6).
 - Updated GDBM to 1.14.1.
+- Introduced Retpoline patches from Clear Linux for GCC 7.2, to mitigate a
+  variant of the Spectre vulnerability.
 
 Changes and Fixes:
 
@@ -41,9 +43,9 @@ What to Expect:
 
 -------------------------------------------------------------------------------
 
-For a full changelog of Core 5.1.0, please read at:
+For a full changelog of Core 5.1.1, please read at:
 
-  https://github.com/AOSC-Dev/aosc-os-core/releases/tag/v5.1.0
+  https://github.com/AOSC-Dev/aosc-os-core/releases/tag/v5.1.1
 
 -------------------------------------------------------------------------------
 
