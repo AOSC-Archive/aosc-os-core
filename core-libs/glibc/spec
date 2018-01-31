@@ -1,4 +1,4 @@
 VER=2.26
-REL=5
+REL=6
 GITSRC="https://sourceware.org/git/glibc.git"
-GITCO="bfda785841346038d338b8c4c8eb590737c6dbf5"
+GITCO="bbabb868cd248763373d0db763bacd84ce27ede8"
