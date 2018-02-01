@@ -17,25 +17,19 @@ install -dm1777 /var/tmp
 
 echo -e \
 '
-Welcome to AOSC OS (5.1.1)!
+Welcome to AOSC OS (5.2.0)!
 
 This is a feature and security update to the Core 5 series.
 
 Updates:
 
 - Updated GNU C Library with the newest changes on the 2.26 branch.
-- Updated Linux API Headers to 4.14.12.
-- Updated Ncurses to 6.0+20171230 to include security and bug fixes.
-- Updated Binutils with the newest changes on the 2.29.1 branch.
-- Updated MPFR to 4.0.0 (ABI version 6).
-- Updated GDBM to 1.14.1.
-- Introduced Retpoline patches from Clear Linux for GCC 7.2, to mitigate a
-  variant of the Spectre vulnerability.
-
-Changes and Fixes:
-
-- Disabled binary stripping in GNU C Library to aid with debugging.
-- Rebuilt GMP to adapt to ABI changes in LibLTO.
+- Updated Linux API Headers to 4.14.16.
+- Updated Ncurses to 6.1+20180129.
+- Updated MPC to 1.1.0.
+- Updated GCC to 7.3.1, with included Retpoline implementation.
+- Updated Ncurses to 2.30.
+- Updated Bash to 4.4.18.
 
 What to Expect:
 
@@ -43,9 +37,9 @@ What to Expect:
 
 -------------------------------------------------------------------------------
 
-For a full changelog of Core 5.1.1, please read at:
+For a full changelog of Core 5.2.0, please read at:
 
-  https://github.com/AOSC-Dev/aosc-os-core/releases/tag/v5.1.1
+  https://github.com/AOSC-Dev/aosc-os-core/releases/tag/v5.2.0
 
 -------------------------------------------------------------------------------
 
