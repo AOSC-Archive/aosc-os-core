@@ -13,8 +13,8 @@ rm `find "$PKGDIR" -name 'libgcc_eh.a'`
 RTLIBS="libatomic libgfortran libgomp libitm libquadmath \
         libsanitizer/asan libsanitizer/lsan libsanitizer/ubsan libstdc++-v3/src libgo"
 
-# VTV not available for PowerPC 32/64.
-if [[ "${CROSS:-$ARCH}" != "powerpc" && "${CROSS:-$ARCH}" != "ppc64" ]]; then
+# VTV not available for PowerPC 32/64 and RISC-V.
+if [[ "${CROSS:-$ARCH}" != "powerpc" && "${CROSS:-$ARCH}" != "ppc64" && "${CROSS:-$ARCH}" != "riscv64" ]]; then
     RTLIBS+=" libvtv "
 fi
 

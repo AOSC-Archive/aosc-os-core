@@ -15,7 +15,7 @@ AUTOTOOLS_AFTER="--prefix=/usr \
                  --disable-werror --enable-lto --disable-gdb
                  --build=${ARCH_TARGET[$ARCH]}"
 
-if [[ "${CROSS:-$ARCH}" != "powerpc" && "${CROSS:-$ARCH}" != "mipsel" ]]; then
+if [[ "${CROSS:-$ARCH}" != "powerpc" && "${CROSS:-$ARCH}" != "mipsel" && "${CROSS:-$ARCH}" != "riscv64" ]]; then
     AUTOTOOLS_AFTER+=" --enable-gold=default"
 fi
 
