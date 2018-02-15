@@ -17,5 +17,6 @@ done
 
 if [[ "${CROSS:-$ARCH}" = "riscv64" ]]; then
 ( cd "$SRCDIR"/libffi ; patch -Np1 -i ../autobuild/riscv-libffi.patch )
+sed -i 's/2\.64/'"$(autoconf --version | head -n 1 | cut -d ')' -f 2 | awk '{print $1;}')"'/g' config/override.m4
 autoreconf -fi
 fi
