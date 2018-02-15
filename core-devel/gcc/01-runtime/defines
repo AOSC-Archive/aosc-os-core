@@ -59,8 +59,12 @@ AUTOTOOLS_AFTER="--prefix=/usr \
                  --enable-checking=release \
                  --with-default-libstdcxx-abi=gcc4-compatible"
 
-
-AUTOTOOLS_AFTER+=" --enable-languages=c,c++,fortran,lto,go,objc,obj-c++"
+if [[ "${CROSS:-$ARCH}" != "riscv64" ]]; then
+    AUTOTOOLS_AFTER+=" --enable-languages=c,c++,fortran,lto,go,objc,obj-c++"
+else
+    # When libFFI is not available on this architecture, Go is not available
+    AUTOTOOLS_AFTER+=" --enable-languages=c,c++,fortran,lto,objc,obj-c++"
+endif
 
 # Cross.
 if [[ "${CROSS:-$ARCH}" = *cross* ]]; then

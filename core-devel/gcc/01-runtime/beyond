@@ -10,8 +10,17 @@ make -C "${ARCH_TARGET[$ARCH]}"/libgcc install-shared DESTDIR="$PKGDIR"
 rm `find "$PKGDIR" -name 'libgcc_eh.a'`
 
 # Common runtimes.
-RTLIBS="libatomic libgfortran libgomp libitm libquadmath \
-        libsanitizer/asan libsanitizer/lsan libsanitizer/ubsan libstdc++-v3/src libgo"
+RTLIBS="libatomic libgfortran libgomp libquadmath libstdc++-v3/src"
+
+# libitm and sanitizer are not available for RISC-V
+if [[ "${CROSS:-$ARCH}" != "riscv64" ]]; then
+    RTLIBS+=" libitm libsanitizer/asan libsanitizer/lsan libsanitizer/ubsan "
+fi
+
+# Go is currently not enabled for RISC-V
+if [[ "${CROSS:-$ARCH}" != "riscv64" ]]; then
+    RTLIBS+=" libgo "
+fi
 
 # VTV not available for PowerPC 32/64 and RISC-V.
 if [[ "${CROSS:-$ARCH}" != "powerpc" && "${CROSS:-$ARCH}" != "ppc64" && "${CROSS:-$ARCH}" != "riscv64" ]]; then
