@@ -47,7 +47,6 @@ AUTOTOOLS_AFTER="--prefix=/usr \
                  --libdir=/usr/lib --libexecdir=/usr/lib \
                  --mandir=/usr/share/man --infodir=/usr/share/info \
                  --with-bugurl=https://github.com/AOSC-Dev/aosc-os-core \
-                 --enable-languages=c,c++,fortran,lto,go,objc,obj-c++ \
                  --enable-shared --enable-threads=posix \
                  --with-system-zlib --enable-gnu-indirect-function --enable-__cxa_atexit \
                  --disable-libunwind-exceptions --enable-clocale=gnu \
@@ -59,6 +58,9 @@ AUTOTOOLS_AFTER="--prefix=/usr \
                  --enable-pie \
                  --enable-checking=release \
                  --with-default-libstdcxx-abi=gcc4-compatible"
+
+
+AUTOTOOLS_AFTER+=" --enable-languages=c,c++,fortran,lto,go,objc,obj-c++"
 
 # Cross.
 if [[ "${CROSS:-$ARCH}" = *cross* ]]; then
@@ -106,6 +108,11 @@ fi
 if [[ "${CROSS:-$ARCH}" = "mips64el" ]]; then
     AUTOTOOLS_AFTER+=" --with-abi=64 --with-arch=mips64r2 \
                        --with-tune=loongson3a"
+fi
+
+# RISC-V specific
+if [[ "${CROSS:-$ARCH}" = riscv* ]]; then
+    AUTOTOOLS_AFTER+=" --without-libffi"
 fi
 
 # Use profiledbootstrap.
