@@ -52,5 +52,11 @@ rm -fv "$PKGDIR"/usr/share/info/libgomp.info
 rm -fv "$PKGDIR"/usr/share/info/libquadmath.info
 rm -fv "$PKGDIR"/usr/share/info/libitm.info
 
-mv "$PKGDIR"/usr/bin/go{,-gnu}
-mv "$PKGDIR"/usr/bin/gofmt{,-gnu}
+if [[ "${CROSS:-$ARCH}" != "riscv64" ]]; then
+    mv "$PKGDIR"/usr/bin/go{,-gnu}
+    mv "$PKGDIR"/usr/bin/gofmt{,-gnu}
+else
+    echo "#! /bin/bash" > "$PKGDIR"/usr/bin/go
+    echo "echo GNU Go is not available on this architecture. ; exit 1" >> "$PKGDIR"/usr/bin/go
+    cp "$PKGDIR"/usr/bin/go{,fmt}
+fi
