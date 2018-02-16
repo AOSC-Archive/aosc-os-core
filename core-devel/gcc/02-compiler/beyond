@@ -13,7 +13,7 @@ ln -sv /usr/bin/cpp "$PKGDIR"/usr/lib/cpp
 # Misplaced file that confuses ldconfig(8), provided by GLibc.
 mkdir -pv "$PKGDIR"/usr/share/gdb/auto-load/usr/lib
 # FIXME: Could go either way.
-if [[ "${CROSS:-$ARCH}" = *64 ]]; then
+if [ -e "$PKGDIR"/usr/lib64/*gdb.py ]; then
     mv -v "$PKGDIR"/usr/lib64/*gdb.py "$PKGDIR"/usr/share/gdb/auto-load/usr/lib
 else
     mv -v "$PKGDIR"/usr/lib/*gdb.py "$PKGDIR"/usr/share/gdb/auto-load/usr/lib
