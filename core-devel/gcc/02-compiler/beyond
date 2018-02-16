@@ -10,13 +10,16 @@ ln -sv /usr/lib/gcc/${ARCH_TARGET[$ARCH]}/$PKGVER/liblto_plugin.so \
 # FHS expects "cpp" to be in /usr/lib.
 ln -sv /usr/bin/cpp "$PKGDIR"/usr/lib/cpp
 
-# Misplaced file that confuses ldconfig(8), provided by GLibc.
-mkdir -pv "$PKGDIR"/usr/share/gdb/auto-load/usr/lib
-# FIXME: Could go either way.
-if [ -e "$PKGDIR"/usr/lib64/*gdb.py ]; then
-    mv -v "$PKGDIR"/usr/lib64/*gdb.py "$PKGDIR"/usr/share/gdb/auto-load/usr/lib
-else
-    mv -v "$PKGDIR"/usr/lib/*gdb.py "$PKGDIR"/usr/share/gdb/auto-load/usr/lib
+# mysteriously this doesn't work for riscv64
+if [[ "${CROSS:-$ARCH}" != "riscv64" ]]; then
+    # Misplaced file that confuses ldconfig(8), provided by GLibc.
+    mkdir -pv "$PKGDIR"/usr/share/gdb/auto-load/usr/lib
+    # FIXME: Could go either way.
+    if [ -e "$PKGDIR"/usr/lib64/*gdb.py ]; then
+        mv -v "$PKGDIR"/usr/lib64/*gdb.py "$PKGDIR"/usr/share/gdb/auto-load/usr/lib
+    else
+        mv -v "$PKGDIR"/usr/lib/*gdb.py "$PKGDIR"/usr/share/gdb/auto-load/usr/lib
+    fi
 fi
 
 # Remove files in gcc-runtime.
@@ -59,4 +62,5 @@ else
     echo "#! /bin/bash" > "$PKGDIR"/usr/bin/go
     echo "echo GNU Go is not available on this architecture. ; exit 1" >> "$PKGDIR"/usr/bin/go
     cp "$PKGDIR"/usr/bin/go{,fmt}
+    chmod 755 "$PKGDIR"/usr/bin/go{,fmt}
 fi
