@@ -64,7 +64,7 @@ if [[ "${CROSS:-$ARCH}" != "riscv64" ]]; then
 else
     # When libFFI is not available on this architecture, Go is not available
     AUTOTOOLS_AFTER+=" --enable-languages=c,c++,fortran,lto,objc,obj-c++"
-endif
+fi
 
 # Cross.
 if [[ "${CROSS:-$ARCH}" = *cross* ]]; then
