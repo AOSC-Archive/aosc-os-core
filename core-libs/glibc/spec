@@ -1,2 +1,3 @@
-VER=2.27
-SRCTBL="https://ftp.gnu.org/gnu/glibc/glibc-2.27.tar.xz"
+VER=2.27+git20180219
+GITSRC="https://sourceware.org/git/glibc.git"
+GITCO="b4108a361f05ee87122b86aa7d799e4512013588"
