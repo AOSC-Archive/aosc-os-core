@@ -47,7 +47,7 @@ To clarify the proposal, a table is produced to show current plan on optimizatio
 | ARMv7 (armel)             | No       | -                                 | -                                 |
 | ARMv8 (aarch64)           | No       | -                                 | -                                 |
 | MIPS32 (mipsel)           | Yes      | Loongson 2E+ binaries and patches | -march=loongson2 -mtune=loongson2 |
-| MIPS64 (mips64el)         | Yes      | Loongson 3+ binarie and patches   | -march=loongson3 -mtune=loongson3 |
+| MIPS64 (mips64r2el)         | Yes      | Loongson 3+ binarie and patches   | -march=loongson3 -mtune=loongson3 |
 | PowerPC 32-bit (powerpc)  | Yes      | AltiVec optimized binaries        | -maltivec -mabi=altivec           |
 | PowerPC 64-bit BE (ppc64) | No       | -                                 | -                                 |
 

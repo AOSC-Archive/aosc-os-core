@@ -108,10 +108,10 @@ if [[ "${CROSS:-$ARCH}" = "ppc64" ]]; then
                        --with-long-double-128 --enable-secureplt"
 fi
 
-# MIPS64EL specific.
+# MIPS64r2EL specific.
 if [[ "${CROSS:-$ARCH}" = "mips64el" ]]; then
     AUTOTOOLS_AFTER+=" --with-abi=64 --with-arch=mips64r2 \
-                       --with-tune=loongson3a"
+                       --with-tune=loongson3a --without-madd4"
 fi
 
 # RISC-V specific

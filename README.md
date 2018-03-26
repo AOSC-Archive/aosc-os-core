@@ -23,7 +23,7 @@ six architectures:
   servers.
 - ARMv7 32-bit development boards, phones, and tablets.
 - ARMv8 64-bit development boards, phones, tablets, and servers.
-- MIPS32 (MIPS-II) personal computers, workstations, and servers.
+- MIPS64r2 N64 (Little Endian) personal computers, workstations, and servers.
 - PowerPC 32-bit (Big Endian) personal computers, Macintosh, workstations,
   and servers.
 - PowerPC 64-bit (Big Endian) personal computers, Macintosh, workstations,
