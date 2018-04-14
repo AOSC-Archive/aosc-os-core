@@ -33,7 +33,7 @@ Updates:
     - Multiple security fixes.
 - Updated GCC with the newest changes on the 7.3.1 branch.
 - Updated Linux API Headers to 4.16.2.
-- Updated Ncurses to 6.1+20180407
+- Updated Ncurses to 6.1+20180407.
 - Updated Bash to 4.4.19.
 - Updated ISL to 0.19.
 
