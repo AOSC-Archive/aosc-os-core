@@ -1,3 +1,4 @@
 VER=7.3.1
+REL=1
 GITSRC="https://gcc.gnu.org/git/gcc.git"
-GITCO="89944add352aadc94ec724a7e2af2b2d756393f3"
+GITCO="f419391b8f06df565b215a62e892c787b7160eab"
