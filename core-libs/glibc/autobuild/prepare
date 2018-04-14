@@ -4,6 +4,9 @@ export PATH="$SRCDIR:$PATH"
 git clone --depth 1 -b v"$LOCALEGENVER" \
     https://github.com/AOSC-Dev/locale-gen
 
+git clone --depth 1 -b packaging \
+    https://github.com/AOSC-Dev/locale-gen localepack
+
 # MIPS64el specific.
 if [[ "${CROSS:-$ARCH}" = "mips64el" ]]; then
     export CFLAGS="${CFLAGS} -march=mips64r2 -mabi=64 -mrelax-pic-calls"
