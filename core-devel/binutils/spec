@@ -1,3 +1,4 @@
 VER=2.30
+REL=1
 GITSRC="https://sourceware.org/git/binutils-gdb.git"
-GITCO="8a0d7c358ddf9caf8550ec339d5df9ef8cdfeeaa"
+GITCO="754fc4850d349dd236d6dbb57330db01358e937e"
