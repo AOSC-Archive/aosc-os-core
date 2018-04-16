@@ -16,9 +16,9 @@ if [[ "${CROSS:-$ARCH}" != "riscv64" ]]; then
     mkdir -pv "$PKGDIR"/usr/share/gdb/auto-load/usr/lib
     # FIXME: Could go either way.
     if [ -e "$PKGDIR"/usr/lib64/*gdb.py ]; then
-        mv -v "$PKGDIR"/usr/lib64/*gdb.py "$PKGDIR"/usr/share/gdb/auto-load/usr/lib
+        mv -v "$PKGDIR"/usr/lib64/*gdb.py "$PKGDIR"/usr/share/gdb/auto-load/usr/lib || true
     else
-        mv -v "$PKGDIR"/usr/lib/*gdb.py "$PKGDIR"/usr/share/gdb/auto-load/usr/lib
+        mv -v "$PKGDIR"/usr/lib/*gdb.py "$PKGDIR"/usr/share/gdb/auto-load/usr/lib || true
     fi
 fi
 
