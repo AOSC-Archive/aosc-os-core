@@ -17,26 +17,14 @@ install -dm1777 /var/tmp
 
 echo -e \
 '
-Welcome to AOSC OS (5.3.1)!
+Welcome to AOSC OS (5.3.2)!
 
-This is a feature and security update to the Core 5 series.
+This is a security update to the Core 5 series.
 
 Updates:
 
-- New architecture support: RISC-V 64-bit (riscv64)!
-- Updated GNU C Library with the newest changes on the 2.27 branch.
-    - Changed behaviour of locale generation, which is now done during
-      compile time - no more hour-long waiting!
-    - Static libraries are longer stripped.
-    - Multiple security fixes.
-- Updated Binutils with the newest changes on the 2.30 branch.
-    - Multiple security fixes.
-- Updated GCC with the newest changes on the 7.3.1 branch.
-- Updated Perl with security fixes.
-- Updated Linux API Headers to 4.16.2.
-- Updated Ncurses to 6.1+20180407.
-- Updated Bash to 4.4.19.
-- Updated ISL to 0.19.
+- Fixed several security vulnerabilities in Perl.
+- Fixed several security and usability issues in the GNU C Library.
 
 What to Expect:
 
@@ -45,9 +33,9 @@ What to Expect:
 
 -------------------------------------------------------------------------------
 
-For a full changelog of Core 5.3.1, please read at:
+For a full changelog of Core 5.3.2, please read at:
 
-  https://github.com/AOSC-Dev/aosc-os-core/releases/tag/v5.3.1
+  https://github.com/AOSC-Dev/aosc-os-core/releases/tag/v5.3.2
 
 -------------------------------------------------------------------------------
 
