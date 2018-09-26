@@ -7,8 +7,10 @@ echo "rtlddir=/usr/lib" >> configparms
 echo "sbindir=/usr/bin" >> configparms
 echo "rootsbindir=/usr/bin" >> configparms
 
+# Frame pointers shouldn't be omitted for glibc
 # Hardening should not be enabled at build time.
 # -fPIC for libraries.
+export CFLAGS="${CFLAGS/-fomit-frame-pointer/}"
 export CFLAGS="${CFLAGS/-fstack-protector-strong/} -fPIC"
 export CXXFLAGS="${CFLAGS/-fstack-protector-strong/} -fPIC"
 export CPPFLAGS="${CPPFLAGS/-D_FORTIFY_SOURCE=2/}"
