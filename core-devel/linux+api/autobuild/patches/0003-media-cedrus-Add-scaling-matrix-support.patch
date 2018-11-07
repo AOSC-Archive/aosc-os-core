@@ -1,0 +1,99 @@
+From 128f4ef38934e0909553aec16831795d551c285f Mon Sep 17 00:00:00 2001
+From: Maxime Ripard <maxime.ripard@bootlin.com>
+Date: Mon, 9 Jul 2018 16:23:44 +0200
+Subject: [PATCH 3/7] media: cedrus: Add scaling matrix support
+
+Signed-off-by: Maxime Ripard <maxime.ripard@bootlin.com>
+---
+ drivers/staging/media/sunxi/cedrus/cedrus.c   |  6 ++++++
+ drivers/staging/media/sunxi/cedrus/cedrus.h   |  1 +
+ .../staging/media/sunxi/cedrus/cedrus_dec.c   |  4 ++++
+ .../staging/media/sunxi/cedrus/cedrus_h264.c  | 19 +++++++++++++++++++
+ 4 files changed, 30 insertions(+)
+
+diff --git a/drivers/staging/media/sunxi/cedrus/cedrus.c b/drivers/staging/media/sunxi/cedrus/cedrus.c
+index 8bcd461b79c5..5a7f97606039 100644
+--- a/drivers/staging/media/sunxi/cedrus/cedrus.c
++++ b/drivers/staging/media/sunxi/cedrus/cedrus.c
+@@ -64,6 +64,12 @@ static const struct cedrus_control cedrus_controls[] = {
+ 		.codec		= CEDRUS_CODEC_H264,
+ 		.required	= true,
+ 	},
++	{
++		.id		= V4L2_CID_MPEG_VIDEO_H264_SCALING_MATRIX,
++		.elem_size	= sizeof(struct v4l2_ctrl_h264_scaling_matrix),
++		.codec		= CEDRUS_CODEC_H264,
++		.required	= true,
++	},
+ };
+ 
+ #define CEDRUS_CONTROLS_COUNT	ARRAY_SIZE(cedrus_controls)
+diff --git a/drivers/staging/media/sunxi/cedrus/cedrus.h b/drivers/staging/media/sunxi/cedrus/cedrus.h
+index 1d1376383fbe..b2cff832a0fc 100644
+--- a/drivers/staging/media/sunxi/cedrus/cedrus.h
++++ b/drivers/staging/media/sunxi/cedrus/cedrus.h
+@@ -56,6 +56,7 @@ struct cedrus_control {
+ struct cedrus_h264_run {
+ 	const struct v4l2_ctrl_h264_decode_param	*decode_param;
+ 	const struct v4l2_ctrl_h264_pps			*pps;
++	const struct v4l2_ctrl_h264_scaling_matrix	*scaling_matrix;
+ 	const struct v4l2_ctrl_h264_slice_param		*slice_param;
+ 	const struct v4l2_ctrl_h264_sps			*sps;
+ };
+diff --git a/drivers/staging/media/sunxi/cedrus/cedrus_dec.c b/drivers/staging/media/sunxi/cedrus/cedrus_dec.c
+index 152c043a5562..de40298cf4f3 100644
+--- a/drivers/staging/media/sunxi/cedrus/cedrus_dec.c
++++ b/drivers/staging/media/sunxi/cedrus/cedrus_dec.c
+@@ -54,8 +54,12 @@ void cedrus_device_run(void *priv)
+ 			V4L2_CID_MPEG_VIDEO_H264_DECODE_PARAMS);
+ 		run.h264.pps = cedrus_find_control_data(ctx,
+ 			V4L2_CID_MPEG_VIDEO_H264_PPS);
++		run.h264.scaling_matrix = cedrus_find_control_data(ctx,
++			V4L2_CID_MPEG_VIDEO_H264_SCALING_MATRIX);
+ 		run.h264.slice_param = cedrus_find_control_data(ctx,
+ 			V4L2_CID_MPEG_VIDEO_H264_SLICE_PARAMS);
++		run.h264.scaling_matrix = cedrus_find_control_data(ctx,
++			V4L2_CID_MPEG_VIDEO_H264_SCALING_MATRIX);
+ 		run.h264.sps = cedrus_find_control_data(ctx,
+ 			V4L2_CID_MPEG_VIDEO_H264_SPS);
+ 		break;
+diff --git a/drivers/staging/media/sunxi/cedrus/cedrus_h264.c b/drivers/staging/media/sunxi/cedrus/cedrus_h264.c
+index f2a2d86b68d0..f5a171f3ab36 100644
+--- a/drivers/staging/media/sunxi/cedrus/cedrus_h264.c
++++ b/drivers/staging/media/sunxi/cedrus/cedrus_h264.c
+@@ -213,6 +213,24 @@ static void cedrus_write_ref_list1(struct cedrus_ctx *ctx,
+ 			       CEDRUS_SRAM_H264_REF_LIST_1);
+ }
+ 
++static void cedrus_write_scaling_lists(struct cedrus_ctx *ctx,
++				       struct cedrus_run *run)
++{
++	const struct v4l2_ctrl_h264_scaling_matrix *scaling =
++		run->h264.scaling_matrix;
++	struct cedrus_dev *dev = ctx->dev;
++
++	return;
++
++	cedrus_h264_write_sram(dev, CEDRUS_SRAM_H264_SCALING_LIST_8x8,
++			       scaling->scaling_list_8x8,
++			       sizeof(scaling->scaling_list_8x8));
++
++	cedrus_h264_write_sram(dev, CEDRUS_SRAM_H264_SCALING_LIST_4x4,
++			       scaling->scaling_list_4x4,
++			       sizeof(scaling->scaling_list_4x4));
++}
++
+ static void cedrus_set_params(struct cedrus_ctx *ctx,
+ 			      struct cedrus_run *run)
+ {
+@@ -370,6 +388,7 @@ static void cedrus_h264_setup(struct cedrus_ctx *ctx,
+ 	cedrus_write(dev, VE_H264_EXTRA_BUFFER2,
+ 		     (ctx->codec.h264.pic_info_buf_dma - PHYS_OFFSET) + 0x48000);
+ 
++	cedrus_write_scaling_lists(ctx, run);
+ 	cedrus_write_frame_list(ctx, run);
+ 
+ 	cedrus_set_params(ctx, run);
+-- 
+2.18.1
+
