@@ -12,7 +12,8 @@ AUTOTOOLS_AFTER="--prefix=/usr \
                  --with-bugurl=https://github.com/AOSC-Dev/aosc-os-core \
                  --enable-threads --enable-shared --with-pic \
                  --enable-ld --enable-plugins \
-                 --disable-werror --enable-lto --disable-gdb
+                 --disable-werror --enable-lto --disable-gdb \
+                 --enable-deterministic-archives \
                  --build=${ARCH_TARGET[$ARCH]}"
 
 if [[ "${CROSS:-$ARCH}" != "powerpc" && "${CROSS:-$ARCH}" != "mipsel" && "${CROSS:-$ARCH}" != "riscv64" ]]; then
