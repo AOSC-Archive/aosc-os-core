@@ -5,25 +5,25 @@ PKGDES="GNU Compiler Collection (runtime libraries only)"
 
 # The following configuration:
 #
-# 1. Enables support for C, C++, Fortran, "LTO", Go, ObjC, and ObjC++;
-#    a. Mind here, Object C/C++ support is not enabled, we will provide that
-#       in the "llvm" package as they provide a higher quality support for them;
-#    b. Fortran is needed for many mathematical packages, as well as some audio/
-#       video codecs, remove support for fortran if you know what you are doing;
-#    c. "LTO" is not really a language, but it enables GCC to use LTO flags, and
-#       thus provide respective optimizations later;
-#    d. ObjC and ObjC++ is mainly used by the libobjc2 library and what is
-#       dependent on it;
-# 2. Enables shared libraries for linking
-#    (this is probably a good choice to reduce binary sizes of any packages that 
-#    links to GCC runtime libraries);
-# 3. Enables POSIX style threading;
-# 4. Enables linking to system Zlib;
-# 5. Disables libunwind support for exception detection;
-# 6. Enables GNU style C locales (you probably would not want to change this);
-# 7. Disables pre-compiled headers for libstdcxx;
-# 8. Disables libssp linking (not needed);
-# 9. Enables GNU unique object;
+# 1.  Enables support for C, C++, Fortran, "LTO", Go, ObjC, and ObjC++;
+#     a. Mind here, Object C/C++ support is not enabled, we will provide that
+#        in the "llvm" package as they provide a higher quality support for them;
+#     b. Fortran is needed for many mathematical packages, as well as some audio/
+#        video codecs, remove support for fortran if you know what you are doing;
+#     c. "LTO" is not really a language, but it enables GCC to use LTO flags, and
+#        thus provide respective optimizations later;
+#     d. ObjC and ObjC++ is mainly used by the libobjc2 library and what is
+#        dependent on it;
+# 2.  Enables shared libraries for linking
+#     (this is probably a good choice to reduce binary sizes of any packages that
+#     links to GCC runtime libraries);
+# 3.  Enables POSIX style threading;
+# 4.  Enables linking to system Zlib;
+# 5.  Disables libunwind support for exception detection;
+# 6.  Enables GNU style C locales (you probably would not want to change this);
+# 7.  Disables pre-compiled headers for libstdcxx;
+# 8.  Disables libssp linking (not needed);
+# 9.  Enables GNU unique object;
 # 10. Enables linker build ID;
 # 11. Enables LTO support (as mentioned in note 1, section c);
 # 12. Enables isl for Graphite loop optimization;
@@ -36,12 +36,12 @@ PKGDES="GNU Compiler Collection (runtime libraries only)"
 #     you will need a copy of GCC with multilib support to build);
 #     a. AOSC OS uses subsystems to provide binary support for foreign architectures.
 # 17. Enable release level checking;
-# 18. Defaults CXX ABI to C++98 
-#     (this is generally a compatibility measure, you may not change this option,
-#     which WILL result in binary incompatibility with AOSC OS);
-#     #18 is now accepted by GCC 5.2.0 as gcc4-compatible
-# 19. Enables support for GNU indirect function 
+# 18. Enables support for GNU indirect function
 #     (you may disable this by removing "--enable-gnu-indirect-function");
+# 19. Use the new "cxx11/new" for libstdc++, available since GCC 5. The old
+#     "gcc4-compatbile" ABI was used until Core 5.
+# 20. --enable-default-pie enables PIE by default (-fpie or `-fPIE`?).
+# 21. --enable-default-ssp enables --fstack-protector-strong by default.
 
 AUTOTOOLS_AFTER="--prefix=/usr \
                  --libdir=/usr/lib --libexecdir=/usr/lib \
@@ -55,9 +55,11 @@ AUTOTOOLS_AFTER="--prefix=/usr \
                  --with-isl=/usr \
                  --enable-lto --enable-plugin --enable-install-libiberty \
                  --disable-multilib --disable-werror \
-                 --enable-pie \
+                 --disable-pie \
                  --enable-checking=release \
-                 --with-default-libstdcxx-abi=gcc4-compatible"
+                 --enable-libstdcxx-dual-abi --with-default-libstdcxx-abi=new \
+                 --enable-default-pie --enable-default-ssp --enable-bootstrap \
+                 --with-mpfr-lib=$SRCDIR/build/mpfr/src/.libs --with-mpfr-include=$SRCDIR/mpfr/src"
 
 if [[ "${CROSS:-$ARCH}" != "riscv64" && "${CROSS:-$ARCH}" != "powerpc" ]]; then
     AUTOTOOLS_AFTER+=" --enable-languages=c,c++,fortran,lto,go,objc,obj-c++"
@@ -119,22 +121,13 @@ if [[ "${CROSS:-$ARCH}" = riscv* ]]; then
     AUTOTOOLS_AFTER+=" --without-libffi"
 fi
 
-# Use profiledbootstrap.
-# if [[ "${CROSS:-$ARCH}" != "armel" ]]; then
-#    ABMK="profiledbootstrap"
-# fi
-
-ABRPMAUTOPROVONLY=yes
-
-# FIXME: LTO leads to linker/compiler error at libmpxwrapper.
-# /var/lib/abbs/build/tmp.oxb17wrLIQ/gcc-6.1.0/libmpx/mpxwrap/mpx_wrappers.c:35:9:
-#   internal compiler error: in ultimate_transparent_alias_target, at varasm.c:1263
-#     void *p = (void *)malloc (size);
-#           ^
-NOLTO=1
+#ABMK="profiledbootstrap"
+AB_FLAGS_SPECS=0
+AB_FLAGS_O3=1
 
 RECONF=0
 
 PKGBREAK="gcc<=5.2.0-1"
-AB_FLAGS_SPECS=0
-AB_FLAGS_O3=1
+ABRPMAUTOPROVONLY=yes
+
+NOLTO=1
