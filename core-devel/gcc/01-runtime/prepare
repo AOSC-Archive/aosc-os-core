@@ -2,16 +2,12 @@
 export AUTOTOOLS_DEF=""
 
 # Get more architecture-dependent flags.
-#source "$AB"/arch/${CROSS:-$ARCH}.sh
-unset CPPFLAGS CFLAGS CXXFLAGS LDFLAGS
+source "$AB"/arch/${CROSS:-$ARCH}.sh
+
 # GCC only passes CPPFLAGS in some stages.
-#export CPPFLAGS="${CPPFLAGS} -O3 ${CFLAGS_COMMON_ARCH}"
-export CPPFLAGS="-fPIC"
-export LDFLAGS="-fPIC"
+export CPPFLAGS="${CPPFLAGS} -O3 ${CFLAGS_COMMON_ARCH}"
 
 if [ "${CROSS:-$ARCH}" = "arm64" ]; then
 	ln -sv /usr/bin/ld.bfd ld
 	export PATH="$PWD:$PATH"
 fi
-
-./contrib/download_prerequisites

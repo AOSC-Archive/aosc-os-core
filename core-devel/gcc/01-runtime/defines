@@ -55,16 +55,15 @@ AUTOTOOLS_AFTER="--prefix=/usr \
                  --with-isl=/usr \
                  --enable-lto --enable-plugin --enable-install-libiberty \
                  --disable-multilib --disable-werror \
-                 --disable-pie \
+                 --enable-pie \
                  --enable-checking=release \
                  --enable-libstdcxx-dual-abi --with-default-libstdcxx-abi=new \
-                 --enable-default-pie --enable-default-ssp --enable-bootstrap \
-                 --with-mpfr-lib=$SRCDIR/build/mpfr/src/.libs --with-mpfr-include=$SRCDIR/mpfr/src"
+                 --enable-default-pie --enable-default-ssp --enable-bootstrap"
 
 if [[ "${CROSS:-$ARCH}" != "riscv64" && "${CROSS:-$ARCH}" != "powerpc" ]]; then
     AUTOTOOLS_AFTER+=" --enable-languages=c,c++,fortran,lto,go,objc,obj-c++"
 else
-    # When libFFI is not available on this architecture, Go is not available
+    # When libFFI is not available on an architecture, Go is not available.
     AUTOTOOLS_AFTER+=" --enable-languages=c,c++,fortran,lto,objc,obj-c++"
 fi
 
@@ -77,7 +76,7 @@ fi
 # MIPS is not yet happy with GNU hashing style.
 # Q: Really?
 # A: At least our MIPS-II (o32) still couldn't be built with GNU hash style.
-#    It is a ABI incompatibility, not an emulation error...
+#    It is an ABI incompatibility, not an emulation error...
 if [[ "${CROSS:-$ARCH}" != mips32 ]]; then
     AUTOTOOLS_AFTER+=" --with-linker-hash-style=gnu"
 fi
@@ -121,13 +120,12 @@ if [[ "${CROSS:-$ARCH}" = riscv* ]]; then
     AUTOTOOLS_AFTER+=" --without-libffi"
 fi
 
-#ABMK="profiledbootstrap"
+ABMK="profiledbootstrap"
 AB_FLAGS_SPECS=0
 AB_FLAGS_O3=1
+NOLTO=1
 
 RECONF=0
 
 PKGBREAK="gcc<=5.2.0-1"
 ABRPMAUTOPROVONLY=yes
-
-NOLTO=1
