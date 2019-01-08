@@ -12,3 +12,4 @@ AUTOTOOLS_AFTER="--enable-thread-safe --enable-shared \
                  --docdir=/usr/share/doc/mpfr \
                  --build=${ARCH_TARGET[$ARCH]}"
 AB_FLAGS_O3=1
+AB_FLAGS_SPECS=0
