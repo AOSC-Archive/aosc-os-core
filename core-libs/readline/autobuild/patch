@@ -9,6 +9,6 @@ for i in `cat autobuild/patches/series`; do
 done
 
 # Patch levels.
-for i in autobuild/patches/readline70-*; do
+for i in autobuild/patches/readline80-*; do
     patch -p0 < $i
 done

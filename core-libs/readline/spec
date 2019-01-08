@@ -1,2 +1,2 @@
-VER=7.0.005
+VER=8.0
 SRCTBL="https://ftp.gnu.org/gnu/readline/readline-${VER:0:3}.tar.gz"
