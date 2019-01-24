@@ -4,7 +4,7 @@ PKGDEP=glibc
 PKGDES="GNU Multiprecision library"
 
 # Build C++ and static libraries as well.
-AUTOTOOLS_AFTER="--enable-cxx --enable-static \
-                 --build=${ARCH_TARGET[$ARCH]}"
+AUTOTOOLS_AFTER="--enable-cxx --enable-static"
+
 NOSTATIC=no
 AB_FLAGS_O3=1
