@@ -6,42 +6,42 @@ PKGDES="GNU C Library"
 # The following configuration:
 #
 # 1.  Declares that libraries should be installed into /usr/lib instead of /lib64;
-# 2.  Declares bug tracking URL (should not be changed unless you are building a derivative);
+# 2.  Declares our bug tracking URL;
 # 3.  Enables add-on support;
-# 4.  Enables obsolete RPC (Remote Procedural Call) support  
-#     (--disable-obsolete-rpc to disable such support, if you know what you are doing);
-# 5.  Declares that Kernel verion 3.4.0 is the minimum accepted
+# 4.  Declares that Kernel verion 3.4.0 is the minimum accepted
 #     (you may raise the version number as you like);
-# 6.  Enables "bind now" (dynamic loader) support;
-# 7.  Disables profiling support 
+# 5.  Enables lock elision (essential for GUILE, and many others that is lock-sensitive);
+# 6.  Enables deprecated NSL and RPC headers (<= 2.14) for compatibility;
+# 7.  Enables obsolete RPC (Remote Procedural Call) support for compatibility;
+# 8.  Ensures that static libraries are installed for development purposes;
+# 9.  Enables tunables (allows for altering of runtime libraries);
+# 10. Disables multiple architecture support (multiarch is not supported in AOSC OS);
+# 11. Disables profiling support
 #     (you may enable, using --enable-profile to your need, however this is not realistic in
 #     a "Core" environment);
-# 8.  Enables stackguard randomization for extra security;
-# 9.  Enables stack protector (libssp);
-# 10. Enables tunables (allows for altering of runtime libraries);
-# 10. Enables lock elision (essential for GUILE, and many others that is lock-sensitive);
-# 11. Enables multiple architecture support 
-#     (mainly used to distinguish among different builds, multiarch is not supported);
 # 12. Disables "warning as error";
-# 13. Ensure that static libraries are installed for development purposes;
-# 14. Enable deprecated NSL and RPC headers (<= 2.14) for compatibility;
+#
+# For architectures other than PowerPC (32-bit), also:
+#
+# 13. Enables "bind now" (disables lazy binding) for extra security;
+# 14. Enables stackguard randomization for extra security;
+# 15. Enables stack protector for extra security.
 
 AUTOTOOLS_AFTER="--libexecdir=/usr/lib \
-                 --with-headers=/usr/include \
+
                  --with-bugurl=https://github.com/AOSC-Dev/aosc-os-core \
+
                  --enable-add-ons \
-                 --enable-obsolete-rpc \
                  --enable-kernel=3.4.0 \
-                 --disable-profile \
-                 --enable-tunables \
                  --enable-lock-elision \
-                 --enable-multi-arch \
-                 --disable-werror \
-                 --enable-static \
-                 --disable-multi-arch \
-                 --with-__thread \
                  --enable-obsolete-nsl \
-                 --enable-obsolete-rpc"
+                 --enable-obsolete-rpc \
+                 --enable-static \
+                 --enable-tunables \
+
+                 --disable-multi-arch \
+                 --disable-profile \
+                 --disable-werror"
 
 if [[ "${CROSS:-$ARCH}" != "powerpc" ]]; then
     AUTOTOOLS_AFTER+=" --enable-bind-now \
