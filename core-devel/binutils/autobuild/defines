@@ -7,14 +7,36 @@ NOSTATIC=no
 NOLTO=yes
 AB_FLAGS_O3=1
 
-AUTOTOOLS_AFTER="--prefix=/usr \
-                 --with-lib-path=/usr/lib \
-                 --with-bugurl=https://github.com/AOSC-Dev/aosc-os-core \
-                 --enable-threads --enable-shared --with-pic \
-                 --enable-ld --enable-plugins \
-                 --disable-werror --enable-lto --disable-gdb \
+# The following configuration:
+#
+# 1.  Sets default library search path to /usr/lib;
+# 2.  Enables the use of PIC;
+# 3.  Sets our bug tracking URL;
+# 4.  Tells ar and ranlib to use zero for timestamps and uids/gids by default (-D)
+#     (this helps with reproducible builds);
+# 5.  Enables the build of ld;
+# 6.  Enables support for Link-Time Optimization;
+# 7.  Enables support for plugins;
+# 8.  Enables multi-threaded linking for gold linker;
+# 9.  Disables the building of GDB (this is splitted into another package);
+# 10. Disables warning as errors;
+#
+# For architectures other than PowerPC (32-bits) and RISC-V:
+#
+# 11. Enables gold linker and sets it as the default linker.
+
+AUTOTOOLS_AFTER="--with-lib-path=/usr/lib \
+                 --with-pic \
+                 --with-bugurl=https://github.com/AOSC-Dev/aosc-os-core
+
                  --enable-deterministic-archives \
-                 --build=${ARCH_TARGET[$ARCH]}"
+                 --enable-ld \
+                 --enable-lto \
+                 --enable-plugins \
+                 --enable-threads \
+
+                 --disable-gdb \
+                 --disable-werror"
 
 if [[ "${CROSS:-$ARCH}" != "powerpc" && "${CROSS:-$ARCH}" != "mipsel" && "${CROSS:-$ARCH}" != "riscv64" ]]; then
     AUTOTOOLS_AFTER+=" --enable-gold=default"
