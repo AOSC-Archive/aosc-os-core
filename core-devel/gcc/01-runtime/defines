@@ -5,7 +5,36 @@ PKGDES="GNU Compiler Collection (runtime libraries only)"
 
 # The following configuration:
 #
-# 1.  Enables support for C, C++, Fortran, "LTO", Go, ObjC, and ObjC++;
+# 1. Redirect libexec directory to /usr/lib;
+# 2.  Use the new "cxx11/new" for libstdc++, available since GCC 5. The old
+#     "gcc4-compatbile" ABI was used until Core 5.
+# 3.  Enables linking to system Zlib;
+# 4.  Sets our bug tracking URL;
+# 5.  Enables release level checking;
+# 6.  Enables GNU style C locales (you probably would not want to change this);
+# 7.  Enables the use of __cxa_atexit rather than atexit for C++;
+# 8.  Enables -fpie and -fPIE by default for hardening;
+# 9.  Enables -fstack-protector-strong by default for hardening;
+# 10. Enables support for GNU indirect function;
+# 11. Enables GNU unique object for C++;
+# 12. Enables libiberty (static library) installation;
+# 13. Enables Dual ABI (C++98 / C++11) support;
+# 14. Enables linker build ID;
+# 15. Enables LTO support;
+# 16. Enables plugin support;
+# 17. Enables POSIX style threading;
+# 18. Disables libssp linking (not needed, provided by Glibc);
+# 19. Disables pre-compiled headers for libstdcxx;
+# 20. Disables internal libunwind support for exception detection;
+# 21. Disables multilib support
+#     (you may remove "--disable-multilib" to enable the support for it, however
+#     you will need a copy of GCC with multilib support to build);
+#     a. AOSC OS uses subsystems to provide binary support for foreign architectures.
+# 22. Disables warning as errors;
+#
+# For language supports:
+#
+# 23. Enables support for C, C++, Fortran, "LTO", Go, ObjC, and ObjC++;
 #     a. Mind here, Object C/C++ support is not enabled, we will provide that
 #        in the "llvm" package as they provide a higher quality support for them;
 #     b. Fortran is needed for many mathematical packages, as well as some audio/
@@ -14,51 +43,40 @@ PKGDES="GNU Compiler Collection (runtime libraries only)"
 #        thus provide respective optimizations later;
 #     d. ObjC and ObjC++ is mainly used by the libobjc2 library and what is
 #        dependent on it;
-# 2.  Enables shared libraries for linking
-#     (this is probably a good choice to reduce binary sizes of any packages that
-#     links to GCC runtime libraries);
-# 3.  Enables POSIX style threading;
-# 4.  Enables linking to system Zlib;
-# 5.  Disables libunwind support for exception detection;
-# 6.  Enables GNU style C locales (you probably would not want to change this);
-# 7.  Disables pre-compiled headers for libstdcxx;
-# 8.  Disables libssp linking (not needed);
-# 9.  Enables GNU unique object;
-# 10. Enables linker build ID;
-# 11. Enables LTO support (as mentioned in note 1, section c);
-# 12. Enables isl for Graphite loop optimization;
-# 13. Enables plugin support;
-# 14. Enables libiberty installation
-#     (you may disable "--enable-install-libiberty" if you really feel the urge...);
-# 15. Enables GNU style linker hash;
-# 16. Disables multilib support 
-#     (you may remove "--disable-multilib" to enable the support for it, however
-#     you will need a copy of GCC with multilib support to build);
-#     a. AOSC OS uses subsystems to provide binary support for foreign architectures.
-# 17. Enable release level checking;
-# 18. Enables support for GNU indirect function
-#     (you may disable this by removing "--enable-gnu-indirect-function");
-# 19. Use the new "cxx11/new" for libstdc++, available since GCC 5. The old
-#     "gcc4-compatbile" ABI was used until Core 5.
-# 20. --enable-default-pie enables PIE by default (-fpie or `-fPIE`?).
-# 21. --enable-default-ssp enables --fstack-protector-strong by default.
+#     e. Go is not built on riscv64 and powerpc platforms because of
+#        incompatibility;
+#
+# For architectures other than mips64{,r2}el:
+#
+# 24. Enables GNU style linker hash.
+#
+# Other platform specific configurations are specified below.
 
-AUTOTOOLS_AFTER="--prefix=/usr \
-                 --libdir=/usr/lib --libexecdir=/usr/lib \
-                 --mandir=/usr/share/man --infodir=/usr/share/info \
-                 --with-bugurl=https://github.com/AOSC-Dev/aosc-os-core \
-                 --enable-shared --enable-threads=posix \
-                 --with-system-zlib --enable-gnu-indirect-function --enable-__cxa_atexit \
-                 --disable-libunwind-exceptions --enable-clocale=gnu \
-                 --disable-libstdcxx-pch --disable-libssp \
-                 --enable-gnu-unique-object --enable-linker-build-id \
-                 --with-isl=/usr \
-                 --enable-lto --enable-plugin --enable-install-libiberty \
-                 --disable-multilib --disable-werror \
-                 --enable-pie \
+AUTOTOOLS_AFTER="--libexecdir=/usr/lib \
+
+                 --with-default-libstdcxx-abi=new \
+                 --with-system-zlib \
+                 --with-bugurl=https://github.com/AOSC-Dev/aosc-os-core
+
                  --enable-checking=release \
-                 --enable-libstdcxx-dual-abi --with-default-libstdcxx-abi=new \
-                 --enable-default-pie --enable-default-ssp --enable-bootstrap"
+                 --enable-clocale=gnu \
+                 --enable-__cxa_atexit \
+                 --enable-default-pie \
+                 --enable-default-ssp \
+                 --enable-gnu-indirect-function \
+                 --enable-gnu-unique-object \
+                 --enable-install-libiberty \
+                 --enable-libstdcxx-dual-abi \
+                 --enable-linker-build-id \
+                 --enable-lto \
+                 --enable-plugin \
+                 --enable-threads=posix \
+
+                 --disable-libssp \
+                 --disable-libstdcxx-pch \
+                 --disable-libunwind-exceptions \
+                 --disable-multilib \
+                 --disable-werror"
 
 if [[ "${CROSS:-$ARCH}" != "riscv64" && "${CROSS:-$ARCH}" != "powerpc" ]]; then
     AUTOTOOLS_AFTER+=" --enable-languages=c,c++,fortran,lto,go,objc,obj-c++"
