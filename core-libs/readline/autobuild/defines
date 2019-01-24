@@ -7,10 +7,11 @@ ABSHADOW=no
 
 # The following configuration:
 #
-# 1. Enables linking with Curses (NCurses in this case), disable if you are cool with
-#    no UNIX shell;
+# 1. Enables linking with Curses (NCurses in this case);
 # 2. Enables multibyte characters support;
-AUTOTOOLS_AFTER="--with-curses --enable-multibyte --enable-shared"
+AUTOTOOLS_AFTER="--with-curses --enable-multibyte"
+
+# This ensures that wide-character version of NCurses is linked
 MAKE_AFTER="SHLIB_LIBS=-lncursesw"
 
 # Cross parameters.
