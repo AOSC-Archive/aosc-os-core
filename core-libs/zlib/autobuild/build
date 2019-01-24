@@ -1,3 +1,6 @@
+# Note: zlib does not use a standard autotools configure script
 ./configure --prefix=/usr
-make $ABMK $MAKE_AFTER
-make install DESTDIR="$PKGDIR" $MAKE_AFTER
+
+# The following lines are copied from autobuild3/build/10-autotools.sh
+make $MAKE_AFTER
+make install BUILDROOT=$PKGDIR DESTDIR=$PKGDIR $MAKE_AFTER
