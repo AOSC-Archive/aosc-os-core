@@ -3,13 +3,12 @@ PKGSEC=libs
 PKGDEP="gmp glibc"
 PKGDES="Functions for multiple precision math"
 
-# Configuration:
+# The following configuration:
 #
-# 1. Enables threaded safety;
-# 2. Enables shared libraries (DO NOT disable, you will need this for shared GCC build);
-# 3. Declares documentation directory;
-AUTOTOOLS_AFTER="--enable-thread-safe --enable-shared \
-                 --docdir=/usr/share/doc/mpfr \
-                 --build=${ARCH_TARGET[$ARCH]}"
+# 1. Declares documentation directory (in a different position);
+# 2. Enables threaded safety;
+
+AUTOTOOLS_AFTER="--docdir=/usr/share/doc/mpfr --enable-thread-safe"
+
 AB_FLAGS_O3=1
 AB_FLAGS_SPECS=0
