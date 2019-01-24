@@ -1,3 +1,18 @@
+# "Many applications still expect the linker to be able to find non-wide-
+# character Ncurses libraries. Trick such applications into linking with wide-
+# character libraries by means of symlinks and linker scripts"
+# -- Linux From Scratch, 6.24
+for lib in ncurses ncurses++ form panel menu; do
+    echo "INPUT(-l${lib}w)" > "$PKGDIR"/usr/lib/lib${lib}.so
+    ln -s ${lib}w.pc "$PKGDIR"/usr/lib/pkgconfig/${lib}.pc
+done
+
+# "... make sure that old applications that look for -lcurses at build time are
+# still buildable"
+# -- Linux From Scratch, 6.24
+echo "INPUT(-lncursesw)" > "$PKGDIR"/usr/lib/libcursesw.so
+ln -s libncurses.so "$PKGDIR"/usr/lib/libcurses.so
+
 # Contigency: add symlinks for system to even survive the bump
 ln -sv libformw.so.6.1		"$PKGDIR"/usr/lib/libform.so.5
 ln -sv libpanelw.so.6.1		"$PKGDIR"/usr/lib/libpanel.so.5
