@@ -1,6 +1,2 @@
-VER=4.20rc1
-REL=2
-# For stable versions
-# SRCTBL="http://www.kernel.org/pub/linux/kernel/v${VER%%.*}.x/linux-$VER.tar.xz"
-
-SRCTBL="https://git.kernel.org/torvalds/t/linux-4.20-rc1.tar.gz"
+VER=4.20
+SRCTBL="http://www.kernel.org/pub/linux/kernel/v${VER%%.*}.x/linux-$VER.tar.xz"
