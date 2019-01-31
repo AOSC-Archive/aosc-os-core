@@ -9,18 +9,20 @@ RPMEXTRAPROVIDE="Provides: libform.so.5()(64bit) libformw.so.5()(64bit) libmenu.
 #
 # 1.  Enables C++ bindings;
 # 2.  Enables C++ shared bindings (remove if #6 is not needed);
-# 3.  Enables building of static library for development use
-# 4.  Enables building of shared library too
-# 5.  Disables Ada support (our GCC does not include such support);
-# 6.  Disables debug support (will be stripped out anyways);
-# 7.  Disables GPM support;
-# 8.  Enables 256-color support;
-# 9.  Enables pkg-config .pc files installing (for later needs, like NetworkManager);
-# 10. Enables support for wide characters (CJK, you know);
+# 3.  Enables building of static library for development use;
+# 4.  Ensures that pkg-config files are installed under /usr/lib/pkgconfig;
+# 5.  Enables building of shared library too;
+# 6.  Disables Ada support (our GCC does not include such support);
+# 7.  Disables debug support (will be stripped out anyways);
+# 8.  Disables GPM support;
+# 9.  Enables 256-color support;
+# 10. Enables pkg-config .pc files installing (for later needs, like NetworkManager);
+# 11. Enables support for wide characters (CJK, you know);
 
 AUTOTOOLS_AFTER="--with-cxx-binding \
                  --with-cxx-shared \
                  --with-normal \
+                 --with-pkg-config-libdir=/usr/lib/pkgconfig
                  --with-shared \
 
                  --without-ada \
