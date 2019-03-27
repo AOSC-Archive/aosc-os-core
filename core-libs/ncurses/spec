@@ -1,2 +1,2 @@
-VER=6.1+20181215
+VER=6.1+20190323
 SRCTBL="http://invisible-mirror.net/archives/ncurses/current/ncurses-${VER/+/-}.tgz"
