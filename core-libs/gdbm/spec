@@ -1,2 +1,0 @@
-VER=1.14.1
-SRCTBL="https://ftp.gnu.org/gnu/gdbm/gdbm-$VER.tar.gz"

@@ -1,4 +1,5 @@
-ln -sv libisl.so.19 "$PKGDIR"/usr/lib/libisl.so.15
+ln -sv libisl.so.21 "$PKGDIR"/usr/lib/libisl.so.15
+ln -sv libisl.so.21 "$PKGDIR"/usr/lib/libisl.so.19
 
 install -dm755 "$PKGDIR"/usr/share/gdb/auto-load/usr/lib/
 mv "$PKGDIR"/usr/lib/libisl.so.*-gdb.py \

@@ -1,2 +1,3 @@
-VER=6.1+20180407
+VER=6.1+20190413
 SRCTBL="http://invisible-mirror.net/archives/ncurses/current/ncurses-${VER/+/-}.tgz"
+CHKSUM="sha256::88fd7adbaf46eab6c3e9b69fda112f858d8dbff00d7a044314926db781bd8737"

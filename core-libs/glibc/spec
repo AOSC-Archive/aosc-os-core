@@ -1,4 +1,3 @@
-VER=2.27
-REL=2
+VER=2.29
 GITSRC="https://sourceware.org/git/glibc.git"
-GITCO="4a871574351e40d298d65949426a502c0ecaffcc"
+GITCO="dcd2b97dd1d695445d45beb4daa815cfe06691dd"

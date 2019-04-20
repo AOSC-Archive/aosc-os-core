@@ -1,2 +1,3 @@
-VER=0.19
+VER=0.21
 SRCTBL="http://isl.gforge.inria.fr/isl-$VER.tar.xz"
+CHKSUM="sha256::777058852a3db9500954361e294881214f6ecd4b594c00da5eee974cd6a54960"

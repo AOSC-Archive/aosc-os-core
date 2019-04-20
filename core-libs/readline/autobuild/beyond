@@ -1,5 +1,5 @@
 # Remove .old libraries
 rm -f "$PKGDIR"/usr/lib/*.old
 
-ln -sv libhistory.so.7 "$PKGDIR"/usr/lib/libhistory.so.6
-ln -sv libreadline.so.7 "$PKGDIR"/usr/lib/libreadline.so.6
+ln -sv libhistory.so.8 "$PKGDIR"/usr/lib/libhistory.so.7
+ln -sv libreadline.so.8 "$PKGDIR"/usr/lib/libreadline.so.7

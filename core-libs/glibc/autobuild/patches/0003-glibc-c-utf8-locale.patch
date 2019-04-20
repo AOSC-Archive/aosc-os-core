@@ -1,3 +1,19 @@
+Short description: Add C.UTF-8 support.
+Author(s): Fedora glibc team <glibc@lists.fedoraproject.org>
+Origin: PATCH
+Upstream status: not-submitted
+
+This patch needs to upstream as part of Carlos O'Donell
+<carlos@redhat.com>'s work on enabling upstream C.UTF-8 support. This
+work is currently blocked on cleaning up the test results to prove that
+full code-point sorting is working as intended.
+
+Note that this patch does not provide full code-point sorting as
+expected.
+
+This patch needs to upstream as soon as possible since it would be nice
+to have this in F29 and fixed.
+
 From 2eda7b462b415105f5a05c1323372d4e39d46439 Mon Sep 17 00:00:00 2001
 From: Mike FABIAN <mfabian@redhat.com>
 Date: Mon, 10 Aug 2015 15:58:12 +0200
