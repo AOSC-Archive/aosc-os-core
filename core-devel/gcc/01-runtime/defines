@@ -120,7 +120,10 @@ if [[ "${CROSS:-$ARCH}" = riscv* ]]; then
     AUTOTOOLS_AFTER+=" --without-libffi"
 fi
 
-ABMK="profiledbootstrap"
+# FIXME: random segmentation faults during build.
+if [[ "${CROSS:-$ARCH}" != "i586" ]]; then
+    ABMK="profiledbootstrap"
+fi
 AB_FLAGS_SPECS=0
 AB_FLAGS_O3=1
 NOLTO=1
