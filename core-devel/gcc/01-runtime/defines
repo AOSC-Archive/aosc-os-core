@@ -105,7 +105,7 @@ fi
 
 # PowerPC64 specific.
 if [[ "${CROSS:-$ARCH}" = "ppc64" ]]; then
-    AUTOTOOLS_AFTER+=" --with-cpu=620 --with-tune=G5 \
+    AUTOTOOLS_AFTER+=" --with-cpu=G5 --with-tune=G5 \
                        --with-long-double-128 --enable-secureplt"
 fi
 
