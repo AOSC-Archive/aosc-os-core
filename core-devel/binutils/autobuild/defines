@@ -14,14 +14,11 @@ AUTOTOOLS_AFTER="--prefix=/usr \
                  --enable-ld --enable-plugins \
                  --disable-werror --enable-lto --disable-gdb \
                  --enable-deterministic-archives \
+                 --enable-64-bit-bfd \
                  --build=${ARCH_TARGET[$ARCH]}"
 
 if [[ "${CROSS:-$ARCH}" != "powerpc" && "${CROSS:-$ARCH}" != "mipsel" && "${CROSS:-$ARCH}" != "riscv64" ]]; then
     AUTOTOOLS_AFTER+=" --enable-gold=default"
-fi
-
-if [[ "${CROSS:-$ARCH}" = *64 ]]; then
-	AUTOTOOLS_AFTER+=" --enable-64-bit-bfd"
 fi
 
 alias BUILD_READY='make configure-host'
