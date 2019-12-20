@@ -67,12 +67,6 @@ else
     AUTOTOOLS_AFTER+=" --enable-languages=c,c++,fortran,lto,objc,obj-c++"
 fi
 
-# Cross.
-if [[ "${CROSS:-$ARCH}" = *cross* ]]; then
-    AUTOTOOLS_AFTER+=" --host=${ARCH_TARGET[$ARCH]} \
-                       --target=${ARCH_TARGET[$ARCH]}"
-fi
-
 # MIPS is not yet happy with GNU hashing style.
 # Q: Really?
 # A: At least our MIPS-II (o32) still couldn't be built with GNU hash style.

@@ -1,15 +1,12 @@
-# Autotools...
-
+abinfo "Removing installed files, rebuild package manually..."
 rm -rf "$PKGDIR"
 
-# Runtime libraries installation.
-
+abinfo "Installing runtime libraries..."
 cd build
-
 make -C "${ARCH_TARGET[$ARCH]}"/libgcc install-shared DESTDIR="$PKGDIR"
 rm `find "$PKGDIR" -name 'libgcc_eh.a'`
 
-# Common runtimes.
+# Common runtime libraries.
 RTLIBS="libatomic libgfortran libgomp libquadmath libstdc++-v3/src"
 
 # libitm and sanitizer are not available for RISC-V
@@ -58,5 +55,5 @@ done
 
 cd "$SRCDIR"
 
-# Dumb RPM is confused with all those libraries.
+abinfo "Set execution bits on all runtime libraries..."
 chmod +x "$PKGDIR"/usr/lib{,32,64}/lib*.so*

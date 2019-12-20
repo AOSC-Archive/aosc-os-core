@@ -3,14 +3,15 @@
 # flags are enabled.
 #
 # Remove if you need to prohibit users/developers from using LTO.
+abinfo "Installing/Registering BFD plugins..."
 mkdir -p "$PKGDIR"/usr/lib/bfd-plugins
 ln -sv /usr/lib/gcc/${ARCH_TARGET[$ARCH]}/$PKGVER/liblto_plugin.so \
        "$PKGDIR"/usr/lib/bfd-plugins/liblto_plugin.so
 
-# FHS expects "cpp" to be in /usr/lib.
+abinfo "Creating symlink - FHS expects "cpp" to be in /usr/lib..."
 ln -sv /usr/bin/cpp "$PKGDIR"/usr/lib/cpp
 
-# mysteriously this doesn't work for riscv64
+# Mysteriously this doesn't work for riscv64
 if [[ "${CROSS:-$ARCH}" != "riscv64" ]]; then
     # Misplaced file that confuses ldconfig(8), provided by GLibc.
     mkdir -pv "$PKGDIR"/usr/share/gdb/auto-load/usr/lib
@@ -22,7 +23,7 @@ if [[ "${CROSS:-$ARCH}" != "riscv64" ]]; then
     fi
 fi
 
-# Remove files in gcc-runtime.
+abinfo "Removing files in gcc-runtime..."
 RTLIBS="asan lsan ubsan vtv itm quadmath atomic gcc_s stdc++ gfortran gomp \
         gomp-plugin-host_nonshm objc go"
 
