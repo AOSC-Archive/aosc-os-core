@@ -32,10 +32,12 @@ case ${CROSS:-$ARCH} in
 	(arm*)	;;
 	(*n32*)
 		ln -sv usr/lib "$PKGDIR"/lib32
-		ln -sv lib "$PKGDIR"/usr/lib32;;
+		ln -sv lib "$PKGDIR"/usr/lib32
+		ln -sv ../lib "$PKGDIR"/usr/lib/32;;
 	(*)
 		ln -sv usr/lib "$PKGDIR"/lib64
-		ln -sv lib "$PKGDIR"/usr/lib64;;
+		ln -sv lib "$PKGDIR"/usr/lib64
+		ln -sv ../lib "$PKGDIR"/usr/lib/64;;
 esac
 ln -sv usr/bin "$PKGDIR"/bin
 ln -sv usr/bin "$PKGDIR"/sbin
