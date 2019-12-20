@@ -2,9 +2,10 @@
 export OLDARCH=$ARCH
 unset ARCH
 
-# Simply make, build and install.
-mkdir -p "$PKGDIR"/usr/include
+abinfo "Preparing directories..."
+mkdir -pv "$PKGDIR"/usr/include
 
+abinfo "Building and installing headers..."
 make mrproper
 make headers_check
 make INSTALL_HDR_PATH=dest headers_install
