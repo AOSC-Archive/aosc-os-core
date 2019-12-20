@@ -1,5 +1,4 @@
-# Nothing special here...
-
+abinfo "Configuring Perl..."
 ./Configure -des -Dusethreads -Duseshrplib \
             -Dprefix=/usr -Dvendorprefix=/usr \
             -Dman1dir=/usr/share/man/man1 \
@@ -20,27 +19,33 @@
             -Dldflags="${LDFLAGS}" \
             -Doptimize="${CFLAGS}"
 
+abinfo "Building and installing Perl..."
 make
 make install DESTDIR="$PKGDIR"
 
+abinfo "Installing makepkg templates..."
 for template in "$SRCDIR"/*.template; do
-    install -Dm644 "$template" "$PKGDIR"/usr/share/makepkg-template/"${template##*/}"
+    install -Dvm644 "$template" \
+        "$PKGDIR"/usr/share/makepkg-template/"${template##*/}"
 done
 
 # From Arch Linux:
 
 ### CPAN Settings ###
 # Set CPAN default config to use the site directories.
+abinfo "Setting default CPAN directories..."
 sed -e '/(makepl_arg =>/   s/""/"INSTALLDIRS=site"/' \
     -e '/(mbuildpl_arg =>/ s/""/"installdirs=site"/' \
     -i "$PKGDIR"/usr/share/perl5/core_perl/CPAN/FirstTime.pm
 
 # Add the dirs so new installs will already have them in PATH once they
 # install their first perl programm
-install -d -m755 "$PKGDIR"/usr/bin/vendor_perl
-install -d -m755 "$PKGDIR"/usr/bin/site_perl
+abinfo "Creating directories of vendor and site executables..."
+install -dvm755 "$PKGDIR"/usr/bin/{vendor,site}_perl
 
-(cd "$PKGDIR"/usr/bin/core_perl; ln -sf c2ph pstruct;)
+abinfo "Creating symlinks for core executables..."
+(cd "$PKGDIR"/usr/bin/core_perl; ln -sfv c2ph pstruct;)
 
+abinfo "Purging metadata files..."
 find "$PKGDIR" -name perllocal.pod -delete
 find "$PKGDIR" -name .packlist -delete
