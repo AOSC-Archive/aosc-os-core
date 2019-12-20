@@ -3,10 +3,4 @@ PKGDEP=glibc
 PKGDES="System V Release 4.0 curses emulation library"
 PKGSEC=libs
 
-RPMEXTRAPROVIDE="Provides: libform.so.5()(64bit) libformw.so.5()(64bit) libmenu.so.5()(64bit) libmenuw.so.5()(64bit) libncurses++w.so.5()(64bit) libncurses.so.5()(64bit) libncursesw.so.5()(64bit) libpanel.so.5()(64bit) libpanelw.so.5()(64bit)"
-
-if [[ "${CROSS:-$ARCH}" = *cross* ]]; then
-    AUTOTOOLS_AFTER+=" --host=${ARCH_TARGET[$ARCH]} --target=${ARCH_TARGET[$ARCH]}"
-fi
-
-NOPARALLEL=yes
+NOPARALLEL=1

@@ -1,4 +1,4 @@
-# Contigency: add symlinks for system to even survive the bump
+abinfo "Creating version 5 symlinks..."
 ln -sv libformw.so.6.1		"$PKGDIR"/usr/lib/libform.so.5
 ln -sv libpanelw.so.6.1		"$PKGDIR"/usr/lib/libpanel.so.5
 ln -sv libpanelw.so.6.1		"$PKGDIR"/usr/lib/libpanelw.so.5
