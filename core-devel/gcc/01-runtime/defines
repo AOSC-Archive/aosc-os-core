@@ -61,10 +61,10 @@ AUTOTOOLS_AFTER="--prefix=/usr \
                  --enable-default-pie --enable-default-ssp --enable-bootstrap"
 
 if [[ "${CROSS:-$ARCH}" != "riscv64" && "${CROSS:-$ARCH}" != "powerpc" ]]; then
-    AUTOTOOLS_AFTER+=" --enable-languages=c,c++,fortran,lto,go,objc,obj-c++"
+    AUTOTOOLS_AFTER+=" --enable-languages=c,c++,fortran,lto,go,objc,obj-c++,d"
 else
     # When libFFI is not available on an architecture, Go is not available.
-    AUTOTOOLS_AFTER+=" --enable-languages=c,c++,fortran,lto,objc,obj-c++"
+    AUTOTOOLS_AFTER+=" --enable-languages=c,c++,fortran,lto,objc,obj-c++,d"
 fi
 
 # MIPS is not yet happy with GNU hashing style.
