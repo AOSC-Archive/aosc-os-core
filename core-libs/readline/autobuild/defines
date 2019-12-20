@@ -3,8 +3,6 @@ PKGSEC=libs
 PKGDEP="glibc ncurses"
 PKGDES="GNU readline library"
 
-ABSHADOW=no
-
 # The following configuration:
 #
 # 1. Enables linking with Curses (NCurses in this case), disable if you are cool with
@@ -13,9 +11,5 @@ ABSHADOW=no
 AUTOTOOLS_AFTER="--with-curses --enable-multibyte --enable-shared"
 MAKE_AFTER="SHLIB_LIBS=-lncursesw"
 
-# Cross parameters.
-if [[ "${CROSS:-$ARCH}" = *cross* ]]; then
-    AUTOTOOLS_AFTER+=" --host=${ARCH_TARGET[$ARCH]}"
-fi
-
-RECONF=no
+RECONF=0
+ABSHADOW=0
