@@ -4,8 +4,8 @@ export PATH="$SRCDIR:$PATH"
 git clone --depth 1 -b v"$LOCALEGENVER" \
     https://github.com/AOSC-Dev/locale-gen
 
-git clone --depth 1 -b packaging \
-    https://github.com/AOSC-Dev/locale-gen localepack
+mkdir -p localepack
+cp autobuild/locale-gen-pack localepack/
 
 # MIPS64el specific.
 if [[ "${CROSS:-$ARCH}" = "mips64el" ]]; then
