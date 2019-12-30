@@ -17,6 +17,10 @@ AUTOTOOLS_AFTER="--prefix=/usr \
                  --enable-64-bit-bfd \
                  --build=${ARCH_TARGET[$ARCH]}"
 
+if [[ "${CROSS:-$ARCH}" != "powerpc" && "${CROSS:-$ARCH}" != "mipsel" && "${CROSS:-$ARCH}" != "riscv64" ]]; then
+    AUTOTOOLS_AFTER+=" --enable-gold=yes"
+fi
+
 alias BUILD_READY='make configure-host'
 MAKE_AFTER="prefix=$PKGDIR/usr tooldir=$PKGDIR/usr BUILDROOT= DESTDIR="
 
