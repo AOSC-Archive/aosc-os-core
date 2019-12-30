@@ -5,7 +5,7 @@ git clone --depth 1 -b v"$LOCALEGENVER" \
     https://github.com/AOSC-Dev/locale-gen
 
 mkdir -p localepack
-cp autobuild/locale-gen-pack localepack/
+cp autobuild/locale-gen-pack localepack/locale-gen
 
 # MIPS64el specific.
 if [[ "${CROSS:-$ARCH}" = "mips64el" ]]; then
