@@ -52,6 +52,7 @@ cat > /etc/crypttab << EOF
 #
 # <name>	<device>	<password>	<options>
 EOF
+fi
 
 echo -e "
 
